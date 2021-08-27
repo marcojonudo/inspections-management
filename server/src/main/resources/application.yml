@@ -1,3 +1,108 @@
 micronaut:
     application:
         name: inspectionsManagement
+    server:
+        port: 8096
+        cors:
+            enabled: true
+    router:
+        static-resources:
+            default:
+                mapping: /**
+                paths: [classpath:static]
+            swagger:
+                paths: classpath:META-INF/swagger
+                mapping: /swagger/**
+            redoc:
+                paths: classpath:META-INF/swagger/views/redoc
+                mapping: /redoc/**
+            rapidoc:
+                paths: classpath:META-INF/swagger/views/rapidoc
+                mapping: /rapidoc/**
+            swagger-ui:
+                paths: classpath:META-INF/swagger/views/swagger-ui
+                mapping: /swagger-ui/**
+
+endpoints:
+    beans:
+        enabled: true
+        sensitive: false
+    info:
+        enabled: true
+        sensitive: false
+    health:
+        enabled: true
+        sensitive: false
+    refresh:
+        enabled: true
+        sensitive: false
+    routes:
+        enabled: true
+        sensitive: false
+    loggers:
+        enabled: true
+        sensitive: false
+
+host:
+    ip: ${HOST_IP:localhost}
+    local-mysql-port: ${MYSQL_PORT:3306}
+
+database:
+    credentials:
+        username: root
+        password: root
+
+hibernate:
+    hbm2ddl:
+        auto: 'none'
+
+dataSource:
+    dbCreate: validate
+    driverClassName: com.mysql.jdbc.Driver
+    dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+    url: jdbc:mysql://${host.ip}:${host.local-mysql-port}/inspection?useSSL=false&serverTimezone=Europe/Madrid
+    username: ${database.credentials.username}
+    password: ${database.credentials.password}
+    properties:
+        initialSize: 1
+        maxActive: 1
+        minIdle: 1
+        maxIdle: 1
+        testOnBorrow: true
+        validationQuery: SELECT 1
+        validationInterval: 15000
+    logSql: true
+
+#dataSources:
+#    fviberi:
+#        dbCreate: validate
+#        driverClassName: com.mysql.jdbc.Driver
+#        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+#        url: jdbc:mysql://${host.ip}:${host.local-mysql-port}/fviberi?useSSL=false
+#        username: ${database.credentials.username}
+#        password: ${database.credentials.password}
+#        properties:
+#            initialSize: 1
+#            maxActive: 1
+#            minIdle: 1
+#            maxIdle: 1
+#            testOnBorrow: true
+#            validationQuery: SELECT 1
+#            validationInterval: 15000
+#        logSql: true
+#    schedules:
+#        dbCreate: validate
+#        driverClassName: com.mysql.jdbc.Driver
+#        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+#        url: jdbc:mysql://${host.ip}:${host.local-mysql-port}/schedules?useSSL=false
+#        username: ${database.credentials.username}
+#        password: ${database.credentials.password}
+#        properties:
+#            initialSize: 1
+#            maxActive: 1
+#            minIdle: 1
+#            maxIdle: 1
+#            testOnBorrow: true
+#            validationQuery: SELECT 1
+#            validationInterval: 15000
+#        logSql: true
