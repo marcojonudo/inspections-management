@@ -1,0 +1,7 @@
+database:
+    credentials:
+        username: inspections
+        password: gDwXYI4a@G3^qZ#kCQ0l5xI1ukIW#W3p
+
+dataSource:
+    logSql: false
