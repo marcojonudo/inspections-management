@@ -73,23 +73,23 @@ dataSource:
         validationInterval: 15000
     logSql: true
 
-#dataSources:
-#    fviberi:
-#        dbCreate: validate
-#        driverClassName: com.mysql.jdbc.Driver
-#        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
-#        url: jdbc:mysql://${host.ip}:${host.local-mysql-port}/fviberi?useSSL=false
-#        username: ${database.credentials.username}
-#        password: ${database.credentials.password}
-#        properties:
-#            initialSize: 1
-#            maxActive: 1
-#            minIdle: 1
-#            maxIdle: 1
-#            testOnBorrow: true
-#            validationQuery: SELECT 1
-#            validationInterval: 15000
-#        logSql: true
+dataSources:
+    fviberi:
+        dbCreate: validate
+        driverClassName: com.mysql.jdbc.Driver
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+        url: jdbc:mysql://${host.ip}:${host.local-mysql-port}/fviberi?useSSL=false
+        username: ${database.credentials.username}
+        password: ${database.credentials.password}
+        properties:
+            initialSize: 1
+            maxActive: 1
+            minIdle: 1
+            maxIdle: 1
+            testOnBorrow: true
+            validationQuery: SELECT 1
+            validationInterval: 15000
+        logSql: true
 #    schedules:
 #        dbCreate: validate
 #        driverClassName: com.mysql.jdbc.Driver
