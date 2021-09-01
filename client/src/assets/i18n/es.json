@@ -1,0 +1,42 @@
+{
+	"summary": {
+		"urgentPendingBudgets": "Presupuestos pendientes urgentes",
+		"secondaryPendingBudgets": "Presupuestos pendientes secundarios",
+		"pendingClientContacts": "Contactos clientes pendientes",
+		"sells": "Ventas añadidas",
+		"acceptedBudgets": "Presupuestos aceptados",
+		"acceptPercentage": "% aceptación",
+		"closedOrders": "ORs cerradas sin finalizar revisión",
+		"completedInspections": "Revisiones realizadas",
+		"detectedProblems": "% anomalías detectadas"
+	},
+	"inspection": {
+		"changelog": "Histórico de cambios",
+		"updateVersion": "Actualizar versión",
+		"type": {
+			"G": "Revisión gratuita",
+			"E": "Revisión estándar",
+			"S": "Revisión súper",
+			"I": "Revisión integral",
+			"O": "Revisión oficial",
+			"SE": "Revisión seguridad"
+		},
+		"state": {
+			"PENDING": "Pendiente",
+			"STARTED": "En curso",
+			"FINISHED": "Cerrada"
+		}
+	},
+	"inspections": {
+		"table": {
+			"ORDER": "OR",
+			"BRAND": "Marco",
+			"MODEL": "Modelo",
+			"INSPECTION_TYPE": "Revisión",
+			"INSPECTION_STATE": "Estado",
+			"BUDGETS": "Presupuestos",
+			"CLIENT_CONTACT": "Contacto cliente",
+			"ACCEPTED_BUDGET": "Ptto. aceptado"
+		}
+	}
+}

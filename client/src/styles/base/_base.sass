@@ -1,0 +1,121 @@
+html, body
+	height: 100%
+	user-select: none
+	-webkit-print-color-adjust: exact !important
+
+::-webkit-scrollbar
+	width: 4px
+	border: 1px solid #d5d5d5
+	background-color: #f1f1f1
+
+::-webkit-scrollbar-thumb
+	background: #c1c1c1
+	border-radius: 10px
+
+::-webkit-scrollbar-thumb:hover
+	background: #a8a8a8
+	color: $primary
+
+.mat-snack-bar-container
+	min-width: 0 !important
+	max-width: 100% !important
+
+.warning-snack-bar
+	color: $white
+	background-color: $highlight
+
+.success-snack-bar
+	color: $white
+	background-color: $light-green
+
+.error-snack-bar
+	color: $white
+	background-color: $red
+
+.mat-card-header-text
+	width: 100%
+
+.mat-button-toggle-label-content
+	line-height: unset !important
+
+table
+
+	thead
+		position: sticky
+		top: 0
+
+	tr
+		display: flex
+
+	th, td
+		@include flex-1
+		@include flex-center
+
+//.mat-bottom-sheet-container
+//	max-height: 50vh !important
+//	padding-left: 0 !important
+//	padding-right: 0 !important
+//
+//#expand-menu-icon
+//	transition: transform $fast-transition
+//
+//.mat-fab.mat-accent[disabled]
+//	background-color: $grey !important
+//
+//.mat-simple-snackbar
+//	justify-content: center !important
+//
+//.mat-expansion-panel-header
+//	padding: 0 $small-gap !important
+//
+//.mat-expansion-panel-body
+//	padding: 0 0 $small-gap !important
+//
+//.mat-list-item-content
+//	padding: 0 !important
+//
+//.mat-expansion-indicator::after
+//	color: $white !important
+//
+//.mat-menu-content
+//	@include flex-column-center
+//	padding-bottom: 0 !important
+//
+//#context-menu-version
+//	position: relative
+//	@include flex-center
+//	font-size: $small-font
+//	margin-top: 1rem
+//
+//#update-indicator
+//	width: .5rem
+//	height: .5rem
+//	position: absolute
+//	top: 0
+//	right: -.5rem
+//	background-color: $dark-highlight
+//	border-radius: 50%
+//
+//.category-title-button
+//
+//	.mat-button-wrapper
+//		position: relative
+//		@include flex-center
+//		color: $white
+//
+//		& > mat-icon
+//			position: absolute
+//			backface-visibility: hidden
+//			transition: transform $fast-transition
+//			transform: rotateY(0)
+//
+//			&.rotated
+//				transform: rotateY(-180deg)
+
+@media print
+
+	.no-print
+		display: none !important
+
+	@page
+		margin: $small-gap $medium-gap

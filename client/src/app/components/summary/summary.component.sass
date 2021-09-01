@@ -1,0 +1,42 @@
+@import "abstracts/mixins"
+
+\:host
+	@include flex-column
+
+	header
+		padding: $small-gap
+
+		#header-wrapper
+			position: relative
+			@include flex-center
+			padding: $small-gap
+
+			#filter-selector
+				position: absolute
+				left: $medium-gap
+				height: 75%
+
+				mat-button-toggle
+					width: 5rem
+					display: flex
+
+			& > span
+				font-weight: bold
+				font-size: 1.3em
+
+	#cards-summary
+		@include flex-1
+		display: flex
+
+		& > mat-card
+			@include flex-1
+			text-align: center
+			padding: 0
+			margin: 0 $small-gap
+			box-sizing: border-box
+
+			.sub-block
+				@include flex-column
+
+			mat-card-title
+				font-size: 1.3em

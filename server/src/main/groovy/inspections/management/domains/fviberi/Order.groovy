@@ -8,13 +8,15 @@ import org.grails.datastore.gorm.GormEntity
 import java.time.LocalDate
 
 @Entity
+//@JsonDeserialize(using = OrderDeserializer)
 class Order implements GormEntity<Order> {
 
 	int number
+	String code
+	String state
 
 	@JsonFormat(pattern = Constants.DateFormat.yyyy_MM_dd, timezone = Constants.SPAIN_TIMEZONE)
 	LocalDate day
-	String state
 	Vehicle vehicle
 	Client client
 	String sellerCode
@@ -36,5 +38,7 @@ class Order implements GormEntity<Order> {
 		id generator: 'assigned', name: 'number'
 		version false
 	}
+
+	static transients = ['code']
 
 }

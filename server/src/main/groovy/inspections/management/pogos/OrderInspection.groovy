@@ -1,5 +1,6 @@
 package inspections.management.pogos
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import groovy.transform.CompileStatic
 import groovy.transform.TupleConstructor
 import inspections.management.domains.Inspection
@@ -14,6 +15,8 @@ class OrderInspection {
     Order order
     Inspection inspection
     SavedInspection.State state = SavedInspection.State.PENDING
-    List<ItemBudget> itemBudgets
+
+    @JsonInclude
+    List<ItemBudget> itemBudgets = []
 
 }

@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import java.time.LocalDate
 
 @Singleton
 @CompileStatic
@@ -31,10 +30,8 @@ class InspectionService {
 	@Inject private InspectionDataService inspectionDataService
 	@Inject private SavedInspectionDataService savedInspectionDataService
 
-	List<OrderInspection> findOrderInspectionInfo() {
-		List<Order> orders = orderDataService.findAll(LocalDate.now())
+	List<OrderInspection> findOrderInspectionInfo(List<Order> orders) {
 		List<OrderInspection> orderInspections = []
-
 		if (orders) {
 			List<ItemBudget> itemBudgets = itemBudgetDataService.findAll()
 
@@ -89,6 +86,12 @@ class InspectionService {
 		return inspection
 	}
 
+	/**
+	 * Completa la información a partir de revisiones guardadas en BD
+	 * @param orderInspections Lista de información de órdenes y revisiones
+	 * @param savedInspections Lista de revisiones guardadas en DB
+	 * @param itemBudgets Items que conllevan presupuesto
+	 */
 	static void fillOrderInspections(
 		List<OrderInspection> orderInspections, List<SavedInspection> savedInspections, List<ItemBudget> itemBudgets
 	) {
@@ -97,10 +100,11 @@ class InspectionService {
 			if (existent) {
 				orderInspection.state = existent.state
 				orderInspection.itemBudgets = itemBudgets.findAll { ItemBudget itemBudget ->
+					/* Los elementos con presupuesto van a ser siempre de selección */
 					SelectSavedItem item = (SelectSavedItem) existent.items.find {
-						it.item.code == itemBudget.itemCode
+						it.item.type == Item.Type.SELECT && it.item.code == itemBudget.itemCode
 					}
-					return item && item.value != Constants.SELECT_CORRECT_OPTION_CODE
+					return item?.filled && item.value != Constants.SELECT_CORRECT_OPTION_CODE
 				}
 			}
 		}

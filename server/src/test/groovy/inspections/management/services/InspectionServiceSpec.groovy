@@ -181,6 +181,28 @@ class InspectionServiceSpec extends Specification {
         orderInspections[0].itemBudgets[0].budgetType == ItemBudget.BudgetType.URGENT
     }
 
+    void "test fill order inspections coincident item budgets text item"() {
+        given:
+        List<OrderInspection> orderInspections = [new OrderInspection(new Order(number: 1), new Inspection(code: 'C'))]
+        List<SavedInspection> savedInspections = [
+            new SavedInspection(
+                orderNumber: 1,
+                state: SavedInspection.State.FINISHED,
+                items: [new SelectSavedItem(item: new Item(code: 'N'), value: 'PC')]
+            )
+        ]
+        List<ItemBudget> itemBudgets = [new ItemBudget(itemCode: 'N', budgetType: ItemBudget.BudgetType.URGENT)]
+
+        when:
+        inspectionService.fillOrderInspections(orderInspections, savedInspections, itemBudgets)
+
+        then:
+        orderInspections
+        orderInspections.size() == 1
+        orderInspections[0].state == SavedInspection.State.FINISHED
+        !orderInspections[0].itemBudgets
+    }
+
     // endregion
 
     // region Find order inspection info
