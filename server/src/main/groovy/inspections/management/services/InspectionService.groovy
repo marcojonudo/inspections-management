@@ -92,12 +92,13 @@ class InspectionService {
 	 * @param savedInspections Lista de revisiones guardadas en DB
 	 * @param itemBudgets Items que conllevan presupuesto
 	 */
-	static void fillOrderInspections(
+	static void  fillOrderInspections(
 		List<OrderInspection> orderInspections, List<SavedInspection> savedInspections, List<ItemBudget> itemBudgets
 	) {
 		orderInspections.each { OrderInspection orderInspection ->
 			SavedInspection existent = savedInspections.find { it.orderNumber == orderInspection.order.number }
 			if (existent) {
+				orderInspection.savedInspection = existent
 				orderInspection.state = existent.state
 				orderInspection.itemBudgets = itemBudgets.findAll { ItemBudget itemBudget ->
 					/* Los elementos con presupuesto van a ser siempre de selección */

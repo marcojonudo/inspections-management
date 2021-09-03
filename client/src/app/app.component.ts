@@ -13,28 +13,23 @@ import { TranslateService } from '@ngx-translate/core';
 export class AppComponent {
 	title = 'Gestión de revisiones';
 
-	// showSplashScreen: boolean;
 	loading: boolean;
 
 	constructor(
 		private inspectionService: InspectionService,
 		private translate: TranslateService,
-		private cdRef: ChangeDetectorRef) {
-		// this.showSplashScreen = true;
+		private cdRef: ChangeDetectorRef
+	) {
 		this.loading = true;
 
 		this.inspectionService.findLanguage().subscribe((lang: string) => {
 			this.translate.setDefaultLang(lang);
 		});
 
-		this.inspectionService.findOrderInspections().subscribe(() => {
+		this.inspectionService.loadMainInfo().subscribe(() => {
 			this.loading = false;
 			this.cdRef.detectChanges();
 		});
 	}
-
-	// checkShowSplash(): boolean {
-	//     return this.loading || this.showSplashScreen;
-	// }
 
 }

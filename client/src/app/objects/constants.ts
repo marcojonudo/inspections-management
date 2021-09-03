@@ -8,8 +8,7 @@ export class Constants {
 
 	static readonly BUDGET_TYPE: any = {
 		URGENT: 0,
-		SECONDARY: 1,
-		MINOR: 3
+		SECONDARY: 1
 	};
 
 	static readonly DATE_FORMAT: any = {
@@ -18,6 +17,14 @@ export class Constants {
 
 	static readonly DAY_JS: any = {
 		d: 'd'
+	};
+
+	static readonly SELECT_ITEM_OPTION_CODE: any = {
+		C: 'C'
+	};
+
+	static readonly INSPECTION_STATE: any = {
+		PENDING: 'PENDING'
 	};
 
 }

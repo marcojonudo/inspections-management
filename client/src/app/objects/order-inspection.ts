@@ -1,11 +1,13 @@
 import { Order } from './orders/order';
 import { Inspection } from './inspections/inspection';
 import { ItemBudget } from './item-budget';
+import { SavedInspection } from './inspections/saved-inspection';
 
 export class OrderInspection {
 
 	order: Order;
 	inspection: Inspection;
+	savedInspection: SavedInspection;
 	state: string;
 	itemBudgets: ItemBudget[];
 

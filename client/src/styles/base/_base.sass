@@ -43,6 +43,7 @@ table
 	thead
 		position: sticky
 		top: 0
+		z-index: 2
 
 	tr
 		display: flex
@@ -50,67 +51,6 @@ table
 	th, td
 		@include flex-1
 		@include flex-center
-
-//.mat-bottom-sheet-container
-//	max-height: 50vh !important
-//	padding-left: 0 !important
-//	padding-right: 0 !important
-//
-//#expand-menu-icon
-//	transition: transform $fast-transition
-//
-//.mat-fab.mat-accent[disabled]
-//	background-color: $grey !important
-//
-//.mat-simple-snackbar
-//	justify-content: center !important
-//
-//.mat-expansion-panel-header
-//	padding: 0 $small-gap !important
-//
-//.mat-expansion-panel-body
-//	padding: 0 0 $small-gap !important
-//
-//.mat-list-item-content
-//	padding: 0 !important
-//
-//.mat-expansion-indicator::after
-//	color: $white !important
-//
-//.mat-menu-content
-//	@include flex-column-center
-//	padding-bottom: 0 !important
-//
-//#context-menu-version
-//	position: relative
-//	@include flex-center
-//	font-size: $small-font
-//	margin-top: 1rem
-//
-//#update-indicator
-//	width: .5rem
-//	height: .5rem
-//	position: absolute
-//	top: 0
-//	right: -.5rem
-//	background-color: $dark-highlight
-//	border-radius: 50%
-//
-//.category-title-button
-//
-//	.mat-button-wrapper
-//		position: relative
-//		@include flex-center
-//		color: $white
-//
-//		& > mat-icon
-//			position: absolute
-//			backface-visibility: hidden
-//			transition: transform $fast-transition
-//			transform: rotateY(0)
-//
-//			&.rotated
-//				transform: rotateY(-180deg)
 
 @media print
 

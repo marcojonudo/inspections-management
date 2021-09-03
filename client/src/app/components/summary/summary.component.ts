@@ -29,10 +29,7 @@ export class SummaryComponent implements OnInit {
 	}
 
 	filterOrders(filters: OrdersFilter[]): void {
-		console.log(this.filters);
-		this.inspectionService.findOrderInspections(filters).subscribe(() => {
-			console.log('done');
-		});
+		this.inspectionService.loadMainInfo(filters).subscribe();
 	}
 
 }

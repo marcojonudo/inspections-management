@@ -14,6 +14,7 @@ class OrderInspection {
 
     Order order
     Inspection inspection
+    SavedInspection savedInspection
     SavedInspection.State state = SavedInspection.State.PENDING
 
     @JsonInclude

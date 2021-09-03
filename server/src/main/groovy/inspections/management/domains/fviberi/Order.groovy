@@ -1,6 +1,7 @@
 package inspections.management.domains.fviberi
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonInclude
 import grails.gorm.annotation.Entity
 import inspections.management.utils.Constants
 import org.grails.datastore.gorm.GormEntity
@@ -8,7 +9,6 @@ import org.grails.datastore.gorm.GormEntity
 import java.time.LocalDate
 
 @Entity
-//@JsonDeserialize(using = OrderDeserializer)
 class Order implements GormEntity<Order> {
 
 	int number
@@ -21,7 +21,13 @@ class Order implements GormEntity<Order> {
 	Client client
 	String sellerCode
 
-	static hasMany = [lines: OrderLine]
+	@JsonInclude
+	Set<RelatedBudget> relatedBudgets
+
+	@JsonInclude
+	List<Budget> budgets
+
+	static hasMany = [lines: OrderLine, relatedBudgets: RelatedBudget]
 
 	static mapping = {
 		datasource Constants.DataSource.FVIBERI
@@ -34,11 +40,12 @@ class Order implements GormEntity<Order> {
 		client column: 'coclient', fetch: 'join'
 		sellerCode column: 'covended'
 		lines fetch: 'join'
+		relatedBudgets fetch: 'join'
 
 		id generator: 'assigned', name: 'number'
 		version false
 	}
 
-	static transients = ['code']
+	static transients = ['code', 'budgets']
 
 }

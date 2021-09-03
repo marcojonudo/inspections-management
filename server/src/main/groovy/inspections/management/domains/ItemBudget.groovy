@@ -13,8 +13,7 @@ class ItemBudget implements GormEntity<ItemBudget> {
 	enum BudgetType {
 
 		URGENT,
-		SECONDARY,
-		MINOR
+		SECONDARY
 
 	}
 

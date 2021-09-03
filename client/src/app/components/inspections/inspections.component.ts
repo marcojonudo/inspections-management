@@ -77,19 +77,13 @@ export class InspectionsComponent implements OnDestroy {
 		return this.translate.instant(`inspections.table.${ code }`);
 	}
 
-	findBudgetsType(itemBudgets: ItemBudget[]): string {
-		if (!itemBudgets.length) {
-			return undefined;
-		}
-		return itemBudgets.map(itemBudget => itemBudget.budgetType).sort((a, b) => {
-			if (Constants.BUDGET_TYPE[a] < Constants.BUDGET_TYPE[b]) {
-				return -1;
-			}
-			if (Constants.BUDGET_TYPE[a] > Constants.BUDGET_TYPE[b]) {
-				return 1;
-			}
-			return 0;
-		})[0].toLowerCase();
+	checkRecommendedBudget(itemBudgets: ItemBudget[]): boolean {
+		// return InspectionService.checkRecommendedBudget(orderCode);
+		return itemBudgets.length > 0;
+	}
+
+	findBudgetState(orderCode: string, itemBudgets: ItemBudget[]): string {
+		return InspectionService.findBudgetState(orderCode, itemBudgets);
 	}
 
 }
