@@ -34,12 +34,24 @@
 			<ng-container matColumnDef="CLIENT_CONTACT">
 				<th mat-header-cell *matHeaderCellDef>{{findColumnName(columns[6])}}</th>
 				<td mat-cell *matCellDef="let element">
-					<mat-slide-toggle color="primary"></mat-slide-toggle>
+					<mat-slide-toggle
+						*ngIf="checkRecommendedBudget(element.BUDGETS)"
+						color="primary"
+						[checked]="checkNotifiedClient(element.ORDER)"
+						(change)="updateNotifiedClient(element.ORDER, $event.checked)">
+					</mat-slide-toggle>
 				</td>
 			</ng-container>
 			<ng-container matColumnDef="ACCEPTED_BUDGET">
 				<th mat-header-cell *matHeaderCellDef>{{findColumnName(columns[7])}}</th>
-				<td mat-cell *matCellDef="let element">{{element.ACCEPTED_BUDGET}}</td>
+				<td mat-cell *matCellDef="let element">
+					<mat-slide-toggle
+						*ngIf="checkNotifiedClient(element.ORDER)"
+						color="primary"
+						[checked]="checkAcceptedBudget(element.ORDER)"
+						(change)="updateAcceptedBudget(element.ORDER, $event.checked)">
+					</mat-slide-toggle>
+				</td>
 			</ng-container>
 
 			<tr mat-header-row *matHeaderRowDef="columns"></tr>

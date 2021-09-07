@@ -1,23 +1,17 @@
 package inspections.management.controllers
 
 import groovy.transform.CompileStatic
-import inspections.management.domains.ClientBudgetNotification
+import inspections.management.domains.BudgetNotification
 import inspections.management.domains.ItemArticleCode
 import inspections.management.domains.ItemBudget
 import inspections.management.domains.fviberi.Order
 import inspections.management.pogos.OrderInspection
 import inspections.management.services.InspectionService
-import inspections.management.services.data.ItemArticleCodeDataService
-import inspections.management.services.data.ItemBudgetDataService
-import inspections.management.services.data.LanguageDataService
-import inspections.management.services.data.OrderDataService
+import inspections.management.services.data.*
 import inspections.management.utils.Constants
 import io.micronaut.core.convert.format.Format
-import io.micronaut.http.annotation.Body
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
-import io.micronaut.http.annotation.Post
-import io.micronaut.http.annotation.QueryValue
+import io.micronaut.http.HttpResponse
+import io.micronaut.http.annotation.*
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
@@ -36,6 +30,7 @@ class InspectionController {
     @Inject private LanguageDataService languageDataService
     @Inject private ItemArticleCodeDataService itemArticleCodeDataService
     @Inject private ItemBudgetDataService itemBudgetDataService
+    @Inject private BudgetNotificationDataService budgetNotificationDataService
 
     @Get("/language")
     @Operation(
@@ -110,7 +105,7 @@ class InspectionController {
         return itemBudgetDataService.findAll()
     }
 
-    @Get("/budgetClientNotifications")
+    @Get("/budgetNotification")
     @Operation(
         summary = "Obtiene las notificaciones de presupuestos a clientes",
         description = "Obtiene las notificaciones de presupuestos a clientes"
@@ -118,10 +113,44 @@ class InspectionController {
     @ApiResponse(
         responseCode = "200",
         description = "Lista de información de BD",
-        content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClientBudgetNotification)))
+        content = @Content(array = @ArraySchema(schema = @Schema(implementation = BudgetNotification)))
     )
-    String findClientBudgetNotifications() {
-        return languageDataService.findLanguageLang()
+    List<BudgetNotification> findBudgetNotifications(@QueryValue List<Integer> orderNumbers) {
+        return orderNumbers ? budgetNotificationDataService.findAll(orderNumbers) : []
+    }
+
+    @Post("/budgetNotification")
+    @Operation(
+        summary = "Crea una notificación de cliente avisado",
+        description = "Crea una notificación de cliente avisado de presupuesto"
+    )
+    @ApiResponse(
+        responseCode = "201",
+        description = "Notificación creada",
+        content = @Content(schema = @Schema(implementation = BudgetNotification))
+    )
+    HttpResponse<BudgetNotification> createBudgetNotification(@Body BudgetNotification budgetNotification) {
+        return HttpResponse.created(budgetNotificationDataService.save(budgetNotification))
+    }
+
+    @Delete("/budgetNotification")
+    @Operation(
+        summary = "Borra una notificación a cliente",
+        description = "Borra una notificación a cliente"
+    )
+    @ApiResponse(responseCode = "200", description = "Notificación borrada")
+    void deleteBudgetNotification(@QueryValue int orderNumber) {
+        budgetNotificationDataService.delete(orderNumber)
+    }
+
+    @Patch("/budgetNotification")
+    @Operation(
+        summary = "Actualiza un presupuesto aceptado",
+        description = "Actualiza un presupuesto aceptado"
+    )
+    @ApiResponse(responseCode = "200", description = "Presupuesto actualizado")
+    void deleteBudgetNotification(@Body BudgetNotification budgetNotification) {
+        budgetNotificationDataService.update(budgetNotification.orderNumber, budgetNotification.accepted)
     }
 
 }

@@ -3,27 +3,27 @@ import { environment } from '../../environments/environment';
 export class Url {
 
 	static orders(): string {
-		return `${ environment.serverUrl }/inspection/orders`;
+		return `${environment.serverUrl}/inspection/orders`;
 	}
 
 	static orderInspections(): string {
-		return `${ environment.serverUrl }/inspection/orderInspection`;
+		return `${environment.serverUrl}/inspection/orderInspection`;
 	}
 
 	static language(): string {
-		return `${ environment.serverUrl }/inspection/language`;
+		return `${environment.serverUrl}/inspection/language`;
 	}
 
 	static articleItems(): string {
-		return `${ environment.serverUrl }/inspection/articleItems`;
+		return `${environment.serverUrl}/inspection/articleItems`;
 	}
 
 	static itemBudgets(): string {
-		return `${ environment.serverUrl }/inspection/itemBudgets`;
+		return `${environment.serverUrl}/inspection/itemBudgets`;
 	}
 
-	static clientBudgetNotifications(): string {
-		return `${ environment.serverUrl }/inspection/clientBudgetNotifications`;
+	static budgetNotification(): string {
+		return `${environment.serverUrl}/inspection/budgetNotification`;
 	}
 
 }

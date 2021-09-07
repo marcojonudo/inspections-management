@@ -10,8 +10,8 @@ import { OrdersFilter } from '../objects/filters/orders-filter';
 import { TodayOrdersFilter } from '../objects/filters/today-orders-filter';
 import { Order } from '../objects/orders/order';
 import { ItemArticleCode } from '../objects/orders/item-article-code';
-import { Budget } from '../objects/orders/budget';
 import { ItemBudget } from '../objects/item-budget';
+import { BudgetNotification } from '../objects/budget-notification';
 
 @Injectable({
 	providedIn: 'root'
@@ -20,6 +20,7 @@ export class InspectionService {
 
 	static orderInspections: OrderInspection[];
 	static itemArticleCodes: ItemArticleCode[];
+	static budgetNotifications: BudgetNotification[];
 
 	filters: OrdersFilter[];
 
@@ -84,6 +85,12 @@ export class InspectionService {
 		})[0].toLowerCase();
 	}
 
+	static findBudgetNotification(
+		orderNumber: number, budgetNotifications: BudgetNotification[] = this.budgetNotifications
+	): BudgetNotification {
+		return budgetNotifications.find(c => c.orderNumber === orderNumber);
+	}
+
 	findLanguage(): Observable<string> {
 		const language = LocalStorageService.getItem(Constants.LOCAL_STORAGE.LANGUAGE);
 		return (language ? of(language) : this.http.get(Url.language(), { responseType: 'text' })).pipe(
@@ -99,20 +106,25 @@ export class InspectionService {
 		return this.findOrders(filters).pipe(
 			mergeMap(orders => {
 				console.log('Orders', orders);
-				// buscar notificaciones para nº de presupuesto que tengan
 				const articles = this.findArticles(orders);
+				const orderNumbers = orders.map(o => o.number);
+				const budgetNotificationsUrl = `${Url.budgetNotification()}?orderNumbers=${orderNumbers.join('&orderNumbers=')}`;
 				return forkJoin([
 					this.http.post(Url.orderInspections(), orders),
-					this.http.post(Url.articleItems(), articles)
+					this.http.post(Url.articleItems(), articles),
+					this.http.get(budgetNotificationsUrl)
 				]);
 			}),
 			tap(data => {
 				console.log('Received order inspections info', data[0]);
 				console.log('Received article items info', data[1]);
+				console.log('Received client budget notification info', data[2]);
 				InspectionService.orderInspections = data[0].map(orderInspection => new OrderInspection(orderInspection));
 				InspectionService.itemArticleCodes = data[1].map(i => new ItemArticleCode(i));
+				InspectionService.budgetNotifications = data[2].map(b => new BudgetNotification(b));
 				console.log('Order inspections', InspectionService.orderInspections);
 				console.log('Item article codes', InspectionService.itemArticleCodes);
+				console.log('Client budget notifications', InspectionService.budgetNotifications);
 				this.orderInspectionsSubject.next(InspectionService.orderInspections);
 			})
 		);
@@ -136,8 +148,15 @@ export class InspectionService {
 		);
 	}
 
-	// findBudgetNotifiedClients(): Observable<any> {
-	// 	return this.http.get(Url)
-	// }
+	updateNotifiedClient(orderNumber: number, notifiedClient: boolean): Observable<any> {
+		return notifiedClient ?
+			this.http.post(Url.budgetNotification(), { orderNumber }) :
+			this.http.delete(Url.budgetNotification(), { params: { orderNumber: `${orderNumber}` } });
+	}
+
+	updateAcceptedBudget(budgetNotification: BudgetNotification, accepted: boolean): Observable<any> {
+		budgetNotification.accepted = accepted;
+		return this.http.patch(Url.budgetNotification(), budgetNotification);
+	}
 
 }

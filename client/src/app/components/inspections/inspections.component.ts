@@ -4,7 +4,6 @@ import { InspectionService } from '../../services/inspection.service';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ItemBudget } from '../../objects/item-budget';
-import { Constants } from '../../objects/constants';
 
 export interface Column {
 	ORDER: number;
@@ -78,12 +77,33 @@ export class InspectionsComponent implements OnDestroy {
 	}
 
 	checkRecommendedBudget(itemBudgets: ItemBudget[]): boolean {
-		// return InspectionService.checkRecommendedBudget(orderCode);
 		return itemBudgets.length > 0;
 	}
 
 	findBudgetState(orderCode: string, itemBudgets: ItemBudget[]): string {
 		return InspectionService.findBudgetState(orderCode, itemBudgets);
+	}
+
+	checkNotifiedClient(shortCode: string): boolean {
+		const order = InspectionService.findOrder(shortCode);
+		return InspectionService.findBudgetNotification(order.number) !== undefined;
+	}
+
+	checkAcceptedBudget(shortCode: string): boolean {
+		const order = InspectionService.findOrder(shortCode);
+		const budgetNotification = InspectionService.findBudgetNotification(order.number);
+		return budgetNotification && budgetNotification.accepted;
+	}
+
+	updateNotifiedClient(shortCode: string, notified: boolean): void {
+		const order = InspectionService.findOrder(shortCode);
+		this.inspectionService.updateNotifiedClient(order.number, notified).subscribe();
+	}
+
+	updateAcceptedBudget(shortCode: string, accepted: boolean): void {
+		const order = InspectionService.findOrder(shortCode);
+		const budgetNotification = InspectionService.findBudgetNotification(order.number);
+		this.inspectionService.updateAcceptedBudget(budgetNotification, accepted).subscribe();
 	}
 
 }
