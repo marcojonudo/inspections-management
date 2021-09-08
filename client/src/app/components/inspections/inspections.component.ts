@@ -40,6 +40,7 @@ export class InspectionsComponent implements OnDestroy {
 	};
 
 	private orderInspectionsSubscription: Subscription;
+	private budgetNotificationsSubscription: Subscription;
 
 	columnsToDisplay: string[];
 	data: Column[];
@@ -54,10 +55,16 @@ export class InspectionsComponent implements OnDestroy {
 			this.data = this.buildData(orderInspections);
 			this.cdRef.detectChanges();
 		});
+		this.budgetNotificationsSubscription = this.inspectionService.budgetNotifications$.subscribe(() => {
+			/* La lista budgetNotifications ya se ha actualizado en el servicio. Aquí se consume el Observable para poder ejecutar un
+			 * ciclo de CD, y refrescar el contenido cuando se actualiza la notificación de cliente */
+			this.cdRef.detectChanges();
+		});
 	}
 
 	ngOnDestroy(): void {
 		this.orderInspectionsSubscription.unsubscribe();
+		this.budgetNotificationsSubscription.unsubscribe();
 	}
 
 	get orderInspections(): OrderInspection[] {
@@ -96,17 +103,17 @@ export class InspectionsComponent implements OnDestroy {
 		return itemBudgets.length > 0;
 	}
 
-	findBudgetState(orderNumber: number, itemBudgets: ItemBudget[]): string {
-		return InspectionService.findBudgetState(orderNumber, itemBudgets);
+	findOrderItemBudgetType(orderNumber: number): string {
+		return InspectionService.findOrderItemBudgetType(orderNumber);
 	}
 
 	checkNotifiedClient(orderNumber: number): boolean {
-		return InspectionService.findBudgetNotification(orderNumber) !== undefined;
+		return InspectionService.findBudgetNotifications(orderNumber).length > 0;
 	}
 
-	checkAcceptedBudget(orderNumber: number): boolean {
-		const budgetNotification = InspectionService.findBudgetNotification(orderNumber);
-		return budgetNotification && budgetNotification.accepted;
+	checkAcceptedBudgets(orderNumber: number): boolean {
+		const budgetNotifications = InspectionService.findBudgetNotifications(orderNumber);
+		return budgetNotifications.find(budgetNotification => !budgetNotification.accepted) === undefined;
 	}
 
 	selectOrder(orderNumber: number): void {

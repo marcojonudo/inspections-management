@@ -21,7 +21,7 @@ export class InspectionDetailsComponent {
 	private COLUMNS: string[] = ['item', 'doneBudget', 'acceptedBudget'];
 
 	private COLUMNS_DATA: any = {
-		item: (i: ItemBudget) => i.itemCode,
+		item: (i: ItemBudget) => i,
 		orderNumber: (i: ItemBudget, o: Order) => o.number
 	};
 
@@ -42,11 +42,9 @@ export class InspectionDetailsComponent {
 		this.selectedOrderSubscription = this.inspectionService.selectedOrderInspection$.subscribe(orderInspection => {
 			this.orderInspection = orderInspection;
 			this.data = this.buildData();
-			console.log(this.orderInspection);
 			this.mechanics = this.orderInspection.savedInspection.items.map(i => i.employeeCode).filter(
 				(value, index, self) => self.indexOf(value) === index
 			).map(employeeCode => EmployeeService.findEmployee(employeeCode));
-			console.log(this.mechanics);
 			this.cdRef.detectChanges();
 		});
 	}
@@ -72,12 +70,12 @@ export class InspectionDetailsComponent {
 		return this.translate.instant(`inspection.item.${code}`);
 	}
 
-	checkExistentBudget(itemCode: string, budgets: Budget[] = this.orderInspection.order.budgets): boolean {
-		return InspectionService.checkExistentBudget(itemCode, budgets);
+	findItemBudgetType(itemBudget: ItemBudget, budgets: Budget[] = this.orderInspection.order.budgets): string {
+		return InspectionService.findItemBudgetType(itemBudget, budgets);
 	}
 
 	checkNotifiedClient(orderNumber: number = this.orderInspection.order.number): boolean {
-		return InspectionService.findBudgetNotification(orderNumber) !== undefined;
+		return InspectionService.findBudgetNotifications(orderNumber).length > 0;
 	}
 
 	checkAcceptedBudget(orderNumber: number, itemCode: string): boolean {
@@ -97,7 +95,7 @@ export class InspectionDetailsComponent {
 	}
 
 	updateAcceptedBudget(orderNumber: number, itemCode: string, accepted: boolean): void {
-		const budgetNotification = InspectionService.findBudgetNotification(orderNumber);
+		const budgetNotification = InspectionService.findBudgetNotification(orderNumber, itemCode);
 		this.inspectionService.updateAcceptedBudget(budgetNotification, accepted).subscribe();
 	}
 

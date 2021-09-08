@@ -46,21 +46,16 @@
 		<table mat-table [dataSource]="data">
 			<ng-container matColumnDef="item">
 				<th mat-header-cell *matHeaderCellDef>{{findColumnName(columnsToDisplay[0])}}</th>
-				<td mat-cell *matCellDef="let element">{{data ? findItemName(element.item) : '-'}}</td>
+				<td mat-cell *matCellDef="let element">{{data ? findItemName(element.item.itemCode) : '-'}}</td>
 			</ng-container>
 			<ng-container matColumnDef="doneBudget">
 				<th mat-header-cell *matHeaderCellDef>{{findColumnName(columnsToDisplay[1])}}</th>
 				<td mat-cell *matCellDef="let element">
 					<mat-icon
 						*ngIf="data"
-						class="color-warning color-{{checkExistentBudget(element.item)}}">
+						class="color-correct color-{{findItemBudgetType(element.item) | lowercase}}">
 						radio_button_checked
 					</mat-icon>
-<!--					<mat-slide-toggle-->
-<!--						color="primary"-->
-<!--						[checked]="checkNotifiedClient(element.orderNumber, element.item)"-->
-<!--						(change)="updateNotifiedClient(element.orderNumber, element.item, $event.checked)">-->
-<!--					</mat-slide-toggle>-->
 				</td>
 			</ng-container>
 			<ng-container matColumnDef="acceptedBudget">
@@ -70,11 +65,17 @@
 						*ngIf="data"
 						color="primary"
 						[disabled]="!checkNotifiedClient()"
-						[checked]="checkAcceptedBudget(element.orderNumber, element.item)"
-						(change)="updateAcceptedBudget(element.orderNumber, element.item, $event.checked)">
+						[checked]="checkAcceptedBudget(element.orderNumber, element.item.itemCode)"
+						(change)="updateAcceptedBudget(element.orderNumber, element.item.itemCode, $event.checked)">
 					</mat-slide-toggle>
 				</td>
 			</ng-container>
+<!--			<ng-container matColumnDef="summary">-->
+<!--				<th mat-header-cell *matHeaderCellDef>Resumen entrega cliente</th>-->
+<!--				<td mat-cell *matCellDef="let element">-->
+<!--					hola-->
+<!--				</td>-->
+<!--			</ng-container>-->
 
 			<tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
 			<tr mat-row *matRowDef="let row; columns: columnsToDisplay;"></tr>

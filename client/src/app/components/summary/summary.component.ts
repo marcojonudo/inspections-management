@@ -10,7 +10,7 @@ import { InspectionService } from '../../services/inspection.service';
 	styleUrls: ['./summary.component.sass'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SummaryComponent implements OnInit {
+export class SummaryComponent {
 
 	filters: OrdersFilter[];
 	todayFilter: OrdersFilter[];
@@ -23,9 +23,6 @@ export class SummaryComponent implements OnInit {
 		this.allFilters = this.todayFilter.concat(this.pendingFilter);
 
 		this.filters = this.todayFilter;
-	}
-
-	ngOnInit(): void {
 	}
 
 	filterOrders(filters: OrdersFilter[]): void {

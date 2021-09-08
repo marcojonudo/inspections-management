@@ -30,6 +30,8 @@ export class InspectionService {
 	orderInspections$: Observable<OrderInspection[]>;
 	selectedOrderInspectionSubject: Subject<OrderInspection>;
 	selectedOrderInspection$: Observable<OrderInspection>;
+	budgetNotificationsSubject: Subject<BudgetNotification[]>;
+	budgetNotifications$: Observable<BudgetNotification[]>;
 
 	constructor(private http: HttpClient) {
 		this.filters = [new TodayOrdersFilter()];
@@ -38,46 +40,26 @@ export class InspectionService {
 
 		this.selectedOrderInspectionSubject = new Subject<OrderInspection>();
 		this.selectedOrderInspection$ = this.selectedOrderInspectionSubject.asObservable();
-	}
 
-	static findOrder(orderNumber: number, orderInspections: OrderInspection[] = this.orderInspections): Order {
-		return orderInspections.find(o => o.order.number === orderNumber).order;
+		this.budgetNotificationsSubject = new Subject<BudgetNotification[]>();
+		this.budgetNotifications$ = this.budgetNotificationsSubject.asObservable();
 	}
 
 	static findOrderInspection(orderNumber: number, orderInspections: OrderInspection[] = this.orderInspections): OrderInspection {
 		return orderInspections.find(o => o.order.number === orderNumber);
 	}
 
-	static findBudgetState(orderNumber: number, itemBudgets: ItemBudget[]): string {
+	static findOrderItemBudgetType(orderNumber: number): string {
 		const orderInspection = this.findOrderInspection(orderNumber);
-		/* Si la orden tiene presupuestos relacionados, se comprueba si sus artículos coinciden con los que tiene pendientes
-		 * la revisión */
-		if (orderInspection.order.budgets.length) {
-			/* itemBudgets contiene los items incorrectos, con el tipo de presupuesto que les corresponde */
-			const existentBudget = this.checkExistentBudget2(orderInspection.order, orderInspection.itemBudgets);
-			/* Si existe un presupuesto asociado a alguno de los items no correctos de la revisión, se devuelve cadena vacía para que el
-			 * icono siga en color verde (el paso de realizar presupuesto en JPDV ya ha sido completado) */
-			if (existentBudget) {
-				return '';
-			}
-		}
-		/* Si la orden no tiene presupuestos relacionados, se comprueba la lista de ItemBudget para comprobar qué
-		 * tipo de presupuesto le corresponde */
-		return this.findItemBudgetsMainType(itemBudgets);
+		const itemBudgetTypes = orderInspection.itemBudgets.map(itemBudget =>
+			this.findItemBudgetType(itemBudget, orderInspection.order.budgets)
+		);
+		return this.findItemBudgetsMainType(itemBudgetTypes);
 	}
 
-	static checkExistentBudget2(order: Order, itemBudgets: ItemBudget[]): boolean {
-		return itemBudgets.find(itemBudget => {
-			/* Se buscan los códigos de artículo que corresponden a los items erróneos */
-			const articleCodes = this.itemArticleCodes.filter(itemArticleCode =>
-				itemArticleCode.itemCode === itemBudget.itemCode
-			).map(itemArticleCode => itemArticleCode.articleCode);
-			/* Una vez obtenidos los artículos, se comprueba si alguno de los presupuestos asociados a la orden contiene alguno de
-			 * ellos. De ser así, se determinaría que existe presupuesto asociado a la revisión */
-			return order.budgets.find(budget =>
-				budget.lines.map(l => l.articleCode).find(articleCode => articleCodes.find(code => code === articleCode))
-			);
-		}) !== undefined;
+	static findItemBudgetType(itemBudget: ItemBudget, budgets: Budget[]): string {
+		const existentBudget = InspectionService.checkExistentBudget(itemBudget.itemCode, budgets);
+		return existentBudget ? '' : itemBudget.budgetType;
 	}
 
 	static checkExistentBudget(
@@ -94,8 +76,8 @@ export class InspectionService {
 		) !== undefined;
 	}
 
-	static findItemBudgetsMainType(itemBudgets: ItemBudget[]): string {
-		return itemBudgets.map(itemBudget => itemBudget.budgetType).sort((a, b) => {
+	static findItemBudgetsMainType(types: string[]): string {
+		return types.sort((a, b) => {
 			if (Constants.BUDGET_TYPE[a] < Constants.BUDGET_TYPE[b]) {
 				return -1;
 			}
@@ -103,13 +85,19 @@ export class InspectionService {
 				return 1;
 			}
 			return 0;
-		})[0].toLowerCase();
+		})[0];
 	}
 
 	static findBudgetNotification(
-		orderNumber: number, itemCode: string = undefined, budgetNotifications: BudgetNotification[] = this.budgetNotifications
+		orderNumber: number, itemCode: string, budgetNotifications: BudgetNotification[] = this.budgetNotifications
 	): BudgetNotification {
-		return budgetNotifications.find(c => c.orderNumber === orderNumber && (itemCode ? c.itemCode === itemCode : true));
+		return budgetNotifications.find(c => c.orderNumber === orderNumber && c.itemCode === itemCode);
+	}
+
+	static findBudgetNotifications(
+		orderNumber: number, budgetNotifications: BudgetNotification[] = this.budgetNotifications
+	): BudgetNotification[] {
+		return budgetNotifications.filter(c => c.orderNumber === orderNumber);
 	}
 
 	findLanguage(): Observable<string> {
@@ -179,6 +167,7 @@ export class InspectionService {
 		return this.http.post(Url.budgetNotification(), budgetNotifications).pipe(
 			tap(() => {
 				InspectionService.budgetNotifications.push(...budgetNotifications);
+				this.budgetNotificationsSubject.next(InspectionService.budgetNotifications);
 			})
 		);
 	}
@@ -189,13 +178,16 @@ export class InspectionService {
 				InspectionService.budgetNotifications = InspectionService.budgetNotifications.filter(budgetNotification =>
 					budgetNotification.orderNumber !== orderNumber
 				);
+				this.budgetNotificationsSubject.next(InspectionService.budgetNotifications);
 			})
 		);
 	}
 
 	updateAcceptedBudget(budgetNotification: BudgetNotification, accepted: boolean): Observable<any> {
 		budgetNotification.accepted = accepted;
-		return this.http.patch(Url.budgetNotification(), budgetNotification);
+		return this.http.patch(Url.budgetNotification(), budgetNotification).pipe(
+			tap(() => this.budgetNotificationsSubject.next(InspectionService.budgetNotifications))
+		);
 	}
 
 }
