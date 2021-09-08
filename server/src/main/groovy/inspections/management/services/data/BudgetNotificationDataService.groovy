@@ -17,9 +17,9 @@ interface BudgetNotificationDataService {
 
 	@Query("""
 		update ${BudgetNotification budgetNotification}
-		set $budgetNotification.accepted
-		where $budgetNotification.orderNumber = $orderNumber
+		set $budgetNotification.accepted = $accepted
+		where $budgetNotification.orderNumber = $orderNumber and $budgetNotification.itemCode = $itemCode
 	""")
-	BudgetNotification update(int orderNumber, boolean accepted)
+	Number update(int orderNumber, String itemCode, boolean accepted)
 
 }

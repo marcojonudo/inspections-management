@@ -3,7 +3,8 @@ export class Constants {
 	static readonly DEFAULT_LANGUAGE: string = 'es';
 
 	static readonly LOCAL_STORAGE: any = {
-		LANGUAGE: 'language'
+		LANGUAGE: 'language',
+		EMPLOYEES: 'employees'
 	};
 
 	static readonly BUDGET_TYPE: any = {
@@ -23,7 +24,7 @@ export class Constants {
 		C: 'C'
 	};
 
-	static readonly INSPECTION_STATE: any = {
+	static readonly inspectionState: any = {
 		PENDING: 'PENDING'
 	};
 

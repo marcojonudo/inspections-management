@@ -26,4 +26,8 @@ export class Url {
 		return `${environment.serverUrl}/inspection/budgetNotification`;
 	}
 
+	static employees(): string {
+		return `${environment.serverUrl}/inspection/employees`;
+	}
+
 }

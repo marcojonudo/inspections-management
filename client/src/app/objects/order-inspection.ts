@@ -14,6 +14,7 @@ export class OrderInspection {
 	constructor(orderInspection: any) {
 		this.order = new Order(orderInspection.order);
 		this.inspection = new Inspection(orderInspection.inspection);
+		this.savedInspection = orderInspection.savedInspection ? new SavedInspection(orderInspection.savedInspection) : undefined;
 		this.state = orderInspection.state;
 		this.itemBudgets = orderInspection.itemBudgets.map(i => new ItemBudget(i));
 	}

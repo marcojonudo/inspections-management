@@ -5,6 +5,7 @@ import inspections.management.domains.BudgetNotification
 import inspections.management.domains.ItemArticleCode
 import inspections.management.domains.ItemBudget
 import inspections.management.domains.fviberi.Order
+import inspections.management.domains.schedules.EmployeeData
 import inspections.management.pogos.OrderInspection
 import inspections.management.services.InspectionService
 import inspections.management.services.data.*
@@ -31,6 +32,7 @@ class InspectionController {
     @Inject private ItemArticleCodeDataService itemArticleCodeDataService
     @Inject private ItemBudgetDataService itemBudgetDataService
     @Inject private BudgetNotificationDataService budgetNotificationDataService
+    @Inject private EmployeeDataDataService employeeDataDataService
 
     @Get("/language")
     @Operation(
@@ -44,6 +46,20 @@ class InspectionController {
     )
     String findLanguage() {
         return languageDataService.findLanguageLang()
+    }
+
+    @Get("/employees")
+    @Operation(
+        summary = "Obtiene los empleados",
+        description = "Obtiene todos los empleados"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Lista de empleados",
+        content = @Content(array = @ArraySchema(schema = @Schema(implementation = EmployeeData)))
+    )
+    List<EmployeeData> getEmployees() {
+        return employeeDataDataService.findAll()
     }
 
     @Get("/orders")
@@ -129,8 +145,11 @@ class InspectionController {
         description = "Notificación creada",
         content = @Content(schema = @Schema(implementation = BudgetNotification))
     )
-    HttpResponse<BudgetNotification> createBudgetNotification(@Body BudgetNotification budgetNotification) {
-        return HttpResponse.created(budgetNotificationDataService.save(budgetNotification))
+    HttpResponse<List<BudgetNotification>> createBudgetNotification(
+        @Body List<BudgetNotification> budgetNotifications
+    ) {
+        budgetNotifications = budgetNotifications.collect { budgetNotificationDataService.save(it) }
+        return HttpResponse.created(budgetNotifications)
     }
 
     @Delete("/budgetNotification")
@@ -150,7 +169,9 @@ class InspectionController {
     )
     @ApiResponse(responseCode = "200", description = "Presupuesto actualizado")
     void deleteBudgetNotification(@Body BudgetNotification budgetNotification) {
-        budgetNotificationDataService.update(budgetNotification.orderNumber, budgetNotification.accepted)
+        budgetNotificationDataService.update(
+            budgetNotification.orderNumber, budgetNotification.itemCode, budgetNotification.accepted
+        )
     }
 
 }

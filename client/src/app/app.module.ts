@@ -18,6 +18,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { FormsModule } from '@angular/forms';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatRippleModule } from '@angular/material/core';
 
 @NgModule({
 	declarations: [
@@ -45,7 +46,8 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 		}),
 		MatTableModule,
 		MatButtonToggleModule,
-		MatSlideToggleModule
+		MatSlideToggleModule,
+		MatRippleModule
 	],
 	providers: [],
 	bootstrap: [AppComponent]

@@ -6,14 +6,15 @@ import { Subscription } from 'rxjs';
 import { ItemBudget } from '../../objects/item-budget';
 
 export interface Column {
-	ORDER: number;
-	BRAND: string;
-	MODEL: string;
-	INSPECTION_TYPE: string;
-	INSPECTION_STATE: string;
-	BUDGETS: ItemBudget[];
-	CLIENT_CONTACT: number;
-	ACCEPTED_BUDGET: boolean;
+	order: number;
+	orderNumber: number;
+	brand: string;
+	model: string;
+	inspectionType: string;
+	inspectionState: string;
+	budgets: ItemBudget[];
+	clientContact: number;
+	acceptedBudget: boolean;
 }
 
 @Component({
@@ -24,20 +25,23 @@ export interface Column {
 })
 export class InspectionsComponent implements OnDestroy {
 
+	private COLUMNS: string[] = [
+		'order', 'brand', 'model', 'inspectionType', 'inspectionState', 'budgets', 'clientContact', 'acceptedBudget'
+	];
+
 	private COLUMNS_DATA: any = {
-		ORDER: (o: OrderInspection) => o.order.code,
-		BRAND: (o: OrderInspection) => o.order.vehicle.brand,
-		MODEL: (o: OrderInspection) => o.order.vehicle.model,
-		INSPECTION_TYPE: (o: OrderInspection, t: TranslateService) => t.instant(`inspection.type.${ o.inspection.code }`),
-		INSPECTION_STATE: (o: OrderInspection, t: TranslateService) => t.instant(`inspection.state.${ o.state }`),
-		BUDGETS: (o: OrderInspection) => o.itemBudgets,
-		CLIENT_CONTACT: (o: OrderInspection) => 1,
-		ACCEPTED_BUDGET: (o: OrderInspection) => 2,
+		order: (o: OrderInspection) => o.order.code,
+		orderNumber: (o: OrderInspection) => o.order.number,
+		brand: (o: OrderInspection) => o.order.vehicle.brand,
+		model: (o: OrderInspection) => o.order.vehicle.model,
+		inspectionType: (o: OrderInspection) => o.inspection.code,
+		inspectionState: (o: OrderInspection) => o.state,
+		budgets: (o: OrderInspection) => o.itemBudgets
 	};
 
 	private orderInspectionsSubscription: Subscription;
 
-	columns: string[];
+	columnsToDisplay: string[];
 	data: Column[];
 
 	constructor(
@@ -45,7 +49,7 @@ export class InspectionsComponent implements OnDestroy {
 		private translate: TranslateService,
 		private cdRef: ChangeDetectorRef
 	) {
-		this.columns = Object.keys(this.COLUMNS_DATA);
+		this.columnsToDisplay = this.COLUMNS;
 		this.orderInspectionsSubscription = this.inspectionService.orderInspections$.subscribe(orderInspections => {
 			this.data = this.buildData(orderInspections);
 			this.cdRef.detectChanges();
@@ -60,12 +64,16 @@ export class InspectionsComponent implements OnDestroy {
 		return InspectionService.orderInspections;
 	}
 
-	buildData(orderInspections: OrderInspection[], columns: string[] = this.columns, columnsData: any = this.COLUMNS_DATA): Column[] {
+	buildData(orderInspections: OrderInspection[], columnsData: any = this.COLUMNS_DATA): Column[] {
 		const data = [];
+		const allColumns = Object.keys(columnsData);
 		this.orderInspections.forEach(orderInspection => {
 			const row = {};
-			columns.forEach(key => {
-				row[key] = columnsData[key](orderInspection, this.translate);
+			allColumns.forEach(key => {
+				const handler = columnsData[key];
+				if (handler) {
+					row[key] = handler(orderInspection, this.translate);
+				}
 			});
 			data.push(row);
 		});
@@ -73,37 +81,36 @@ export class InspectionsComponent implements OnDestroy {
 	}
 
 	findColumnName(code: string): string {
-		return this.translate.instant(`inspections.table.${ code }`);
+		return this.translate.instant(`inspections.table.${code}`);
+	}
+
+	findInspectionTypeName(code: string): string {
+		return this.translate.instant(`inspection.type.${code}`);
+	}
+
+	findInspectionStateName(state: string): string {
+		return this.translate.instant(`inspection.state.${state}`);
 	}
 
 	checkRecommendedBudget(itemBudgets: ItemBudget[]): boolean {
 		return itemBudgets.length > 0;
 	}
 
-	findBudgetState(orderCode: string, itemBudgets: ItemBudget[]): string {
-		return InspectionService.findBudgetState(orderCode, itemBudgets);
+	findBudgetState(orderNumber: number, itemBudgets: ItemBudget[]): string {
+		return InspectionService.findBudgetState(orderNumber, itemBudgets);
 	}
 
-	checkNotifiedClient(shortCode: string): boolean {
-		const order = InspectionService.findOrder(shortCode);
-		return InspectionService.findBudgetNotification(order.number) !== undefined;
+	checkNotifiedClient(orderNumber: number): boolean {
+		return InspectionService.findBudgetNotification(orderNumber) !== undefined;
 	}
 
-	checkAcceptedBudget(shortCode: string): boolean {
-		const order = InspectionService.findOrder(shortCode);
-		const budgetNotification = InspectionService.findBudgetNotification(order.number);
+	checkAcceptedBudget(orderNumber: number): boolean {
+		const budgetNotification = InspectionService.findBudgetNotification(orderNumber);
 		return budgetNotification && budgetNotification.accepted;
 	}
 
-	updateNotifiedClient(shortCode: string, notified: boolean): void {
-		const order = InspectionService.findOrder(shortCode);
-		this.inspectionService.updateNotifiedClient(order.number, notified).subscribe();
-	}
-
-	updateAcceptedBudget(shortCode: string, accepted: boolean): void {
-		const order = InspectionService.findOrder(shortCode);
-		const budgetNotification = InspectionService.findBudgetNotification(order.number);
-		this.inspectionService.updateAcceptedBudget(budgetNotification, accepted).subscribe();
+	selectOrder(orderNumber: number): void {
+		this.inspectionService.selectOrder(orderNumber);
 	}
 
 }

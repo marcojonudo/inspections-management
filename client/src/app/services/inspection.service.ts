@@ -12,6 +12,7 @@ import { Order } from '../objects/orders/order';
 import { ItemArticleCode } from '../objects/orders/item-article-code';
 import { ItemBudget } from '../objects/item-budget';
 import { BudgetNotification } from '../objects/budget-notification';
+import { Budget } from '../objects/orders/budget';
 
 @Injectable({
 	providedIn: 'root'
@@ -21,33 +22,39 @@ export class InspectionService {
 	static orderInspections: OrderInspection[];
 	static itemArticleCodes: ItemArticleCode[];
 	static budgetNotifications: BudgetNotification[];
+	static selectedOrderInspection: OrderInspection;
 
 	filters: OrdersFilter[];
 
 	orderInspectionsSubject: Subject<OrderInspection[]>;
 	orderInspections$: Observable<OrderInspection[]>;
+	selectedOrderInspectionSubject: Subject<OrderInspection>;
+	selectedOrderInspection$: Observable<OrderInspection>;
 
 	constructor(private http: HttpClient) {
 		this.filters = [new TodayOrdersFilter()];
 		this.orderInspectionsSubject = new Subject<OrderInspection[]>();
 		this.orderInspections$ = this.orderInspectionsSubject.asObservable();
+
+		this.selectedOrderInspectionSubject = new Subject<OrderInspection>();
+		this.selectedOrderInspection$ = this.selectedOrderInspectionSubject.asObservable();
 	}
 
-	static findOrder(code: string, orderInspections: OrderInspection[] = this.orderInspections): Order {
-		return orderInspections.find(o => o.order.code === code).order;
+	static findOrder(orderNumber: number, orderInspections: OrderInspection[] = this.orderInspections): Order {
+		return orderInspections.find(o => o.order.number === orderNumber).order;
 	}
 
-	static findOrderInspection(code: string, orderInspections: OrderInspection[] = this.orderInspections): OrderInspection {
-		return orderInspections.find(o => o.order.code === code);
+	static findOrderInspection(orderNumber: number, orderInspections: OrderInspection[] = this.orderInspections): OrderInspection {
+		return orderInspections.find(o => o.order.number === orderNumber);
 	}
 
-	static findBudgetState(orderCode: string, itemBudgets: ItemBudget[]): string {
-		const orderInspection = this.findOrderInspection(orderCode);
+	static findBudgetState(orderNumber: number, itemBudgets: ItemBudget[]): string {
+		const orderInspection = this.findOrderInspection(orderNumber);
 		/* Si la orden tiene presupuestos relacionados, se comprueba si sus artículos coinciden con los que tiene pendientes
 		 * la revisión */
 		if (orderInspection.order.budgets.length) {
 			/* itemBudgets contiene los items incorrectos, con el tipo de presupuesto que les corresponde */
-			const existentBudget = this.checkExistentBudget(orderInspection.order, orderInspection.itemBudgets);
+			const existentBudget = this.checkExistentBudget2(orderInspection.order, orderInspection.itemBudgets);
 			/* Si existe un presupuesto asociado a alguno de los items no correctos de la revisión, se devuelve cadena vacía para que el
 			 * icono siga en color verde (el paso de realizar presupuesto en JPDV ya ha sido completado) */
 			if (existentBudget) {
@@ -59,7 +66,7 @@ export class InspectionService {
 		return this.findItemBudgetsMainType(itemBudgets);
 	}
 
-	static checkExistentBudget(order: Order, itemBudgets: ItemBudget[]): boolean {
+	static checkExistentBudget2(order: Order, itemBudgets: ItemBudget[]): boolean {
 		return itemBudgets.find(itemBudget => {
 			/* Se buscan los códigos de artículo que corresponden a los items erróneos */
 			const articleCodes = this.itemArticleCodes.filter(itemArticleCode =>
@@ -71,6 +78,20 @@ export class InspectionService {
 				budget.lines.map(l => l.articleCode).find(articleCode => articleCodes.find(code => code === articleCode))
 			);
 		}) !== undefined;
+	}
+
+	static checkExistentBudget(
+		itemCode: string, budgets: Budget[], itemArticleCodes: ItemArticleCode[] = this.itemArticleCodes
+	): boolean {
+		/* Se buscan los códigos de artículo que corresponden al item erróneo */
+		const articleCodes = itemArticleCodes.filter(itemArticleCode =>
+			itemArticleCode.itemCode === itemCode
+		).map(itemArticleCode => itemArticleCode.articleCode);
+		/* Una vez obtenidos los artículos, se comprueba si alguno de los presupuestos asociados a la orden contiene alguno de
+		 * ellos. De ser así, se determinaría que existe presupuesto asociado a la revisión */
+		return budgets.find(budget =>
+			budget.lines.map(l => l.articleCode).find(articleCode => articleCodes.find(code => code === articleCode))
+		) !== undefined;
 	}
 
 	static findItemBudgetsMainType(itemBudgets: ItemBudget[]): string {
@@ -86,9 +107,9 @@ export class InspectionService {
 	}
 
 	static findBudgetNotification(
-		orderNumber: number, budgetNotifications: BudgetNotification[] = this.budgetNotifications
+		orderNumber: number, itemCode: string = undefined, budgetNotifications: BudgetNotification[] = this.budgetNotifications
 	): BudgetNotification {
-		return budgetNotifications.find(c => c.orderNumber === orderNumber);
+		return budgetNotifications.find(c => c.orderNumber === orderNumber && (itemCode ? c.itemCode === itemCode : true));
 	}
 
 	findLanguage(): Observable<string> {
@@ -148,10 +169,28 @@ export class InspectionService {
 		);
 	}
 
-	updateNotifiedClient(orderNumber: number, notifiedClient: boolean): Observable<any> {
-		return notifiedClient ?
-			this.http.post(Url.budgetNotification(), { orderNumber }) :
-			this.http.delete(Url.budgetNotification(), { params: { orderNumber: `${orderNumber}` } });
+	selectOrder(orderNumber: number): void {
+		InspectionService.selectedOrderInspection = InspectionService.findOrderInspection(orderNumber);
+		this.selectedOrderInspectionSubject.next(InspectionService.selectedOrderInspection);
+	}
+
+	createBudgetNotification(orderNumber: number, itemCodes: string[]): Observable<any> {
+		const budgetNotifications = itemCodes.map(itemCode => new BudgetNotification({ orderNumber, itemCode }));
+		return this.http.post(Url.budgetNotification(), budgetNotifications).pipe(
+			tap(() => {
+				InspectionService.budgetNotifications.push(...budgetNotifications);
+			})
+		);
+	}
+
+	deleteBudgetNotification(orderNumber: number): Observable<any> {
+		return this.http.delete(Url.budgetNotification(), { params: { orderNumber: `${orderNumber}` } }).pipe(
+			tap(() => {
+				InspectionService.budgetNotifications = InspectionService.budgetNotifications.filter(budgetNotification =>
+					budgetNotification.orderNumber !== orderNumber
+				);
+			})
+		);
 	}
 
 	updateAcceptedBudget(budgetNotification: BudgetNotification, accepted: boolean): Observable<any> {

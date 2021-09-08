@@ -8,6 +8,7 @@ import org.grails.datastore.gorm.GormEntity
 class BudgetNotification implements GormEntity<BudgetNotification> {
 
 	int orderNumber
+	String itemCode
 	boolean accepted
 
 }

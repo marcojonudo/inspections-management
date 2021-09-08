@@ -92,7 +92,7 @@ class InspectionService {
 	 * @param savedInspections Lista de revisiones guardadas en DB
 	 * @param itemBudgets Items que conllevan presupuesto
 	 */
-	static void  fillOrderInspections(
+	static void fillOrderInspections(
 		List<OrderInspection> orderInspections, List<SavedInspection> savedInspections, List<ItemBudget> itemBudgets
 	) {
 		orderInspections.each { OrderInspection orderInspection ->

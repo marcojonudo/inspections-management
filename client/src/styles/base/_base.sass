@@ -38,19 +38,37 @@ html, body
 .mat-button-toggle-label-content
 	line-height: unset !important
 
-table
+.table-container-wrapper
+	padding: $small-gap
+	box-sizing: border-box
 
-	thead
-		position: sticky
-		top: 0
-		z-index: 2
+	.table-container
+		height: 100%
+		overflow: auto
 
-	tr
-		display: flex
+		table
+			width: 100%
 
-	th, td
-		@include flex-1
-		@include flex-center
+			thead
+				position: sticky
+				top: 0
+				z-index: 2
+
+			tr
+				display: flex
+
+			th, td
+				@include flex-1
+				@include flex-center
+
+		.color-urgent
+			color: $red !important
+
+		.color-secondary, .color-warning
+			color: $dark-highlight !important
+
+		.color-correct
+			color: $light-green !important
 
 @media print
 
