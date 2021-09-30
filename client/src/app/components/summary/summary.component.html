@@ -14,7 +14,7 @@
             <mat-card-title translate>summary.urgentPendingBudgets</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-            3
+            {{findAllItemBudgetLength(urgentType)}}
         </mat-card-content>
     </mat-card>
     <mat-card>
@@ -22,7 +22,7 @@
             <mat-card-title translate>summary.secondaryPendingBudgets</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-            3
+			{{findAllItemBudgetLength(secondaryType)}}
         </mat-card-content>
     </mat-card>
     <mat-card>
@@ -30,7 +30,7 @@
             <mat-card-title translate>summary.pendingClientContacts</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-            3
+            {{findPendingClientContacts()}}
         </mat-card-content>
     </mat-card>
     <mat-card>
@@ -38,18 +38,18 @@
             <mat-card-title translate>summary.sells</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-            3
+            {{findBudgetsPrice()}}€
         </mat-card-content>
     </mat-card>
     <mat-card>
         <mat-card-header>
-            <mat-card-title translate>summary.acceptedBudgets</mat-card-title>
+            <mat-card-title translate>summary.budgets</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-            3
+            {{findAcceptedBudgets()}}/{{findAllBudgets()}}
             <div class="sub-block">
                 <span translate>summary.acceptPercentage</span>
-                <span>12.1%</span>
+                <span>{{findAcceptedPercentage() | percent: '2.1'}}</span>
             </div>
         </mat-card-content>
     </mat-card>
@@ -58,7 +58,7 @@
             <mat-card-title translate>summary.closedOrders</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-            3
+            {{findClosedOrders()}}
         </mat-card-content>
     </mat-card>
     <mat-card>
@@ -66,10 +66,10 @@
             <mat-card-title translate>summary.completedInspections</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-            18/20
+			{{findFinishedInspections()}}/{{orderInspections.length}}
             <div class="sub-block">
                 <span translate>summary.detectedProblems</span>
-                <span>5.7%</span>
+                <span>{{findWrongItemsPercentage() | percent: '2.1'}}</span>
             </div>
         </mat-card-content>
     </mat-card>

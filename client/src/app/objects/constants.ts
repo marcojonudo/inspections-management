@@ -8,6 +8,11 @@ export class Constants {
 	};
 
 	static readonly BUDGET_TYPE: any = {
+		URGENT: 'URGENT',
+		SECONDARY: 'SECONDARY'
+	};
+
+	static readonly BUDGET_TYPE_ORDER: any = {
 		URGENT: 0,
 		SECONDARY: 1
 	};
@@ -16,16 +21,23 @@ export class Constants {
 		yyyy_MM_dd: 'YYYY-MM-DD'
 	};
 
-	static readonly DAY_JS: any = {
-		d: 'd'
+	static readonly ORDER_STATE: any = {
+		V: 'V',
+		F: 'F',
+		X: 'X'
+	};
+
+	static readonly INSPECTION_STATE: any = {
+		FINISHED: 'FINISHED'
+	};
+
+	static readonly ITEM_TYPE: any = {
+		SELECT: 'SELECT'
 	};
 
 	static readonly SELECT_ITEM_OPTION_CODE: any = {
 		C: 'C'
 	};
 
-	static readonly inspectionState: any = {
-		PENDING: 'PENDING'
-	};
 
 }

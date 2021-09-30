@@ -15,6 +15,8 @@ class BudgetLine implements GormEntity<BudgetLine>, Serializable {
 	Budget budget
 	int line
 	int articleCode
+	Float price
+	Float units
 
 	static mapping = {
 		datasource Constants.DataSource.FVIBERI
@@ -23,6 +25,8 @@ class BudgetLine implements GormEntity<BudgetLine>, Serializable {
 		budget column: 'nupresup'
 		line column: 'nulinpto'
 		articleCode column: 'coarticu'
+		price column: 'prpventa'
+		units column: 'capresup'
 
 		id composite: ['budget', 'line'], generator: 'assigned'
 		version false

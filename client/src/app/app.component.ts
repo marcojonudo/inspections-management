@@ -2,6 +2,9 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/
 import { leaveAnimation } from './animations';
 import { InspectionService } from './services/inspection.service';
 import { TranslateService } from '@ngx-translate/core';
+import { LoadingService } from './services/loading.service';
+import { forkJoin } from 'rxjs';
+import { EmployeeService } from './services/employee.service';
 
 @Component({
 	selector: 'app-root',
@@ -17,18 +20,22 @@ export class AppComponent {
 
 	constructor(
 		private inspectionService: InspectionService,
-		private translate: TranslateService,
-		private cdRef: ChangeDetectorRef
+		private employeeService: EmployeeService,
+		private loadingService: LoadingService,
+		private translate: TranslateService
 	) {
 		this.loading = true;
 
-		this.inspectionService.findLanguage().subscribe((lang: string) => {
-			this.translate.setDefaultLang(lang);
+		forkJoin([
+			this.inspectionService.findLanguage(),
+			this.employeeService.findEmployees()
+		]).subscribe(data => {
+			this.translate.setDefaultLang(data[0]);
+			EmployeeService.setEmployees(data[1]);
 		});
 
-		this.inspectionService.loadMainInfo().subscribe(() => {
-			this.loading = false;
-			this.cdRef.detectChanges();
+		this.loadingService.subscribe(loading => {
+			this.loading = loading;
 		});
 	}
 

@@ -10,7 +10,6 @@ import inspections.management.domains.savedItems.SelectSavedItem
 import inspections.management.pogos.OrderInspection
 import inspections.management.services.data.InspectionDataService
 import inspections.management.services.data.ItemBudgetDataService
-import inspections.management.services.data.OrderDataService
 import inspections.management.services.data.SavedInspectionDataService
 import inspections.management.utils.Constants
 import org.slf4j.Logger
@@ -25,7 +24,6 @@ class InspectionService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(InspectionService)
 
-	@Inject private OrderDataService orderDataService
 	@Inject private ItemBudgetDataService itemBudgetDataService
 	@Inject private InspectionDataService inspectionDataService
 	@Inject private SavedInspectionDataService savedInspectionDataService
@@ -41,7 +39,8 @@ class InspectionService {
 			)
 			fillOrderInspections(orderInspections, savedInspections, itemBudgets)
 		}
-		return orderInspections
+		/* Sólo se obtienen aquellas órdenes cuya revisión tenga algún elemento susceptible de presupuesto */
+		return orderInspections.findAll { it.itemBudgets }
 	}
 
 	/**

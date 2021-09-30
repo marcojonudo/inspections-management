@@ -6,7 +6,7 @@ import groovy.transform.CompileStatic
 class Constants {
 
     static final String SPAIN_TIMEZONE = "Europe/Madrid"
-    static final List<String> CLOSED_ORDER_STATES = ['V', 'F', 'X']
+    static final List<String> CLOSED_ORDER_STATES = ['V', 'X']
     static final String SELECT_CORRECT_OPTION_CODE = 'C'
 
     static class DataSource {

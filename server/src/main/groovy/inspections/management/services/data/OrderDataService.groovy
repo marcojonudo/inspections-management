@@ -21,7 +21,7 @@ abstract class OrderDataService {
 	@Where({ day == day && !(state in Constants.CLOSED_ORDER_STATES) })
 	abstract List<Order> findAllOrders(LocalDate day)
 
-	@Where({ day < day && !(state in Constants.CLOSED_ORDER_STATES) })
+	@Where({ day < day && day >= day.minusDays(7) && !(state in Constants.CLOSED_ORDER_STATES) })
 	abstract List<Order> findAllOrdersTo(LocalDate day)
 
 	List<Order> findAllTo(LocalDate day) {
@@ -48,7 +48,6 @@ abstract class OrderDataService {
 			order.budgets = orderBudgetNumbers.collect { int budgetNumber ->
 				budgets.find { it.number == budgetNumber }
 			}
-			int a = 1
 		}
 		return orders
 	}

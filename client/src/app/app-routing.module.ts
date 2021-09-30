@@ -2,13 +2,14 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { HomeComponent } from './components/home/home.component';
 import { EmployeesResolver } from './resolvers/employees-resolver';
+import { MainInfoResolver } from './resolvers/main-info-resolver';
 
 
 const routes: Routes = [
 	{
 		path: 'home',
 		component: HomeComponent,
-		resolve: { employees: EmployeesResolver }
+		resolve: { mainInfo: MainInfoResolver }
 	},
 	{ path: '**', pathMatch: 'full', redirectTo: 'home' }
 ];

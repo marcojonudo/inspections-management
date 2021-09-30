@@ -19,6 +19,7 @@ import { Budget } from '../objects/orders/budget';
 })
 export class InspectionService {
 
+	static orders: Order[];
 	static orderInspections: OrderInspection[];
 	static itemArticleCodes: ItemArticleCode[];
 	static budgetNotifications: BudgetNotification[];
@@ -26,8 +27,6 @@ export class InspectionService {
 
 	filters: OrdersFilter[];
 
-	orderInspectionsSubject: Subject<OrderInspection[]>;
-	orderInspections$: Observable<OrderInspection[]>;
 	selectedOrderInspectionSubject: Subject<OrderInspection>;
 	selectedOrderInspection$: Observable<OrderInspection>;
 	budgetNotificationsSubject: Subject<BudgetNotification[]>;
@@ -35,8 +34,6 @@ export class InspectionService {
 
 	constructor(private http: HttpClient) {
 		this.filters = [new TodayOrdersFilter()];
-		this.orderInspectionsSubject = new Subject<OrderInspection[]>();
-		this.orderInspections$ = this.orderInspectionsSubject.asObservable();
 
 		this.selectedOrderInspectionSubject = new Subject<OrderInspection>();
 		this.selectedOrderInspection$ = this.selectedOrderInspectionSubject.asObservable();
@@ -78,10 +75,10 @@ export class InspectionService {
 
 	static findItemBudgetsMainType(types: string[]): string {
 		return types.sort((a, b) => {
-			if (Constants.BUDGET_TYPE[a] < Constants.BUDGET_TYPE[b]) {
+			if (Constants.BUDGET_TYPE_ORDER[a] < Constants.BUDGET_TYPE_ORDER[b]) {
 				return -1;
 			}
-			if (Constants.BUDGET_TYPE[a] > Constants.BUDGET_TYPE[b]) {
+			if (Constants.BUDGET_TYPE_ORDER[a] > Constants.BUDGET_TYPE_ORDER[b]) {
 				return 1;
 			}
 			return 0;
@@ -100,6 +97,48 @@ export class InspectionService {
 		return budgetNotifications.filter(c => c.orderNumber === orderNumber);
 	}
 
+	static findAllItemBudgets(type: string = undefined, orderInspections: OrderInspection[] = this.orderInspections): ItemBudget[] {
+		const itemBudgets = [];
+		orderInspections.forEach(orderInspection => {
+			const foundItemBudgets = type ?
+				orderInspection.itemBudgets.filter(itemBudget => itemBudget.budgetType === type) :
+				orderInspection.itemBudgets;
+			itemBudgets.push(...foundItemBudgets);
+		});
+		return itemBudgets;
+	}
+
+	static findPendingClientContactOrders(orderInspections: OrderInspection[] = this.orderInspections): number[] {
+		const pendingContactOrders = [];
+		orderInspections.forEach(orderInspection => {
+			const pending = InspectionService.findBudgetNotifications(orderInspection.order.number).length === 0;
+			if (pending) {
+				pendingContactOrders.push(orderInspection.order.number);
+			}
+		});
+		return pendingContactOrders;
+	}
+
+	static findBudgetsPrice(orderInspections: OrderInspection[] = this.orderInspections): number {
+		let price = 0;
+		orderInspections.forEach(orderInspection => {
+			orderInspection.order.budgets.forEach(budget => {
+				budget.lines.filter(l => l.price).forEach(line => {
+					price += line.units * line.price;
+				});
+			});
+		});
+		return price;
+	}
+
+	static findAllBudgetNotifications(orderInspections: OrderInspection[] = this.orderInspections): BudgetNotification[] {
+		const allBudgetNotifications = [];
+		orderInspections.forEach(orderInspection => {
+			allBudgetNotifications.push(...InspectionService.findBudgetNotifications(orderInspection.order.number));
+		});
+		return allBudgetNotifications;
+	}
+
 	findLanguage(): Observable<string> {
 		const language = LocalStorageService.getItem(Constants.LOCAL_STORAGE.LANGUAGE);
 		return (language ? of(language) : this.http.get(Url.language(), { responseType: 'text' })).pipe(
@@ -114,9 +153,11 @@ export class InspectionService {
 	loadMainInfo(filters: OrdersFilter[] = this.filters): Observable<any> {
 		return this.findOrders(filters).pipe(
 			mergeMap(orders => {
-				console.log('Orders', orders);
-				const articles = this.findArticles(orders);
-				const orderNumbers = orders.map(o => o.number);
+				const openedOrders = orders.filter(o => o.state !== Constants.ORDER_STATE.F);
+				console.log('Opened orders', openedOrders);
+
+				const articles = this.findArticles(openedOrders);
+				const orderNumbers = openedOrders.map(o => o.number);
 				const budgetNotificationsUrl = `${Url.budgetNotification()}?orderNumbers=${orderNumbers.join('&orderNumbers=')}`;
 				return forkJoin([
 					this.http.post(Url.orderInspections(), orders),
@@ -134,7 +175,6 @@ export class InspectionService {
 				console.log('Order inspections', InspectionService.orderInspections);
 				console.log('Item article codes', InspectionService.itemArticleCodes);
 				console.log('Client budget notifications', InspectionService.budgetNotifications);
-				this.orderInspectionsSubject.next(InspectionService.orderInspections);
 			})
 		);
 	}
@@ -152,7 +192,9 @@ export class InspectionService {
 		return forkJoin(requests).pipe(
 			map(data => {
 				console.log('Received orders info', data);
-				return [].concat(...data).map(o => new Order(o));
+				const orders = [].concat(...data).map(o => new Order(o));
+				console.log('Orders', orders);
+				return orders;
 			})
 		);
 	}

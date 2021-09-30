@@ -8,6 +8,7 @@ export class Order {
 
 	number: number;
 	code: string;
+	state: string;
 	vehicle: Vehicle;
 	client: Client;
 	sellerCode: string;
@@ -17,6 +18,7 @@ export class Order {
 	constructor(order: any) {
 		this.number = order.number;
 		this.code = order.code;
+		this.state = order.state;
 		this.vehicle = new Vehicle(order.vehicle);
 		this.client = new Client(order.client);
 		this.sellerCode = order.sellerCode;

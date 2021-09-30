@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { EmployeeService } from '../../services/employee.service';
+import { LoadingService } from '../../services/loading.service';
 
 @Component({
 	selector: 'app-home',
@@ -10,11 +10,15 @@ import { EmployeeService } from '../../services/employee.service';
 })
 export class HomeComponent implements OnInit {
 
-	constructor(private activatedRoute: ActivatedRoute) {}
+	constructor(
+		private loadingService: LoadingService,
+		private cdRef: ChangeDetectorRef,
+		private activatedRoute: ActivatedRoute
+	) {}
 
 	ngOnInit(): void {
-		this.activatedRoute.data.subscribe((data: { employees: any }) => {
-			EmployeeService.setEmployees(data.employees);
+		this.activatedRoute.data.subscribe(() => {
+			this.loadingService.stop();
 		});
 	}
 

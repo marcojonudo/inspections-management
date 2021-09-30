@@ -39,7 +39,6 @@ export class InspectionsComponent implements OnDestroy {
 		budgets: (o: OrderInspection) => o.itemBudgets
 	};
 
-	private orderInspectionsSubscription: Subscription;
 	private budgetNotificationsSubscription: Subscription;
 
 	columnsToDisplay: string[];
@@ -51,10 +50,7 @@ export class InspectionsComponent implements OnDestroy {
 		private cdRef: ChangeDetectorRef
 	) {
 		this.columnsToDisplay = this.COLUMNS;
-		this.orderInspectionsSubscription = this.inspectionService.orderInspections$.subscribe(orderInspections => {
-			this.data = this.buildData(orderInspections);
-			this.cdRef.detectChanges();
-		});
+		this.data = this.buildData(InspectionService.orderInspections);
 		this.budgetNotificationsSubscription = this.inspectionService.budgetNotifications$.subscribe(() => {
 			/* La lista budgetNotifications ya se ha actualizado en el servicio. Aquí se consume el Observable para poder ejecutar un
 			 * ciclo de CD, y refrescar el contenido cuando se actualiza la notificación de cliente */
@@ -63,7 +59,6 @@ export class InspectionsComponent implements OnDestroy {
 	}
 
 	ngOnDestroy(): void {
-		this.orderInspectionsSubscription.unsubscribe();
 		this.budgetNotificationsSubscription.unsubscribe();
 	}
 

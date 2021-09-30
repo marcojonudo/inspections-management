@@ -27,7 +27,8 @@ export class EmployeeService {
 	}
 
 	findEmployees(): Observable<any> {
-		return this.http.get(Url.employees()).pipe(
+		const employees = LocalStorageService.getItem(Constants.LOCAL_STORAGE.EMPLOYEES);
+		return employees ? of(employees) : this.http.get(Url.employees()).pipe(
 			catchError(() => of([]))
 		);
 	}

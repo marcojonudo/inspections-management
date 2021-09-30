@@ -27,7 +27,11 @@ class BudgetLineDeserializer extends StdDeserializer<BudgetLine> {
 		int budgetNumber = node.get("budgetNumber").asInt()
 		int line = node.get("line").asInt()
 		int articleCode = node.get("articleCode").asInt()
-		return new BudgetLine(budget: new Budget(number: budgetNumber), line: line, articleCode: articleCode)
+		Float units = (Float) node.get("units")?.asDouble()
+		Float price = (Float) node.get("price")?.asDouble()
+		return new BudgetLine(
+			budget: new Budget(number: budgetNumber), line: line, articleCode: articleCode, units: units, price: price
+		)
 	}
 
 }

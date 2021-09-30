@@ -76,7 +76,8 @@ class InspectionController {
         @QueryValue @Format(Constants.DateFormat.yyyy_MM_dd) LocalDate day,
         @QueryValue boolean to
     ) {
-        return to ? orderDataService.findAllTo(day) : orderDataService.findAll(day)
+        List<Order> a = to ? orderDataService.findAllTo(day) : orderDataService.findAll(day)
+        return a
     }
 
     @Post("/orderInspection")
