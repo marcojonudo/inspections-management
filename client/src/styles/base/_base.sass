@@ -1,0 +1,79 @@
+html, body
+	height: 100%
+	user-select: none
+	-webkit-print-color-adjust: exact !important
+
+::-webkit-scrollbar
+	width: 4px
+	border: 1px solid #d5d5d5
+	background-color: #f1f1f1
+
+::-webkit-scrollbar-thumb
+	background: #c1c1c1
+	border-radius: 10px
+
+::-webkit-scrollbar-thumb:hover
+	background: #a8a8a8
+	color: $primary
+
+.mat-snack-bar-container
+	min-width: 0 !important
+	max-width: 100% !important
+
+.warning-snack-bar
+	color: $white
+	background-color: $highlight
+
+.success-snack-bar
+	color: $white
+	background-color: $light-green
+
+.error-snack-bar
+	color: $white
+	background-color: $red
+
+.mat-card-header-text
+	width: 100%
+
+.mat-button-toggle-label-content
+	line-height: unset !important
+
+.table-container-wrapper
+	padding: $small-gap
+	box-sizing: border-box
+
+	.table-container
+		height: 100%
+		overflow: auto
+
+		table
+			width: 100%
+
+			thead
+				position: sticky
+				top: 0
+				z-index: 2
+
+			tr
+				display: flex
+
+			th, td
+				@include flex-1
+				@include flex-center
+
+		.color-urgent
+			color: $red !important
+
+		.color-secondary, .color-warning
+			color: $dark-highlight !important
+
+		.color-correct
+			color: $light-green
+
+@media print
+
+	.no-print
+		display: none !important
+
+	@page
+		margin: $small-gap $medium-gap

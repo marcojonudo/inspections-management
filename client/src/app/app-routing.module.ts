@@ -1,11 +1,22 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { HomeComponent } from './components/home/home.component';
+import { EmployeesResolver } from './resolvers/employees-resolver';
+import { MainInfoResolver } from './resolvers/main-info-resolver';
 
 
-const routes: Routes = [];
+const routes: Routes = [
+	{
+		path: 'home',
+		component: HomeComponent,
+		resolve: { mainInfo: MainInfoResolver }
+	},
+	{ path: '**', pathMatch: 'full', redirectTo: 'home' }
+];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+	imports: [RouterModule.forRoot(routes)],
+	exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {
+}

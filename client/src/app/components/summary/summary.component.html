@@ -1,0 +1,76 @@
+<header>
+	<div id="header-wrapper" class="mat-elevation-z1">
+		<mat-button-toggle-group id="filter-selector" [(ngModel)]="filters">
+			<mat-button-toggle (change)="filterOrders($event.value)" [value]="pendingFilter">Pasadas</mat-button-toggle>
+			<mat-button-toggle (change)="filterOrders($event.value)" [value]="todayFilter" checked>Hoy</mat-button-toggle>
+			<mat-button-toggle (change)="filterOrders($event.value)" [value]="allFilters">Todas</mat-button-toggle>
+		</mat-button-toggle-group>
+		<span>Situación revisiones taller</span>
+	</div>
+</header>
+<section id="cards-summary">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title translate>summary.urgentPendingBudgets</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            {{findAllItemBudgetLength(urgentType)}}
+        </mat-card-content>
+    </mat-card>
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title translate>summary.secondaryPendingBudgets</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+			{{findAllItemBudgetLength(secondaryType)}}
+        </mat-card-content>
+    </mat-card>
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title translate>summary.pendingClientContacts</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            {{findPendingClientContacts()}}
+        </mat-card-content>
+    </mat-card>
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title translate>summary.sells</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            {{findBudgetsPrice()}}€
+        </mat-card-content>
+    </mat-card>
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title translate>summary.budgets</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            {{findAcceptedBudgets()}}/{{findAllBudgets()}}
+            <div class="sub-block">
+                <span translate>summary.acceptPercentage</span>
+                <span>{{findAcceptedPercentage() | percent: '2.1'}}</span>
+            </div>
+        </mat-card-content>
+    </mat-card>
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title translate>summary.closedOrders</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            {{findClosedOrders()}}
+        </mat-card-content>
+    </mat-card>
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title translate>summary.completedInspections</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+			{{findFinishedInspections()}}/{{orderInspections.length}}
+            <div class="sub-block">
+                <span translate>summary.detectedProblems</span>
+                <span>{{findWrongItemsPercentage() | percent: '2.1'}}</span>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</section>
