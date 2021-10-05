@@ -10,6 +10,9 @@
 			position: relative
 			@include flex-center
 			padding: $small-gap
+			background-color: $secondary
+			color: $white
+			border-radius: $border-radius
 
 			#filter-selector
 				position: absolute
@@ -30,13 +33,33 @@
 
 		& > mat-card
 			@include flex-1
+			@include flex-column
 			text-align: center
 			padding: $small-gap 0
 			margin: 0 $small-gap
 			box-sizing: border-box
 
-			.sub-block
-				@include flex-column
-
 			mat-card-title
 				font-size: 1.3em
+
+				&.mat-card-title
+					margin-bottom: 0 !important
+
+			mat-card-content
+				@include flex-1
+				@include flex-column
+
+				.content-block
+					@include flex-1
+					@include flex-column
+
+					& > span
+						@include flex-1
+
+						&:first-child
+							font-size: 1.2em
+
+						&:last-child
+							@include flex-center
+							font-size: 1.8em
+							font-weight: bold

@@ -6,8 +6,12 @@ export class Url {
 		return `${environment.serverUrl}/inspection/orders`;
 	}
 
-	static orderInspections(): string {
-		return `${environment.serverUrl}/inspection/orderInspection`;
+	static inspections(): string {
+		return `${environment.serverUrl}/inspection/inspections`;
+	}
+
+	static savedInspections(): string {
+		return `${environment.serverUrl}/inspection/savedInspections`;
 	}
 
 	static language(): string {

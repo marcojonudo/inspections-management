@@ -1,10 +1,10 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { OrdersFilter } from '../../objects/filters/orders-filter';
 import { PendingOrdersFilter } from '../../objects/filters/pending-orders-filter';
 import { TodayOrdersFilter } from '../../objects/filters/today-orders-filter';
 import { InspectionService } from '../../services/inspection.service';
 import { Constants } from '../../objects/constants';
-import { OrderInspection } from '../../objects/order-inspection';
+import { OrderInspectionVehicle } from '../../objects/order-inspection-vehicle';
 
 @Component({
 	selector: 'app-summary',
@@ -35,8 +35,8 @@ export class SummaryComponent {
 		return Constants.BUDGET_TYPE.SECONDARY;
 	}
 
-	get orderInspections(): OrderInspection[] {
-		return InspectionService.orderInspections;
+	get orderInspections(): OrderInspectionVehicle[] {
+		return InspectionService.orderInspections2;
 	}
 
 	filterOrders(filters: OrdersFilter[]): void {
@@ -71,19 +71,27 @@ export class SummaryComponent {
 	}
 
 	findClosedOrders(): number {
-		return InspectionService.orderInspections.filter(orderInspection =>
-			orderInspection.order.state === Constants.ORDER_STATE.F && orderInspection.state !== Constants.INSPECTION_STATE.FINISHED
-		).length;
+		return this.orderInspections.filter(orderInspection => {
+			const savedInspection = InspectionService.findSavedInspection(orderInspection.order.number);
+			return orderInspection.order.state === Constants.ORDER_STATE.F && savedInspection.state !== Constants.INSPECTION_STATE.FINISHED;
+		}).length;
 	}
 
 	findFinishedInspections(): number {
-		return InspectionService.orderInspections.filter(orderInspection =>
-			orderInspection.state === Constants.INSPECTION_STATE.FINISHED
-		).length;
+		return this.orderInspections.filter(orderInspection => {
+			const savedInspection = InspectionService.findSavedInspection(orderInspection.order.number);
+			return savedInspection.state === Constants.INSPECTION_STATE.FINISHED;
+		}).length;
 	}
 
 	findWrongItemsPercentage(): number {
-		const savedInspections = this.orderInspections.filter(o => o.savedInspection).map(o => o.savedInspection);
+		const savedInspections = [];
+		this.orderInspections.forEach(o => {
+			const savedInspection = InspectionService.findSavedInspection(o.order.number);
+			if (savedInspection) {
+				savedInspections.push(savedInspection);
+			}
+		});
 		const totalItems = [].concat(...savedInspections.map(s => s.items.filter(i => i.item.type === Constants.ITEM_TYPE.SELECT)));
 		const wrongItems = totalItems.filter(i => i.filled && i.findValue() !== Constants.SELECT_ITEM_OPTION_CODE.C);
 		return wrongItems.length / totalItems.length;
