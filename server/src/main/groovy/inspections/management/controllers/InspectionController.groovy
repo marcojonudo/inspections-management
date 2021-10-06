@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import inspections.management.domains.BudgetNotification
 import inspections.management.domains.ItemArticleCode
 import inspections.management.domains.ItemBudget
+import inspections.management.domains.SavedInspection
 import inspections.management.domains.fviberi.Order
 import inspections.management.domains.schedules.EmployeeData
 import inspections.management.pogos.OrderInspection
@@ -18,13 +19,19 @@ import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import javax.inject.Inject
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.temporal.ChronoUnit
 
 @Controller("/inspection")
 @CompileStatic
 class InspectionController {
+
+    private static final Logger LOG = LoggerFactory.getLogger(InspectionController)
 
     @Inject private OrderDataService orderDataService
     @Inject private InspectionService inspectionService
@@ -33,6 +40,7 @@ class InspectionController {
     @Inject private ItemBudgetDataService itemBudgetDataService
     @Inject private BudgetNotificationDataService budgetNotificationDataService
     @Inject private EmployeeDataDataService employeeDataDataService
+    @Inject private SavedInspectionDataService savedInspectionDataService
 
     @Get("/language")
     @Operation(
@@ -76,22 +84,38 @@ class InspectionController {
         @QueryValue @Format(Constants.DateFormat.yyyy_MM_dd) LocalDate day,
         @QueryValue boolean to
     ) {
-        List<Order> a = to ? orderDataService.findAllTo(day) : orderDataService.findAll(day)
-        return a
+        return to ? orderDataService.findAllTo(day) : orderDataService.findAll(day)
     }
 
-    @Post("/orderInspection")
+    @Post("/inspections")
     @Operation(
-        summary = "Obtiene las ordenes y revisiones",
-        description = "Obtiene las ordenes y e información sobre la revisión asociada"
+        summary = "Obtiene las revisiones",
+        description = "Obtiene las revisiones asociadas a los números de orden"
     )
     @ApiResponse(
         responseCode = "200",
-        description = "Lista de ordenes y revisiones",
+        description = "Lista de revisiones",
         content = @Content(array = @ArraySchema(schema = @Schema(implementation = OrderInspection)))
     )
-    List<OrderInspection> findOrderInspectionInfo(@Body List<Order> orders) {
-        return inspectionService.findOrderInspectionInfo(orders)
+    List<OrderInspection> findInspections(@Body List<Order> orders) {
+        return inspectionService.findOrderInspections(orders)
+    }
+
+    @Post("/savedInspections")
+    @Operation(
+        summary = "Obtiene las revisiones guardadas",
+        description = "Obtiene las revisiones guardadas en base de datos"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Lista de revisiones guardadas",
+        content = @Content(array = @ArraySchema(schema = @Schema(implementation = SavedInspection)))
+    )
+    List<SavedInspection> findSavedInspections(@Body List<Integer> orders) {
+        LocalTime refTime = LocalTime.now()
+        List<SavedInspection> a = savedInspectionDataService.findAll(orders)
+        LOG.info("SAVED -INSPECIONTS: ${ChronoUnit.MILLIS.between(refTime, LocalTime.now())}")
+        return a
     }
 
     @Post("/articleItems")
@@ -105,7 +129,7 @@ class InspectionController {
         content = @Content(array = @ArraySchema(schema = @Schema(implementation = ItemArticleCode)))
     )
     List<ItemArticleCode> findArticleItems(@Body List<Integer> articleCodes) {
-        return articleCodes ? itemArticleCodeDataService.findAll(articleCodes) : []
+        return itemArticleCodeDataService.findAll(articleCodes)
     }
 
     @Get("/itemBudgets")
@@ -133,7 +157,7 @@ class InspectionController {
         content = @Content(array = @ArraySchema(schema = @Schema(implementation = BudgetNotification)))
     )
     List<BudgetNotification> findBudgetNotifications(@QueryValue List<Integer> orderNumbers) {
-        return orderNumbers ? budgetNotificationDataService.findAll(orderNumbers) : []
+        return budgetNotificationDataService.findAll(orderNumbers)
     }
 
     @Post("/budgetNotification")

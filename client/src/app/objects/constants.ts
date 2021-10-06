@@ -28,6 +28,8 @@ export class Constants {
 	};
 
 	static readonly INSPECTION_STATE: any = {
+		PENDING: 'PENDING',
+		STARTED: 'STARTED',
 		FINISHED: 'FINISHED'
 	};
 

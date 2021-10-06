@@ -1,4 +1,4 @@
-export class Inspection {
+export class InspectionType {
 
 	code: string;
 	name: string;

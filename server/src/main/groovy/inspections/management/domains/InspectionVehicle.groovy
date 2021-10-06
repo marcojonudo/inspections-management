@@ -8,23 +8,21 @@ import org.grails.datastore.gorm.GormEntity
 
 @Entity
 @TupleConstructor
-class Inspection implements GormEntity<Inspection> {
+class InspectionVehicle implements GormEntity<InspectionVehicle> {
 
-	String code
-	String name
-
-	@JsonIgnore
+	InspectionType inspectionType
+	String vehicle
 	Set<Item> items
 
-	static hasMany = [items: Item, internalCodes: InspectionInternalCode]
+	@JsonIgnore
+	Set<ArticleCodeInspection> articleCodes
 
-	static constraints = {
-		code maxSize: 15
-		name maxSize: 45
-	}
+	static hasMany = [items: Item, articleCodes: ArticleCodeInspection]
 
 	static mapping = {
+		inspectionType lazy: false
 		items fetch: 'join'
+		articleCodes fetch: 'join'
 	}
 
 }

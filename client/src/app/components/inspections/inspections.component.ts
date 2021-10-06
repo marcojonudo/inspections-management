@@ -1,9 +1,12 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
-import { OrderInspection } from '../../objects/order-inspection';
 import { InspectionService } from '../../services/inspection.service';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ItemBudget } from '../../objects/item-budget';
+import { OrderInspectionVehicle } from '../../objects/order-inspection-vehicle';
+import { Order } from '../../objects/orders/order';
+import { SavedInspection } from '../../objects/inspections/saved-inspection';
+import { Constants } from '../../objects/constants';
 
 export interface Column {
 	order: number;
@@ -30,13 +33,14 @@ export class InspectionsComponent implements OnDestroy {
 	];
 
 	private COLUMNS_DATA: any = {
-		order: (o: OrderInspection) => o.order.code,
-		orderNumber: (o: OrderInspection) => o.order.number,
-		brand: (o: OrderInspection) => o.order.vehicle.brand,
-		model: (o: OrderInspection) => o.order.vehicle.model,
-		inspectionType: (o: OrderInspection) => o.inspection.code,
-		inspectionState: (o: OrderInspection) => o.state,
-		budgets: (o: OrderInspection) => o.itemBudgets
+		order: (o: Order) => o.code,
+		orderNumber: (o: Order) => o.number,
+		brand: (o: Order) => o.vehicle.brand,
+		model: (o: Order) => o.vehicle.model,
+		inspectionType: (o: Order, inspection: OrderInspectionVehicle) => inspection.inspection.inspectionType.code,
+		inspectionState: (o: Order, inspection: OrderInspectionVehicle, savedInspection: SavedInspection) =>
+			savedInspection ? savedInspection.state : Constants.INSPECTION_STATE.PENDING,
+		budgets: (o: Order, inspection: OrderInspectionVehicle, savedInspection: SavedInspection) => savedInspection.itemBudgets
 	};
 
 	private budgetNotificationsSubscription: Subscription;
@@ -50,7 +54,7 @@ export class InspectionsComponent implements OnDestroy {
 		private cdRef: ChangeDetectorRef
 	) {
 		this.columnsToDisplay = this.COLUMNS;
-		this.data = this.buildData(InspectionService.orderInspections);
+		this.data = this.buildData(InspectionService.orderInspections2);
 		this.budgetNotificationsSubscription = this.inspectionService.budgetNotifications$.subscribe(() => {
 			/* La lista budgetNotifications ya se ha actualizado en el servicio. Aquí se consume el Observable para poder ejecutar un
 			 * ciclo de CD, y refrescar el contenido cuando se actualiza la notificación de cliente */
@@ -62,22 +66,27 @@ export class InspectionsComponent implements OnDestroy {
 		this.budgetNotificationsSubscription.unsubscribe();
 	}
 
-	get orderInspections(): OrderInspection[] {
-		return InspectionService.orderInspections;
-	}
+	// get orderInspections(): OrderInspection[] {
+	// 	return InspectionService.orderInspections;
+	// }
 
-	buildData(orderInspections: OrderInspection[], columnsData: any = this.COLUMNS_DATA): Column[] {
+	buildData(orderInspections: OrderInspectionVehicle[], columnsData: any = this.COLUMNS_DATA): Column[] {
 		const data = [];
 		const allColumns = Object.keys(columnsData);
-		this.orderInspections.forEach(orderInspection => {
-			const row = {};
-			allColumns.forEach(key => {
-				const handler = columnsData[key];
-				if (handler) {
-					row[key] = handler(orderInspection, this.translate);
-				}
-			});
-			data.push(row);
+		orderInspections.forEach(orderInspection => {
+			const inspection = InspectionService.findOrderInspection(orderInspection.order.number);
+			/* Se obtienen únicamente aquellas OR que tengan revisión */
+			if (inspection) {
+				const savedInspection = InspectionService.findSavedInspection(orderInspection.order.number);
+				const row = {};
+				allColumns.forEach(key => {
+					const handler = columnsData[key];
+					if (handler) {
+						row[key] = handler(orderInspection.order, inspection, savedInspection);
+					}
+				});
+				data.push(row);
+			}
 		});
 		return data;
 	}

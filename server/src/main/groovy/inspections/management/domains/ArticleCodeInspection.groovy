@@ -5,10 +5,11 @@ import grails.gorm.annotation.Entity
 import org.grails.datastore.gorm.GormEntity
 
 @Entity
-class InspectionInternalCode implements GormEntity<InspectionInternalCode> {
+class ArticleCodeInspection implements GormEntity<ArticleCodeInspection> {
+
+	int articleCode
 
 	@JsonIgnore
-	Inspection inspection
-	int code
+	InspectionVehicle inspectionVehicle
 
 }

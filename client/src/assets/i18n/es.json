@@ -1,4 +1,12 @@
 {
+	"header": {
+		"title": "Situación revisiones taller",
+		"filter": {
+			"old": "Pasadas",
+			"today": "Hoy",
+			"all": "Todas"
+		}
+	},
 	"summary": {
 		"urgentPendingBudgets": "Presupuestos pendientes urgentes",
 		"secondaryPendingBudgets": "Presupuestos pendientes secundarios",
@@ -168,8 +176,8 @@
 			"inspectionState": "Estado",
 			"budgets": "Presupuestos",
 			"clientContact": "Contacto cliente",
-			"doneBudget": "Ptto. realizado",
-			"acceptedBudget": "Ptto. aceptado",
+			"doneBudget": "Pto. realizado",
+			"acceptedBudget": "Pto. aceptado",
 			"item": "Item"
 		}
 	}

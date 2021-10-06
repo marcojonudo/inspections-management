@@ -2,7 +2,7 @@ package inspections.management.domains.items
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import grails.gorm.annotation.Entity
-import inspections.management.domains.Inspection
+import inspections.management.domains.InspectionVehicle
 import org.grails.datastore.gorm.GormEntity
 
 @Entity
@@ -12,11 +12,18 @@ class Item implements GormEntity<Item> {
 	String code
 
 	@JsonIgnore
-	Set<Inspection> inspections
+	Set<InspectionVehicle> inspectionsVehicle
 
-	static hasMany = [inspections: Inspection]
+	@JsonIgnore
+	Set<ItemVehicleData> vehicleDataList
 
-	static belongsTo = Inspection
+    ItemVehicleData vehicleData
+
+	static hasMany = [inspectionsVehicle: InspectionVehicle, vehicleDataList: ItemVehicleData]
+
+	static belongsTo = InspectionVehicle
+
+	static transients = ['vehicleData']
 
 	static constraints = {
 		type maxSize: 25
@@ -24,6 +31,8 @@ class Item implements GormEntity<Item> {
 
 	static mapping = {
 		tablePerHierarchy false
+
+		vehicleDataList fetch: 'join'
 	}
 
 	enum Type {

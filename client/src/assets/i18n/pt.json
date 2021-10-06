@@ -1,4 +1,12 @@
 {
+	"header": {
+		"title": "Situación revisiones taller",
+		"filter": {
+			"old": "Pasadas",
+			"today": "Hoy",
+			"all": "Todas"
+		}
+	},
 	"init": {
 		"introduceEmployeeCode": "Qual é o seu código de empregado?",
 		"employeeCode": "Código de empregado",
