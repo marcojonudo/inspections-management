@@ -98,11 +98,7 @@ export class InspectionDetailsComponent {
 		} else {
 			observable = this.inspectionService.deleteBudgetNotification(orderInspection.order.number);
 		}
-		console.log(1);
-		observable.subscribe(() => {
-			console.log(2);
-			this.cdRef.detectChanges();
-		});
+		observable.subscribe();
 	}
 
 	updateAcceptedBudget(orderNumber: number, itemCode: string, accepted: boolean): void {

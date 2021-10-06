@@ -69,7 +69,6 @@ export class InspectionService {
 	static findOrderItemBudgetType(orderNumber: number): string {
 		const order = this.findOrderInspection(orderNumber).order;
 		const savedInspection = this.findSavedInspection(orderNumber);
-		console.log(order.code, savedInspection);
 		const itemBudgetTypes = savedInspection.itemBudgets.map(itemBudget => this.findItemBudgetType(itemBudget, order.budgets));
 		return this.findItemBudgetsMainType(itemBudgetTypes);
 	}
@@ -239,12 +238,9 @@ export class InspectionService {
 
 	createBudgetNotification(orderNumber: number, itemCodes: string[]): Observable<any> {
 		const budgetNotifications = itemCodes.map(itemCode => new BudgetNotification({ orderNumber, itemCode }));
-		return this.http.post(Url.budgetNotification(), budgetNotifications).pipe(
-			tap(() => {
-				InspectionService.budgetNotifications.push(...budgetNotifications);
-				this.budgetNotificationsSubject.next(InspectionService.budgetNotifications);
-			})
-		);
+		InspectionService.budgetNotifications.push(...budgetNotifications);
+		this.budgetNotificationsSubject.next(InspectionService.budgetNotifications);
+		return this.http.post(Url.budgetNotification(), budgetNotifications);
 	}
 
 	deleteBudgetNotification(orderNumber: number): Observable<any> {
