@@ -24,7 +24,12 @@
 			"S": "Revisão super",
 			"I": "Revisão integral",
 			"O": "Revisão oficial",
-			"SE": "Revisão segurança"
+			"SE": "Revisão segurança",
+			"PITV": "Revisão pre-ITV",
+			"GCS": "Revisão garantia de seguro de carro",
+			"PC": "Revisão teste de estrada",
+			"ST": "Revisão a tranquilidade do serviço",
+			"AD": "Anomalias detectadas"
 		},
 		"category": {
 			"CP": "Viatura no park",

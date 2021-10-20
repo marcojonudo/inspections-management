@@ -20,8 +20,7 @@ import { SavedInspection } from '../objects/inspections/saved-inspection';
 })
 export class InspectionService {
 
-	static orders: Order[];
-	static orderInspections2: OrderInspectionVehicle[];
+	static orderInspections: OrderInspectionVehicle[];
 	static savedInspections: SavedInspection[];
 	static itemBudgets: ItemBudget[];
 	static itemArticleCodes: ItemArticleCode[];
@@ -44,7 +43,7 @@ export class InspectionService {
 		this.budgetNotificationsSubject = new Subject<BudgetNotification[]>();
 		this.budgetNotifications$ = this.budgetNotificationsSubject.asObservable();
 
-		InspectionService.orderInspections2 = [];
+		InspectionService.orderInspections = [];
 		InspectionService.savedInspections = [];
 		InspectionService.itemArticleCodes = [];
 		InspectionService.budgetNotifications = [];
@@ -55,7 +54,7 @@ export class InspectionService {
 	// }
 
 	static findOrderInspection(
-		orderNumber: number, orderInspections: OrderInspectionVehicle[] = this.orderInspections2
+		orderNumber: number, orderInspections: OrderInspectionVehicle[] = this.orderInspections
 	): OrderInspectionVehicle {
 		return orderInspections.find(o => o.order.number === orderNumber);
 	}
@@ -127,7 +126,7 @@ export class InspectionService {
 		return itemBudgets;
 	}
 
-	static findPendingClientContactOrders(orderInspections: OrderInspectionVehicle[] = this.orderInspections2): number[] {
+	static findPendingClientContactOrders(orderInspections: OrderInspectionVehicle[] = this.orderInspections): number[] {
 		const pendingContactOrders = [];
 		orderInspections.forEach(orderInspection => {
 			const pending = InspectionService.findBudgetNotifications(orderInspection.order.number).length === 0;
@@ -138,7 +137,7 @@ export class InspectionService {
 		return pendingContactOrders;
 	}
 
-	static findBudgetsPrice(orderInspections: OrderInspectionVehicle[] = this.orderInspections2): number {
+	static findBudgetsPrice(orderInspections: OrderInspectionVehicle[] = this.orderInspections): number {
 		let price = 0;
 		orderInspections.forEach(orderInspection => {
 			orderInspection.order.budgets.forEach(budget => {
@@ -150,7 +149,7 @@ export class InspectionService {
 		return price;
 	}
 
-	static findAllBudgetNotifications(orderInspections: OrderInspectionVehicle[] = this.orderInspections2): BudgetNotification[] {
+	static findAllBudgetNotifications(orderInspections: OrderInspectionVehicle[] = this.orderInspections): BudgetNotification[] {
 		const allBudgetNotifications = [];
 		orderInspections.forEach(orderInspection => {
 			allBudgetNotifications.push(...InspectionService.findBudgetNotifications(orderInspection.order.number));
@@ -180,7 +179,7 @@ export class InspectionService {
 					const orderNumbers = openedOrders.map(o => o.number);
 					const budgetNotificationsUrl = `${Url.budgetNotification()}?orderNumbers=${orderNumbers.join('&orderNumbers=')}`;
 					return forkJoin([
-						InspectionService.itemBudgets ? of(InspectionService.itemBudgets) : this.http.get(Url.itemBudgets()),
+						this.findItemBudgets(),
 						InspectionService.itemArticleCodes || articles.length ?
 							of(InspectionService.itemArticleCodes) : this.http.post(Url.articleItems(), articles),
 						this.http.post(Url.inspections(), orders),
@@ -194,21 +193,49 @@ export class InspectionService {
 			tap(data => {
 				console.log('Received data', data);
 				if (data.length) {
-					InspectionService.itemBudgets = InspectionService.itemBudgets ?
-						InspectionService.itemBudgets : data[0].map(i => new ItemBudget(i));
+					InspectionService.itemBudgets = this.buildItemBudgets(data[0]);
 					InspectionService.itemArticleCodes = InspectionService.itemArticleCodes.length ?
 						InspectionService.itemArticleCodes : data[1].map(i => new ItemArticleCode(i));
-					InspectionService.orderInspections2 = data[2].map(d => new OrderInspectionVehicle(d));
 					InspectionService.savedInspections = data[3].map(d => new SavedInspection(d, InspectionService.itemBudgets));
 					InspectionService.budgetNotifications = data[4].map(b => new BudgetNotification(b));
+
+					const orderInspections = data[2].map(d => new OrderInspectionVehicle(d));
+					InspectionService.orderInspections = this.buildOrderInspections(orderInspections, InspectionService.savedInspections);
 				}
 				console.log('Item budgets', InspectionService.itemBudgets);
 				console.log('Item article codes', InspectionService.itemArticleCodes);
-				console.log('Order inspections', InspectionService.orderInspections2);
+				console.log('Order inspections', InspectionService.orderInspections);
 				console.log('Saved inspections', InspectionService.savedInspections);
 				console.log('Client budget notifications', InspectionService.budgetNotifications);
 			})
 		);
+	}
+
+	findItemBudgets(): Observable<any> {
+		const savedItemBudgets = LocalStorageService.getItem(Constants.LOCAL_STORAGE.ITEM_BUDGETS);
+		return savedItemBudgets ? of(savedItemBudgets) : this.http.get(Url.itemBudgets());
+	}
+
+	buildItemBudgets(itemBudgets: any[]): ItemBudget[] {
+		const savedItemBudgets = LocalStorageService.getItem(Constants.LOCAL_STORAGE.ITEM_BUDGETS);
+		if (savedItemBudgets) {
+			return savedItemBudgets;
+		}
+		const builtItemBudgets = itemBudgets.map(i => new ItemBudget(i));
+		LocalStorageService.setItem(Constants.LOCAL_STORAGE.ITEM_BUDGETS, builtItemBudgets);
+		return builtItemBudgets;
+	}
+
+	buildOrderInspections(orderInspections: OrderInspectionVehicle[], savedInspections: SavedInspection[]): OrderInspectionVehicle[] {
+		const allOrderInspections = [];
+		orderInspections.forEach(orderInspection => {
+			/* Cuenta como revisión si tiene una asociada, o si tiene una guardad previamente (caso de una OR sin revisión en la que se ha
+			 * destacado algún aspecto incorrecto) */
+			if (orderInspection.inspection || savedInspections.find(s => s.orderNumber === orderInspection.order.number) !== undefined) {
+				allOrderInspections.push(orderInspection);
+			}
+		});
+		return allOrderInspections;
 	}
 
 	findArticles(orders: Order[]): number[] {

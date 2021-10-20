@@ -8,7 +8,6 @@ export class OrderInspectionVehicle {
 
 	constructor(orderInspectionVehicle: any) {
 		this.order = new Order(orderInspectionVehicle.order);
-		this.order = orderInspectionVehicle.order;
 		if (orderInspectionVehicle.inspectionVehicle) {
 			this.inspection = new InspectionVehicle(orderInspectionVehicle.inspectionVehicle);
 		}

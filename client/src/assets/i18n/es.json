@@ -31,7 +31,12 @@
 			"S": "Revisión súper",
 			"I": "Revisión integral",
 			"O": "Revisión oficial",
-			"SE": "Revisión seguridad"
+			"SE": "Revisión seguridad",
+			"PITV": "Revisión pre-ITV",
+			"GCS": "Revisión garantía coche seguro",
+			"PC": "Revisión prueba en carretera",
+			"ST": "Revisión servicio tranquilidad",
+			"AD": "Anomalías detectadas"
 		},
 		"state": {
 			"PENDING": "Pendiente",

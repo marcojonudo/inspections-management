@@ -21,16 +21,24 @@ abstract class OrderDataService {
 	@Where({ day == day && !(state in Constants.CLOSED_ORDER_STATES) })
 	abstract List<Order> findAllOrders(LocalDate day)
 
-	@Where({ day < day && day >= day.minusDays(7) && !(state in Constants.CLOSED_ORDER_STATES) })
-	abstract List<Order> findAllOrdersTo(LocalDate day)
+	@Where({ day >= from && day < to && !(state in Constants.CLOSED_ORDER_STATES) })
+	abstract List<Order> findAllOrders(LocalDate from, LocalDate to)
 
-	List<Order> findAllTo(LocalDate day) {
-		List<Order> orders = findAllOrdersTo(day)
+	@Where({ number in numbers })
+	abstract List<Order> findAllOrders(List<Integer> numbers)
+
+	List<Order> findAll(LocalDate from, LocalDate to) {
+		List<Order> orders = findAllOrders(from, to)
 		return fillOrders(orders)
 	}
 
 	List<Order> findAll(LocalDate day) {
 		List<Order> orders = findAllOrders(day)
+		return fillOrders(orders)
+	}
+
+	List<Order> findAll(List<Integer> numbers) {
+		List<Order> orders = findAllOrders(numbers)
 		return fillOrders(orders)
 	}
 

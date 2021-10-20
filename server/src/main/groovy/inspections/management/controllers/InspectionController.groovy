@@ -33,7 +33,6 @@ class InspectionController {
 
     private static final Logger LOG = LoggerFactory.getLogger(InspectionController)
 
-    @Inject private OrderDataService orderDataService
     @Inject private InspectionService inspectionService
     @Inject private LanguageDataService languageDataService
     @Inject private ItemArticleCodeDataService itemArticleCodeDataService
@@ -84,7 +83,7 @@ class InspectionController {
         @QueryValue @Format(Constants.DateFormat.yyyy_MM_dd) LocalDate day,
         @QueryValue boolean to
     ) {
-        return to ? orderDataService.findAllTo(day) : orderDataService.findAll(day)
+        return inspectionService.findOrders(day, to)
     }
 
     @Post("/inspections")
