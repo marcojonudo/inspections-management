@@ -36,7 +36,7 @@ export class SummaryComponent {
 	}
 
 	get orderInspections(): OrderInspectionVehicle[] {
-		return InspectionService.orderInspections2;
+		return InspectionService.orderInspections;
 	}
 
 	filterOrders(filters: OrdersFilter[]): void {

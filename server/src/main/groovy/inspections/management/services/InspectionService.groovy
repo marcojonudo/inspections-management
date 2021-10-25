@@ -7,6 +7,7 @@ import inspections.management.domains.items.Item
 import inspections.management.pogos.OrderInspection
 import inspections.management.services.data.InspectionVehicleDataService
 import inspections.management.services.data.ItemBudgetDataService
+import inspections.management.services.data.OrderDataService
 import inspections.management.services.data.SavedInspectionDataService
 import inspections.management.utils.Builder
 import org.slf4j.Logger
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import java.time.LocalDate
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 
@@ -23,15 +25,47 @@ class InspectionService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(InspectionService)
 
+	private static final int DAYS_OFFSET = 7
+
 	@Inject private ItemBudgetDataService itemBudgetDataService
 	@Inject private InspectionVehicleDataService inspectionVehicleDataService
 	@Inject private SavedInspectionDataService savedInspectionDataService
+	@Inject private OrderDataService orderDataService
+
+	List<Order> findOrders(LocalDate day, boolean to) {
+		List<Order> orders
+		List<Integer> savedOrderNumbers
+		if (to) {
+			orders = orderDataService.findAll(day, day.minusDays(DAYS_OFFSET))
+			savedOrderNumbers = savedInspectionDataService.findOrderNumbers(day, day.minusDays(DAYS_OFFSET))
+		} else {
+			orders = orderDataService.findAll(day)
+			savedOrderNumbers = savedInspectionDataService.findOrderNumbers(day)
+		}
+
+		return handleNotInspectionOrders(orders, savedOrderNumbers)
+	}
+
+	List<Order> handleNotInspectionOrders(List<Order> orders, List<Integer> savedOrderNumbers) {
+		/* Se buscan los números de orden guardados en revisiones, que no figuren en la lista de ordenes. Esto significa
+		 * que no tienen ningún código de artículo de revisión, pero se guardó alguna anomalía */
+		List<Integer> notInspectionOrderNumbers = []
+		savedOrderNumbers.each { Integer orderNumber ->
+			boolean existent = orders.find { it.number == orderNumber }
+			if (!existent) {
+				notInspectionOrderNumbers << orderNumber
+			}
+		}
+		List<Order> notInspectionOrders = notInspectionOrderNumbers ?
+			orderDataService.findAll(notInspectionOrderNumbers) : []
+		return orders + notInspectionOrders
+	}
 
 	List<OrderInspection> findOrderInspections(List<Order> orders) {
 		return orders.collect {
 			InspectionVehicle inspectionVehicle = findInspection(it)
 			return new OrderInspection(it, inspectionVehicle)
-		}.findAll { it.inspectionVehicle }
+		}
 	}
 
 	/**
@@ -45,7 +79,7 @@ class InspectionService {
 			order.lines*.articleCode.toList()
 		)
 		LOG.info("INSPECTIONS VEHICLE: ${ChronoUnit.MILLIS.between(refTime, LocalTime.now())}")
-		return buildGroupedInspection2(inspectionsVehicle)
+		return buildGroupedInspection(inspectionsVehicle)
 	}
 
 	/**
@@ -53,7 +87,7 @@ class InspectionService {
 	 * @param inspections Lista de revisiones
 	 * @return Revisión con items agrupados
 	 */
-	static InspectionVehicle buildGroupedInspection2(List<InspectionVehicle> inspectionsVehicle) {
+	static InspectionVehicle buildGroupedInspection(List<InspectionVehicle> inspectionsVehicle) {
 		InspectionVehicle inspectionVehicle = null
 		if (inspectionsVehicle) {
 			/* Se obtienen el código y nombre de la revisión con mayor número de items */

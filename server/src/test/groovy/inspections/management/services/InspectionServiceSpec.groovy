@@ -1,38 +1,75 @@
 package inspections.management.services
 
-
+import inspections.management.domains.fviberi.Order
+import inspections.management.services.data.InspectionVehicleDataService
+import inspections.management.services.data.ItemBudgetDataService
+import inspections.management.services.data.OrderDataService
+import inspections.management.services.data.SavedInspectionDataService
 import io.micronaut.test.annotation.MicronautTest
+import io.micronaut.test.annotation.MockBean
 import spock.lang.Specification
+
+import javax.inject.Inject
 
 @MicronautTest
 class InspectionServiceSpec extends Specification {
 
-//    @Inject InspectionService inspectionService
-//    @Inject OrderDataService orderDataService
-//    @Inject ItemBudgetDataService itemBudgetDataService
-//    @Inject InspectionDataService inspectionDataService
-//    @Inject SavedInspectionDataService savedInspectionDataService
-//
-//    @MockBean(OrderDataService)
-//    OrderDataService orderDataService () {
-//        Mock(OrderDataService)
-//    }
-//
-//    @MockBean(ItemBudgetDataService)
-//    ItemBudgetDataService itemBudgetDataService () {
-//        Mock(ItemBudgetDataService)
-//    }
-//
-//    @MockBean(InspectionDataService)
-//    InspectionDataService inspectionDataService() {
-//        Mock(InspectionDataService)
-//    }
-//
-//    @MockBean(SavedInspectionDataService)
-//    SavedInspectionDataService savedInspectionDataService() {
-//        Mock(SavedInspectionDataService)
-//    }
-//
+    @Inject InspectionService inspectionService
+    @Inject OrderDataService orderDataService
+    @Inject ItemBudgetDataService itemBudgetDataService
+    @Inject SavedInspectionDataService savedInspectionDataService
+    @Inject InspectionVehicleDataService inspectionVehicleDataService
+
+    @MockBean(OrderDataService)
+    OrderDataService orderDataService () {
+        Mock(OrderDataService)
+    }
+
+    @MockBean(ItemBudgetDataService)
+    ItemBudgetDataService itemBudgetDataService () {
+        Mock(ItemBudgetDataService)
+    }
+
+    @MockBean(SavedInspectionDataService)
+    SavedInspectionDataService savedInspectionDataService() {
+        Mock(SavedInspectionDataService)
+    }
+
+    @MockBean(InspectionVehicleDataService)
+    InspectionVehicleDataService inspectionVehicleDataService() {
+        Mock(InspectionVehicleDataService)
+    }
+
+    // region Handle not inspection orders
+
+    void "test handle not inspection orders no more orders"() {
+        given:
+        List<Order> orders = [new Order(number: 1, lines: []), new Order(number: 2, lines: [])]
+        List<Integer> savedOrderNumbers = []
+        orderDataService.findAll(savedOrderNumbers) >> []
+
+        when:
+        List<Order> allOrders = inspectionService.handleNotInspectionOrders(orders, savedOrderNumbers)
+
+        then:
+        allOrders.size() == orders.size()
+    }
+
+    void "test handle not inspection orders more orders"() {
+        given:
+        List<Order> orders = [new Order(number: 1, lines: []), new Order(number: 2, lines: [])]
+        List<Integer> savedOrderNumbers = [3]
+        orderDataService.findAll(savedOrderNumbers) >> [new Order(number: savedOrderNumbers[0])]
+
+        when:
+        List<Order> allOrders = inspectionService.handleNotInspectionOrders(orders, savedOrderNumbers)
+
+        then:
+        allOrders.size() == orders.size() + 1
+    }
+
+    // endregion
+
 //    // region test find order inspections
 //
 //    void "test find order inspections orders without inspections"() {

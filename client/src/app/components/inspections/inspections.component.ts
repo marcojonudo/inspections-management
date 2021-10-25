@@ -37,7 +37,8 @@ export class InspectionsComponent implements OnDestroy {
 		orderNumber: (o: Order) => o.number,
 		brand: (o: Order) => o.vehicle.brand,
 		model: (o: Order) => o.vehicle.model,
-		inspectionType: (o: Order, inspection: OrderInspectionVehicle) => inspection.inspection.inspectionType.code,
+		inspectionType: (o: Order, inspection: OrderInspectionVehicle) =>
+			inspection.inspection?.inspectionType?.code || Constants.DETECTED_ANOMALIES_CODE,
 		inspectionState: (o: Order, inspection: OrderInspectionVehicle, savedInspection: SavedInspection) =>
 			savedInspection ? savedInspection.state : Constants.INSPECTION_STATE.PENDING,
 		budgets: (o: Order, inspection: OrderInspectionVehicle, savedInspection: SavedInspection) => savedInspection.itemBudgets
@@ -54,7 +55,7 @@ export class InspectionsComponent implements OnDestroy {
 		private cdRef: ChangeDetectorRef
 	) {
 		this.columnsToDisplay = this.COLUMNS;
-		this.data = this.buildData(InspectionService.orderInspections2);
+		this.data = this.buildData(InspectionService.orderInspections);
 		this.budgetNotificationsSubscription = this.inspectionService.budgetNotifications$.subscribe(() => {
 			/* La lista budgetNotifications ya se ha actualizado en el servicio. Aquí se consume el Observable para poder ejecutar un
 			 * ciclo de CD, y refrescar el contenido cuando se actualiza la notificación de cliente */

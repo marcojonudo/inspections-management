@@ -5,15 +5,8 @@ import grails.gorm.services.Service
 import inspections.management.domains.ItemBudget
 
 @Service(ItemBudget)
-abstract class ItemBudgetDataService {
+interface ItemBudgetDataService {
 
-	List<ItemBudget> itemBudgets
-
-	abstract List<ItemBudget> findAllItemBudget()
-
-	List<ItemBudget> findAll() {
-		itemBudgets = itemBudgets ?: findAllItemBudget()
-		return itemBudgets
-	}
+	List<ItemBudget> findAll()
 
 }

@@ -1,10 +1,12 @@
 export class Constants {
 
 	static readonly DEFAULT_LANGUAGE: string = 'es';
+	static readonly DETECTED_ANOMALIES_CODE = 'AD';
 
 	static readonly LOCAL_STORAGE: any = {
 		LANGUAGE: 'language',
-		EMPLOYEES: 'employees'
+		EMPLOYEES: 'employees',
+		ITEM_BUDGETS: 'itemBudgets'
 	};
 
 	static readonly BUDGET_TYPE: any = {
