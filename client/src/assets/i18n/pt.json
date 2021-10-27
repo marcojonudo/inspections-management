@@ -1,23 +1,23 @@
 {
 	"header": {
-		"title": "Situación revisiones taller",
-		"filter": {
-			"old": "Pasadas",
-			"today": "Hoy",
-			"all": "Todas"
-		}
+		"title": "Analisa a situação"
 	},
-	"init": {
-		"introduceEmployeeCode": "Qual é o seu código de empregado?",
-		"employeeCode": "Código de empregado",
-		"requiredEmployeeCode": "Deve inserir um código de empregado",
-		"introduceShortCode": "Qual é o código curto do ordem de reparação",
-		"shortCode": "Código curto",
-		"requiredShortCode": "Deve inserir um código curto do ordem"
+	"summary": {
+		"urgentPendingBudgets": "Orçamentos pendentes urgentes",
+		"secondaryPendingBudgets": "Orçamentos secundários pendentes",
+		"pendingClientContacts": "Contatos pendentes do cliente",
+		"sells": "Vendas adicionadas",
+		"budgets": "Orçamentos feitos",
+		"acceptPercentage": "% aceitação",
+		"closedOrders": "ORs fechados sem finalizar a revisão",
+		"completedInspections": "Avaliações feitas",
+		"detectedProblems": "% anomalias detectadas",
+		"orderNumber": "Ou não.",
+		"model": "Marca e modelo",
+		"mechanic": "Mecânico",
+		"mechanics": "Mecânica"
 	},
 	"inspection": {
-		"changelog": "Histórico de mudanças",
-		"updateVersion": "Versão mais recente",
 		"type": {
 			"G": "Revisão gratuita",
 			"E": "Revisão standard",
@@ -31,19 +31,10 @@
 			"ST": "Revisão a tranquilidade do serviço",
 			"AD": "Anomalias detectadas"
 		},
-		"category": {
-			"CP": "Viatura no park",
-			"CB": "Viatura no box",
-			"MA": "Viatura meia altura",
-			"E": "Viatura elevada",
-			"VM": "Compartimento motor",
-			"CA": "Viatura no chão",
-			"I": "Iluminação",
-			"C": "Carrocería",
-			"RDI": "Roda DD",
-			"RDD": "Roda DE",
-			"RTD": "Roda TD",
-			"RTI": "Roda TE"
+		"state": {
+			"PENDING": "Pendente",
+			"STARTED": "No curso",
+			"FINISHED": "Fechado"
 		},
 		"item": {
 			"CT": "Luz avisadores de painel",
@@ -172,73 +163,25 @@
 			"ENR": "Estado do pneu de reserva",
 			"PPNR": "Comprovar pressão pneu reserva",
 			"C": "Comentários"
+		}
+	},
+	"inspections": {
+		"title": {
+			"inspections": "Revisões",
+			"pendingBudgets": "Orçamentos a serem feitos"
 		},
-		"selectItemOption": {
-			"C": "Certo",
-			"PS": "Planejar substituição",
-			"SN": "Substituição necessária",
-			"RA": "Feito ajustamento/mudança",
-			"RR": "Feito preenchimento",
-			"NA": "Não se aplica",
-			"P": "Seleção pendente"
+		"table": {
+			"order": "OU",
+			"brand": "marca",
+			"model": "Modelo",
+			"inspectionType": "Revisão",
+			"inspectionState": "Estado",
+			"mechanic": "Mecânico",
+			"budgets": "Orçamentos",
+			"clientContact": "Contato do cliente",
+			"doneBudget": "Pt. Feito",
+			"acceptedBudget": "Pto. Aceito",
+			"item": "Item"
 		}
-	},
-	"order": {
-		"numberPlate": "Matrícula",
-		"brandModel": "Marca e modelo",
-		"cylinder": "Cilindrada",
-		"engineCode": "Código motor",
-		"power": "Potência",
-		"registrationYear": "Ano",
-		"description": "Descrição",
-		"units": "Uds."
-	},
-	"bottomPanel": {
-		"introduceEmployeeCode": "Insira um novo código de empregado"
-	},
-	"dialog": {
-		"header": "Atenção!",
-		"cancel": "Cancelar",
-		"accept": "Aceitar"
-	},
-	"message": {
-		"NONEXISTENT_ORDER": "Não se encontra nenhuma ordem de trabalho associado ao código curto da ordem de trabalho",
-		"NONEXISTENT_INSPECTIONS": "Nenhuma revisão associada à ordem encontrada",
-		"UPDATE_EMPLOYEE_MESSAGE": "Quer mudar de empregado {{employeeCode}} para {{newEmployeeCode}}?",
-		"ERROR_SAVING_INSPECTION": "Ocorreu um erro ao guardar a revisão. Por favor, tente de novo",
-		"SAVED_INSPECTION": "Revisão guardada corretamente ",
-		"NON_COMPLETE_INSPECTION": "A revisão não está terminada. Por favor, preencha todos os itens",
-		"WARNING_GOING_BACK": "Tem certeza de que deseja voltar para a tela inicial?",
-		"ERROR_FINDING_EMPLOYEES": "Erro ao obter empregados. Tente novamente em alguns instantes ou envie um e-mail para TI",
-		"CLEARED_LOCAL_STORAGE": "Dados do navegador excluídos"
-	},
-	"print": {
-		"info": "Em formação",
-		"seller": "Vendedor",
-		"orderNumber": "Nº pedido",
-		"centre": "Centro",
-		"vehicle": "Veículo",
-		"client": "Cliente",
-		"summary": "Resumo",
-		"numberPlate": "Registro carro",
-		"model": "Modelo",
-		"cylinder": "Deslocamento",
-		"engine": "Motor",
-		"power": "Potência",
-		"registration": "Cadastro",
-		"category": {
-			"I": "Iluminação",
-			"C": "Carrocería",
-			"N": "Pneus",
-			"EM": "Componentes mecánicos",
-			"SE": "Sistema de escape",
-			"CL": "Qualidade líquidos",
-			"NI": "Níveis líquidos",
-			"SC": "Sistema de carga",
-			"D": "Diagnostico"
-		}
-	},
-	"resetEmployee": {
-		"introduceEmployeeCode": "Insira um novo código de empregado novamente"
 	}
 }

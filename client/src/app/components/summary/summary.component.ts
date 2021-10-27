@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
 import { OrdersFilter } from '../../objects/filters/orders-filter';
 import { PendingOrdersFilter } from '../../objects/filters/pending-orders-filter';
 import { TodayOrdersFilter } from '../../objects/filters/today-orders-filter';
 import { InspectionService } from '../../services/inspection.service';
 import { Constants } from '../../objects/constants';
 import { OrderInspectionVehicle } from '../../objects/order-inspection-vehicle';
+import { Subscription } from 'rxjs';
 
 @Component({
 	selector: 'app-summary',
@@ -12,19 +13,29 @@ import { OrderInspectionVehicle } from '../../objects/order-inspection-vehicle';
 	styleUrls: ['./summary.component.sass'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SummaryComponent {
+export class SummaryComponent implements OnDestroy {
+
+	private budgetNotificationsSubscription: Subscription;
 
 	filters: OrdersFilter[];
 	todayFilter: OrdersFilter[];
 	pendingFilter: OrdersFilter[];
 	allFilters: OrdersFilter[];
 
-	constructor(private inspectionService: InspectionService) {
+	constructor(private inspectionService: InspectionService, private cdRef: ChangeDetectorRef) {
 		this.todayFilter = [new TodayOrdersFilter()];
 		this.pendingFilter = [new PendingOrdersFilter()];
 		this.allFilters = this.todayFilter.concat(this.pendingFilter);
 
 		this.filters = this.todayFilter;
+
+		this.budgetNotificationsSubscription = this.inspectionService.budgetNotifications$.subscribe(() => {
+			this.cdRef.detectChanges();
+		});
+	}
+
+	ngOnDestroy(): void {
+		this.budgetNotificationsSubscription.unsubscribe();
 	}
 
 	get urgentType(): string {
@@ -37,10 +48,6 @@ export class SummaryComponent {
 
 	get orderInspections(): OrderInspectionVehicle[] {
 		return InspectionService.orderInspections;
-	}
-
-	filterOrders(filters: OrdersFilter[]): void {
-		this.inspectionService.loadMainInfo(filters).subscribe();
 	}
 
 	findAllItemBudgetLength(budgetType: string): number {
@@ -67,7 +74,7 @@ export class SummaryComponent {
 	findAcceptedPercentage(): number {
 		const allBudgetNotifications = InspectionService.findAllBudgetNotifications();
 		const acceptedBudgetNotifications = allBudgetNotifications.filter(b => b.accepted);
-		return acceptedBudgetNotifications.length / allBudgetNotifications.length;
+		return allBudgetNotifications.length ? acceptedBudgetNotifications.length / allBudgetNotifications.length : 0;
 	}
 
 	findClosedOrders(): number {
@@ -80,7 +87,7 @@ export class SummaryComponent {
 	findFinishedInspections(): number {
 		return this.orderInspections.filter(orderInspection => {
 			const savedInspection = InspectionService.findSavedInspection(orderInspection.order.number);
-			return savedInspection.state === Constants.INSPECTION_STATE.FINISHED;
+			return savedInspection?.state === Constants.INSPECTION_STATE.FINISHED;
 		}).length;
 	}
 

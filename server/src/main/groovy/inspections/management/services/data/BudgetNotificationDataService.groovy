@@ -5,6 +5,8 @@ import grails.gorm.services.Service
 import grails.gorm.services.Where
 import inspections.management.domains.BudgetNotification
 
+import java.time.LocalDateTime
+
 @Service(BudgetNotification)
 interface BudgetNotificationDataService {
 
@@ -20,6 +22,6 @@ interface BudgetNotificationDataService {
 		set $budgetNotification.accepted = $accepted
 		where $budgetNotification.orderNumber = $orderNumber and $budgetNotification.itemCode = $itemCode
 	""")
-	Number update(int orderNumber, String itemCode, boolean accepted)
+	Number update(int orderNumber, String itemCode, LocalDateTime accepted)
 
 }

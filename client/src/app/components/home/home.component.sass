@@ -1,14 +1,18 @@
 \:host
-    height: 100%
-    display: grid
-    grid-template-columns: repeat(2, 1fr)
-    grid-template-rows: 25% 75%
+	height: 100%
+	display: grid
+	grid-template-columns: 1fr 1fr 2.5rem
+	grid-template-rows: 25% 75%
 
-    app-summary
-        grid-column: 1 / span 2
+	app-summary
+		grid-column: 1 / span 2
 
-    app-inspections
-        grid-column: 1 / span 1
+	app-inspections
+		grid-column: 1 / span 1
 
-    app-inspection-details
-        grid-column: 2 / span 1
+	app-inspection-details
+		grid-column: 2 / span 1
+
+	app-tools-bar
+		grid-column: 3
+		grid-row: 1 / span 2

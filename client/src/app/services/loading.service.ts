@@ -6,9 +6,11 @@ import { Subject, Subscription } from 'rxjs';
 })
 export class LoadingService {
 
+	loading: boolean;
 	loadingSubject: Subject<boolean>;
 
 	constructor() {
+		this.loading = false;
 		this.loadingSubject = new Subject<boolean>();
 	}
 
@@ -16,8 +18,15 @@ export class LoadingService {
 		return this.loadingSubject.subscribe(onNext);
 	}
 
+	start(): void {
+		this.loading = true;
+		this.loadingSubject.next(this.loading);
+		console.log(0, this.loading, this.loadingSubject);
+	}
+
 	stop(): void {
-		this.loadingSubject.next(false);
+		this.loading = false;
+		this.loadingSubject.next(this.loading);
 	}
 
 }

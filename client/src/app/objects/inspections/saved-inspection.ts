@@ -6,12 +6,14 @@ import { Constants } from '../constants';
 export class SavedInspection {
 
 	orderNumber: number;
+	employeeCode: string;
 	state: string;
 	items: SavedItem[];
 	itemBudgets: ItemBudget[];
 
 	constructor(savedInspection: any, itemBudgets: ItemBudget[]) {
 		this.orderNumber = savedInspection.orderNumber;
+		this.employeeCode = savedInspection.employeeCode;
 		this.state = savedInspection.state;
 		this.items = savedInspection.items.map(i => Builder.buildSavedItem(i));
 		this.itemBudgets = itemBudgets.filter(itemBudget => {

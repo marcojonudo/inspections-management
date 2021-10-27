@@ -10,6 +10,7 @@ import { Employee } from '../../objects/employee';
 import { EmployeeService } from '../../services/employee.service';
 import { OrderInspectionVehicle } from '../../objects/order-inspection-vehicle';
 import { SavedInspection } from '../../objects/inspections/saved-inspection';
+import { SavedItem } from '../../objects/inspections/saved-items/saved-item';
 
 @Component({
 	selector: 'app-inspection-details',
@@ -19,11 +20,12 @@ import { SavedInspection } from '../../objects/inspections/saved-inspection';
 })
 export class InspectionDetailsComponent {
 
-	private COLUMNS: string[] = ['item', 'doneBudget', 'acceptedBudget'];
+	private COLUMNS: string[] = ['item', 'image', 'doneBudget', 'clientContact', 'acceptedBudget'];
 
 	private COLUMNS_DATA: any = {
 		item: (i: ItemBudget) => i,
-		orderNumber: (i: ItemBudget, o: Order) => o.number
+		image: (i: ItemBudget, savedItem: SavedItem) => savedItem.image,
+		orderNumber: (i: ItemBudget, savedItem: SavedItem, o: Order) => o.number
 	};
 
 	private selectedOrderSubscription: Subscription;
@@ -45,9 +47,9 @@ export class InspectionDetailsComponent {
 			this.orderInspection = orderInspection;
 			this.savedInspection = InspectionService.findSavedInspection(this.orderInspection.order.number);
 			this.data = this.buildData(this.orderInspection, this.savedInspection);
-			this.mechanics = this.savedInspection.items.map(i => i.employeeCode).filter(
+			this.mechanics = this.savedInspection ? this.savedInspection.items.map(i => i.employeeCode).filter(
 				(value, index, self) => self.indexOf(value) === index
-			).map(employeeCode => EmployeeService.findEmployee(employeeCode));
+			).map(employeeCode => EmployeeService.findEmployee(employeeCode)) : [];
 			this.cdRef.detectChanges();
 		});
 	}
@@ -55,13 +57,16 @@ export class InspectionDetailsComponent {
 	buildData(orderInspection: OrderInspectionVehicle, savedInspection: SavedInspection, columnsData: any = this.COLUMNS_DATA): Column[] {
 		const data = [];
 		const allColumns = Object.keys(columnsData);
-		savedInspection.itemBudgets.forEach(itemBudget => {
-			const row = {};
-			allColumns.forEach(key => {
-				row[key] = columnsData[key](itemBudget, orderInspection.order);
+		if (savedInspection) {
+			savedInspection.itemBudgets.forEach(itemBudget => {
+				const row = {};
+				allColumns.forEach(key => {
+					const savedItem = savedInspection.items.find(i => i.item.code === itemBudget.itemCode);
+					row[key] = columnsData[key](itemBudget, savedItem, orderInspection.order);
+				});
+				data.push(row);
 			});
-			data.push(row);
-		});
+		}
 		return data;
 	}
 
@@ -83,7 +88,11 @@ export class InspectionDetailsComponent {
 
 	checkAcceptedBudget(orderNumber: number, itemCode: string): boolean {
 		const budgetNotification = InspectionService.findBudgetNotification(orderNumber, itemCode);
-		return budgetNotification && budgetNotification.accepted;
+		return budgetNotification && budgetNotification.accepted !== undefined;
+	}
+
+	openImage(a): void {
+		console.log(a);
 	}
 
 	updateNotifiedClient(
@@ -98,7 +107,7 @@ export class InspectionDetailsComponent {
 		} else {
 			observable = this.inspectionService.deleteBudgetNotification(orderInspection.order.number);
 		}
-		observable.subscribe();
+		observable.subscribe(() => this.cdRef.detectChanges());
 	}
 
 	updateAcceptedBudget(orderNumber: number, itemCode: string, accepted: boolean): void {

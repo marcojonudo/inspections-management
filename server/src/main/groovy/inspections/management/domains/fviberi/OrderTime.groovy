@@ -9,6 +9,7 @@ class OrderTime implements GormEntity<OrderTime> {
 
 	Integer orderNumber
 	String code
+	String mechanicCode
 
 	static mapping = {
 		datasource Constants.DataSource.FVIBERI
@@ -16,6 +17,7 @@ class OrderTime implements GormEntity<OrderTime> {
 
 		orderNumber column: 'nuordrep'
 		code column: 'codcorto'
+		mechanicCode column: 'covende3'
 
 		id generator: 'assigned', name: 'orderNumber'
 		version false

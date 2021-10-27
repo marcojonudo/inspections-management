@@ -1,0 +1,10 @@
+<button mat-icon-button (click)="filterOrders(pendingFilter)" [class.highlight]="checkSelectedFilter(pendingFilter)">
+	<mat-icon>calendar_today</mat-icon>
+<!--	<mat-icon>chevron_left</mat-icon>-->
+</button>
+<button mat-icon-button (click)="filterOrders(todayFilter)" [class.highlight]="checkSelectedFilter(todayFilter)">
+	<mat-icon>today</mat-icon>
+</button>
+<button mat-icon-button (click)="filterOrders(allFilters)" [class.highlight]="checkSelectedFilter(allFilters)">
+	<mat-icon>date_range</mat-icon>
+</button>

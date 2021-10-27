@@ -7,6 +7,9 @@ import { OrderInspectionVehicle } from '../../objects/order-inspection-vehicle';
 import { Order } from '../../objects/orders/order';
 import { SavedInspection } from '../../objects/inspections/saved-inspection';
 import { Constants } from '../../objects/constants';
+import { SavedItem } from '../../objects/inspections/saved-items/saved-item';
+import { EmployeeService } from '../../services/employee.service';
+import { Employee } from '../../objects/employee';
 
 export interface Column {
 	order: number;
@@ -29,7 +32,7 @@ export interface Column {
 export class InspectionsComponent implements OnDestroy {
 
 	private COLUMNS: string[] = [
-		'order', 'brand', 'model', 'inspectionType', 'inspectionState', 'budgets', 'clientContact', 'acceptedBudget'
+		'order', 'brand', 'model', 'inspectionType', 'inspectionState', 'mechanic', 'budgets', 'clientContact', 'acceptedBudget'
 	];
 
 	private COLUMNS_DATA: any = {
@@ -41,7 +44,10 @@ export class InspectionsComponent implements OnDestroy {
 			inspection.inspection?.inspectionType?.code || Constants.DETECTED_ANOMALIES_CODE,
 		inspectionState: (o: Order, inspection: OrderInspectionVehicle, savedInspection: SavedInspection) =>
 			savedInspection ? savedInspection.state : Constants.INSPECTION_STATE.PENDING,
-		budgets: (o: Order, inspection: OrderInspectionVehicle, savedInspection: SavedInspection) => savedInspection.itemBudgets
+		mechanic: (o: Order, inspection: OrderInspectionVehicle, savedInspection: SavedInspection) =>
+			this.findMechanicCode(o, savedInspection),
+		budgets: (o: Order, inspection: OrderInspectionVehicle, savedInspection: SavedInspection) =>
+			savedInspection ? savedInspection.itemBudgets : []
 	};
 
 	private budgetNotificationsSubscription: Subscription;
@@ -66,10 +72,6 @@ export class InspectionsComponent implements OnDestroy {
 	ngOnDestroy(): void {
 		this.budgetNotificationsSubscription.unsubscribe();
 	}
-
-	// get orderInspections(): OrderInspection[] {
-	// 	return InspectionService.orderInspections;
-	// }
 
 	buildData(orderInspections: OrderInspectionVehicle[], columnsData: any = this.COLUMNS_DATA): Column[] {
 		const data = [];
@@ -121,8 +123,30 @@ export class InspectionsComponent implements OnDestroy {
 		return budgetNotifications.find(budgetNotification => !budgetNotification.accepted) === undefined;
 	}
 
+	checkSelectedOrder(orderNumber: number): boolean {
+		return this.inspectionService.checkSelectedOrder(orderNumber);
+	}
+
 	selectOrder(orderNumber: number): void {
 		this.inspectionService.selectOrder(orderNumber);
+	}
+
+	findMechanicCode(order: Order, savedInspection: SavedInspection): string {
+		let mechanicCode;
+		if (savedInspection) {
+			mechanicCode = savedInspection.employeeCode || this.findItemsMechanicCode(savedInspection.items);
+		}
+		return mechanicCode ? mechanicCode : order.mechanicCode;
+	}
+
+	findMechanic(code: string): Employee {
+		return EmployeeService.findEmployee(code);
+	}
+
+	findItemsMechanicCode(items: SavedItem[]): string {
+		const maxFilled = Math.max(...items.map(i => i.filled.valueOf()));
+		const maxFilledItem = items.find(i => i.filled.valueOf() === maxFilled);
+		return maxFilledItem.employeeCode;
 	}
 
 }

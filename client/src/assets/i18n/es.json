@@ -1,11 +1,6 @@
 {
 	"header": {
-		"title": "Situación revisiones taller",
-		"filter": {
-			"old": "Pasadas",
-			"today": "Hoy",
-			"all": "Todas"
-		}
+		"title": "Situación revisiones taller"
 	},
 	"summary": {
 		"urgentPendingBudgets": "Presupuestos pendientes urgentes",
@@ -23,8 +18,6 @@
 		"mechanics": "Mecánicos"
 	},
 	"inspection": {
-		"changelog": "Histórico de cambios",
-		"updateVersion": "Actualizar versión",
 		"type": {
 			"G": "Revisión gratuita",
 			"E": "Revisión estándar",
@@ -173,17 +166,23 @@
 		}
 	},
 	"inspections": {
+		"title": {
+			"inspections": "Revisiones",
+			"pendingBudgets": "Presupuestos a realizar"
+		},
 		"table": {
 			"order": "OR",
 			"brand": "Marca",
 			"model": "Modelo",
 			"inspectionType": "Revisión",
 			"inspectionState": "Estado",
+			"mechanic": "Mecánico",
 			"budgets": "Presupuestos",
 			"clientContact": "Contacto cliente",
 			"doneBudget": "Pto. realizado",
 			"acceptedBudget": "Pto. aceptado",
-			"item": "Item"
+			"item": "Item",
+			"image": ""
 		}
 	}
 }

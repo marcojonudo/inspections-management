@@ -3,22 +3,14 @@
 \:host
 	@include flex-column
 
-	#order-summary
-		@include flex-center
-		padding: $small-gap
-
-		& > mat-card
-			padding: $small-gap
-			margin: 0 $small-gap
-			text-align: center
-
-			mat-card-title
-				font-size: 1.3em
-
-			mat-card-content
-				@include flex-column-center
-				line-height: 24px
-
 	.table-container-wrapper
 		@include flex-1
 		overflow-y: auto
+
+	td
+		position: relative
+		text-align: center
+
+		button
+			position: absolute
+			right: 0

@@ -2,6 +2,7 @@ html, body
 	height: 100%
 	user-select: none
 	-webkit-print-color-adjust: exact !important
+	text-transform: uppercase
 
 ::-webkit-scrollbar
 	width: 4px
@@ -41,9 +42,15 @@ html, body
 .table-container-wrapper
 	padding: $small-gap
 	box-sizing: border-box
+	@include flex-column
+
+	.table-header
+		@include flex-center
+		@include header-title
+		border-radius: $border-radius $border-radius 0 0
 
 	.table-container
-		height: 100%
+		@include flex-1
 		overflow: auto
 
 		table
@@ -57,6 +64,14 @@ html, body
 			tr
 				display: flex
 
+				&.mat-header-row
+					height: $table-header-height
+					background-color: $light-grey
+
+				th
+					text-align: center
+					border-bottom: 1px solid $sand
+
 			th, td
 				@include flex-1
 				@include flex-center
@@ -69,6 +84,9 @@ html, body
 
 .color-correct
 	color: $light-green
+
+.image-column
+	max-width: 40px
 
 @media print
 

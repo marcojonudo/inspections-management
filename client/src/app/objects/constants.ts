@@ -23,6 +23,10 @@ export class Constants {
 		yyyy_MM_dd: 'YYYY-MM-DD'
 	};
 
+	static readonly DATE_TIME_FORMAT: any = {
+		yyyy_MM_dd_HH_mm_ss: 'YYYY-MM-DD HH:mm:ss'
+	};
+
 	static readonly ORDER_STATE: any = {
 		V: 'V',
 		F: 'F',
