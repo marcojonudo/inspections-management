@@ -9,9 +9,7 @@
 		#header-wrapper
 			position: relative
 			@include flex-center
-			padding: $small-gap
-			background-color: $secondary
-			color: $white
+			@include header-title
 			border-radius: $border-radius
 
 			#filter-selector
@@ -38,6 +36,9 @@
 			padding: $small-gap 0
 			margin: 0 $small-gap
 			box-sizing: border-box
+			border: 1px solid $border
+			border-bottom: 8px solid $sand
+			border-radius: 0
 
 			mat-card-title
 				font-size: 1.3em
@@ -61,5 +62,10 @@
 
 						&:last-child
 							@include flex-center
-							font-size: 1.8em
+							font-size: 5.5em
 							font-weight: bold
+
+						&.test
+							font-size: 3em
+
+

@@ -22,7 +22,8 @@ export class AppComponent {
 		private inspectionService: InspectionService,
 		private employeeService: EmployeeService,
 		private loadingService: LoadingService,
-		private translate: TranslateService
+		private translate: TranslateService,
+		private cdRef: ChangeDetectorRef
 	) {
 		this.loading = true;
 
@@ -36,6 +37,7 @@ export class AppComponent {
 
 		this.loadingService.subscribe(loading => {
 			this.loading = loading;
+			this.cdRef.detectChanges();
 		});
 	}
 

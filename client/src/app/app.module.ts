@@ -19,6 +19,11 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { FormsModule } from '@angular/forms';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatRippleModule } from '@angular/material/core';
+import { ToolsBarComponent } from './components/tools-bar/tools-bar.component';
+import { MatButtonModule } from '@angular/material/button';
+import * as dayjs from 'dayjs';
+import { Dayjs } from 'dayjs';
+import { Constants } from './objects/constants';
 
 @NgModule({
 	declarations: [
@@ -27,7 +32,8 @@ import { MatRippleModule } from '@angular/material/core';
 		HomeComponent,
 		SummaryComponent,
 		InspectionsComponent,
-		InspectionDetailsComponent
+		InspectionDetailsComponent,
+		ToolsBarComponent
 	],
 	imports: [
 		BrowserModule,
@@ -47,12 +53,27 @@ import { MatRippleModule } from '@angular/material/core';
 		MatTableModule,
 		MatButtonToggleModule,
 		MatSlideToggleModule,
-		MatRippleModule
+		MatRippleModule,
+		MatButtonModule
 	],
 	providers: [],
 	bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule {
+
+	constructor() {
+		this.overrideDateToJSON();
+	}
+
+	private overrideDateToJSON() {
+		dayjs.prototype.toJSON = function() {
+			return this.hour() === 0 && this.minute() === 0 && this.second() === 0
+				? this.format(Constants.DATE_FORMAT.yyyy_MM_dd)
+				: this.format(Constants.DATE_TIME_FORMAT.yyyy_MM_dd_HH_mm_ss);
+		};
+	}
+
+}
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 	return new TranslateHttpLoader(http);

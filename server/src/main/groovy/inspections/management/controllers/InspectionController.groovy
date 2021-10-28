@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory
 
 import javax.inject.Inject
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 
@@ -192,9 +193,9 @@ class InspectionController {
         description = "Actualiza un presupuesto aceptado"
     )
     @ApiResponse(responseCode = "200", description = "Presupuesto actualizado")
-    void deleteBudgetNotification(@Body BudgetNotification budgetNotification) {
+    void deleteBudgetNotification(@Body BudgetNotification budgetNotification, @QueryValue boolean accepted) {
         budgetNotificationDataService.update(
-            budgetNotification.orderNumber, budgetNotification.itemCode, budgetNotification.accepted
+            budgetNotification.orderNumber, budgetNotification.itemCode, accepted ? LocalDateTime.now() : null
         )
     }
 

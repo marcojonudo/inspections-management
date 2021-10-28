@@ -20,6 +20,7 @@ class Order implements GormEntity<Order> {
 	Vehicle vehicle
 	Client client
 	String sellerCode
+	String mechanicCode
 
 	@JsonInclude
 	Set<RelatedBudget> relatedBudgets
@@ -46,6 +47,6 @@ class Order implements GormEntity<Order> {
 		version false
 	}
 
-	static transients = ['code', 'budgets']
+	static transients = ['code', 'mechanicCode', 'budgets']
 
 }

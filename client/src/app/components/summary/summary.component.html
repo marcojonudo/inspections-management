@@ -1,16 +1,5 @@
 <header>
 	<div id="header-wrapper" class="mat-elevation-z1">
-		<mat-button-toggle-group id="filter-selector" [(ngModel)]="filters" class="mat-elevation-z3">
-			<mat-button-toggle (change)="filterOrders($event.value)" [value]="pendingFilter">
-				<span translate>header.filter.old</span>
-			</mat-button-toggle>
-			<mat-button-toggle (change)="filterOrders($event.value)" [value]="todayFilter" checked>
-				<span translate>header.filter.today</span>
-			</mat-button-toggle>
-			<mat-button-toggle (change)="filterOrders($event.value)" [value]="allFilters">
-				<span translate>header.filter.all</span>
-			</mat-button-toggle>
-		</mat-button-toggle-group>
 		<span translate>header.title</span>
 	</div>
 </header>
@@ -51,11 +40,11 @@
         <mat-card-content>
 			<div class="content-block">
 				<span translate>summary.budgets</span>
-				<span>{{findAcceptedBudgets()}}/{{findAllBudgets()}}</span>
+				<span class="test">{{findAcceptedBudgets()}}/{{findAllBudgets()}}</span>
 			</div>
 			<div class="content-block">
 				<span translate>summary.acceptPercentage</span>
-				<span class="color-correct">{{findAcceptedPercentage() | percent: '2.1'}}</span>
+				<span class="color-correct test">{{findAcceptedPercentage() | percent: '2.1'}}</span>
 			</div>
         </mat-card-content>
     </mat-card>
@@ -71,11 +60,11 @@
         <mat-card-content>
 			<div class="content-block">
 				<span translate>summary.completedInspections</span>
-				<span>{{findFinishedInspections()}}/{{orderInspections.length}}</span>
+				<span class="test">{{findFinishedInspections()}}/{{orderInspections.length}}</span>
 			</div>
             <div class="content-block">
                 <span translate>summary.detectedProblems</span>
-                <span class="color-correct">{{findWrongItemsPercentage() | percent: '2.1'}}</span>
+                <span class="color-correct test">{{findWrongItemsPercentage() | percent: '2.1'}}</span>
             </div>
         </mat-card-content>
     </mat-card>

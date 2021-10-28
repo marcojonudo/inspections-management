@@ -2,7 +2,6 @@ import { OrderLine } from './order-line';
 import { Vehicle } from './vehicle';
 import { Client } from './client';
 import { Budget } from './budget';
-import { Constants } from '../constants';
 
 export class Order {
 
@@ -12,6 +11,7 @@ export class Order {
 	vehicle: Vehicle;
 	client: Client;
 	sellerCode: string;
+	mechanicCode: string;
 	lines: OrderLine[];
 	budgets: Budget[];
 
@@ -22,7 +22,8 @@ export class Order {
 		this.vehicle = new Vehicle(order.vehicle);
 		this.client = new Client(order.client);
 		this.sellerCode = order.sellerCode;
-		this.lines = order.lines.map(line => new OrderLine(this.number, line));
+		this.mechanicCode = order.mechanicCode;
+		this.lines = order.lines ? order.lines.map(line => new OrderLine(this.number, line)) : [];
 		this.budgets = order.budgets.map(budget => new Budget(budget));
 	}
 

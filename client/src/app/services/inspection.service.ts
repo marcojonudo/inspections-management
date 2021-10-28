@@ -14,6 +14,7 @@ import { BudgetNotification } from '../objects/budget-notification';
 import { Budget } from '../objects/orders/budget';
 import { OrderInspectionVehicle } from '../objects/order-inspection-vehicle';
 import { SavedInspection } from '../objects/inspections/saved-inspection';
+import { InspectionVehicle } from '../objects/inspections/inspection-vehicle';
 
 @Injectable({
 	providedIn: 'root'
@@ -177,7 +178,7 @@ export class InspectionService {
 				if (openedOrders.length) {
 					const articles = this.findArticles(openedOrders);
 					const orderNumbers = openedOrders.map(o => o.number);
-					const budgetNotificationsUrl = `${Url.budgetNotification()}?orderNumbers=${orderNumbers.join('&orderNumbers=')}`;
+					const budgetNotificationsUrl = `${Url.budgetNotification()}&orderNumbers=${orderNumbers.join('&orderNumbers=')}`;
 					return forkJoin([
 						this.findItemBudgets(),
 						InspectionService.itemArticleCodes || articles.length ?
@@ -258,6 +259,10 @@ export class InspectionService {
 		);
 	}
 
+	checkSelectedOrder(orderNumber: number, orderInspection: OrderInspectionVehicle = InspectionService.selectedOrderInspection): boolean {
+		return orderInspection && orderInspection.order.number === orderNumber;
+	}
+
 	selectOrder(orderNumber: number): void {
 		InspectionService.selectedOrderInspection = InspectionService.findOrderInspection(orderNumber);
 		this.selectedOrderInspectionSubject.next(InspectionService.selectedOrderInspection);
@@ -282,8 +287,8 @@ export class InspectionService {
 	}
 
 	updateAcceptedBudget(budgetNotification: BudgetNotification, accepted: boolean): Observable<any> {
-		budgetNotification.accepted = accepted;
-		return this.http.patch(Url.budgetNotification(), budgetNotification).pipe(
+		this.budgetNotificationsSubject.next([budgetNotification]);
+		return this.http.patch(Url.budgetNotification(accepted), budgetNotification).pipe(
 			tap(() => this.budgetNotificationsSubject.next(InspectionService.budgetNotifications))
 		);
 	}

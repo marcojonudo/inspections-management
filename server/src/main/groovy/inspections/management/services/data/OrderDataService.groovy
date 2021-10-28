@@ -49,7 +49,9 @@ abstract class OrderDataService {
 		}.flatten()
 		List<Budget> budgets = budgetNumbers ? budgetDataService.findAll(budgetNumbers) : []
 		orders.each { Order order ->
-			order.code = ordersTime.find { it.orderNumber == order.number }.code
+			OrderTime orderTime = ordersTime.find { it.orderNumber == order.number }
+			order.code = orderTime.code
+			order.mechanicCode = orderTime.mechanicCode
 			List<Integer> orderBudgetNumbers = (List<Integer>) order.relatedBudgets.sort { it.number }.takeRight(
 				order.relatedBudgets.size() - 1
 			).number

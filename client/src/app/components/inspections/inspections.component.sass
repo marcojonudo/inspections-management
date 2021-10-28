@@ -1,5 +1,30 @@
+@import "abstracts/mixins"
+
 .table-container-wrapper
 	height: 100%
 
 	td
 		text-align: center
+
+		&.mat-cell
+
+			&:first-of-type
+				padding-left: $small-gap
+
+			&:last-of-type
+				padding-right: $small-gap
+
+	th.mat-header-cell
+
+		&:first-of-type
+			padding-left: $small-gap
+
+		&:last-of-type
+			padding-right: $small-gap
+
+	tr
+		cursor: pointer
+		transition: background-color $fast-transition
+
+	.highlight
+		background-color: $grey
