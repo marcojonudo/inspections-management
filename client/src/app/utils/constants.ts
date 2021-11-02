@@ -44,8 +44,12 @@ export class Constants {
 	};
 
 	static readonly SELECT_ITEM_OPTION_CODE: any = {
-		C: 'C'
+		C: 'C',
+		NA: 'NA'
 	};
 
+	public static readonly PATH: any = {
+		INSPECTION: '/inspection',
+	};
 
 }

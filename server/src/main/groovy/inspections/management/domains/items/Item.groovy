@@ -3,6 +3,7 @@ package inspections.management.domains.items
 import com.fasterxml.jackson.annotation.JsonIgnore
 import grails.gorm.annotation.Entity
 import inspections.management.domains.InspectionVehicle
+import inspections.management.domains.ItemCategory
 import org.grails.datastore.gorm.GormEntity
 
 @Entity
@@ -10,6 +11,7 @@ class Item implements GormEntity<Item> {
 
 	Type type
 	String code
+	ItemCategory category
 
 	@JsonIgnore
 	Set<InspectionVehicle> inspectionsVehicle
@@ -27,12 +29,14 @@ class Item implements GormEntity<Item> {
 
 	static constraints = {
 		type maxSize: 25
+		category nullable: true
 	}
 
 	static mapping = {
 		tablePerHierarchy false
 
 		vehicleDataList fetch: 'join'
+		category lazy: false
 	}
 
 	enum Type {

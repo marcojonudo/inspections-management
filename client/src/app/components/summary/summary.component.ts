@@ -3,9 +3,9 @@ import { OrdersFilter } from '../../objects/filters/orders-filter';
 import { PendingOrdersFilter } from '../../objects/filters/pending-orders-filter';
 import { TodayOrdersFilter } from '../../objects/filters/today-orders-filter';
 import { InspectionService } from '../../services/inspection.service';
-import { Constants } from '../../objects/constants';
 import { OrderInspectionVehicle } from '../../objects/order-inspection-vehicle';
 import { Subscription } from 'rxjs';
+import { Constants } from '../../utils/constants';
 
 @Component({
 	selector: 'app-summary',

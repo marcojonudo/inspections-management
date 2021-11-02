@@ -1,13 +1,26 @@
+import { ItemVehicleData } from './item-vehicle-data';
+import { ItemCategory } from '../item-category';
+
 export class Item {
 
 	type: string;
 	code: string;
 	name: string;
+	order: number;
+	printOrder: number;
+	vehicleData: ItemVehicleData;
+	category: ItemCategory;
+	header: string;
 
 	constructor(item: any) {
 		this.type = item.type;
 		this.code = item.code;
 		this.name = item.name;
+		this.order = item.order;
+		this.printOrder = item.printOrder;
+		this.vehicleData = new ItemVehicleData(item.vehicleData);
+		this.category = item.category ? new ItemCategory(item.category) : undefined;
+		this.header = item.header;
 	}
 
 }

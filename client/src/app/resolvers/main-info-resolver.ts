@@ -1,11 +1,8 @@
 import {
 	Injectable,
 } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
-import { EmployeeService } from '../services/employee.service';
-import { LocalStorageService } from '../services/local-storage.service';
-import { Constants } from '../objects/constants';
 import { InspectionService } from '../services/inspection.service';
 
 @Injectable({

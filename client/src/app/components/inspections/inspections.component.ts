@@ -6,10 +6,10 @@ import { ItemBudget } from '../../objects/item-budget';
 import { OrderInspectionVehicle } from '../../objects/order-inspection-vehicle';
 import { Order } from '../../objects/orders/order';
 import { SavedInspection } from '../../objects/inspections/saved-inspection';
-import { Constants } from '../../objects/constants';
 import { SavedItem } from '../../objects/inspections/saved-items/saved-item';
 import { EmployeeService } from '../../services/employee.service';
 import { Employee } from '../../objects/employee';
+import { Constants } from '../../utils/constants';
 
 export interface Column {
 	order: number;

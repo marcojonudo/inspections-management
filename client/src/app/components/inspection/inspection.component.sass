@@ -1,0 +1,131 @@
+@import "abstracts/mixins"
+
+\:host
+	@include flex-1
+	@include flex-center
+
+	#inspection-container
+		width: 70%
+		height: 100%
+		box-sizing: border-box
+		overflow-y: auto
+		padding: $medium-gap
+		background-color: $light-grey
+
+		.image-category-content
+			width: 100%
+			display: grid
+			grid-template-columns: repeat(4, 1fr)
+
+			.image-item
+				@include flex-column-center
+				text-align: center
+
+				.image-container
+					height: 100%
+					@include flex-1
+					@include flex-center
+
+				img
+					width: 100%
+					height: auto
+					object-fit: cover
+					border-radius: $border-radius
+
+		.text-area-card
+			height: 8rem !important
+
+		canvas
+			display: inline-block !important
+			margin-bottom: 2px
+
+		mat-card
+			padding: $tiny-gap
+			margin: 0 $tiny-gap
+
+			.mat-card-header .mat-card-title, .mat-card-content
+				font-size: 1em
+				margin-bottom: 0 !important
+
+			.mat-card-avatar
+				height: auto
+				width: auto
+
+			.mat-card-header-text
+				display: flex
+				align-items: center
+
+		.category
+			position: relative
+			margin: $small-gap 0
+
+			&.fill
+				@include flex-1
+
+			.highlight
+				font-weight: bold
+
+			mat-card
+
+				.graph-container
+					width: 100%
+					height: 100%
+					position: absolute
+					top: 0
+					@include flex-center
+
+					.graph-info
+						width: 10%
+						position: absolute
+						right: 0
+
+				mat-card-content
+					display: flex
+
+					.items-info
+						width: 100%
+						display: grid
+						grid-template-columns: repeat(4, 1fr)
+
+						.item
+							position: relative
+							display: flex
+							align-items: center
+							padding: $tiny-gap
+							overflow: hidden
+
+							&-text
+								width: 88%
+								overflow: hidden
+								white-space: nowrap
+								text-overflow: ellipsis
+
+							&-data
+								width: 12%
+								@include flex-center
+
+							&-text-value
+								@include flex-1
+								@include flex-center
+
+							&-unit
+								line-height: 2.1
+								font-size: .8em
+
+							mat-icon
+								font-size: $bigger-font
+
+				& > div:not(:last-child)
+					@include flex-1
+
+			.text-area-card
+				height: calc(100% - .5rem)
+				max-height: 150px
+
+				.mat-card-content
+					width: 100%
+					display: flex
+					flex-direction: column
+
+					& > div
+						line-height: 1.5

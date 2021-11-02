@@ -22,8 +22,10 @@ import { MatRippleModule } from '@angular/material/core';
 import { ToolsBarComponent } from './components/tools-bar/tools-bar.component';
 import { MatButtonModule } from '@angular/material/button';
 import * as dayjs from 'dayjs';
-import { Dayjs } from 'dayjs';
-import { Constants } from './objects/constants';
+import { InspectionComponent } from './components/inspection/inspection.component';
+import { OrderPipe } from './pipes/order.pipe';
+import { PrintOrderPipe } from './pipes/print-order.pipe';
+import { Constants } from './utils/constants';
 
 @NgModule({
 	declarations: [
@@ -33,7 +35,10 @@ import { Constants } from './objects/constants';
 		SummaryComponent,
 		InspectionsComponent,
 		InspectionDetailsComponent,
-		ToolsBarComponent
+		ToolsBarComponent,
+		InspectionComponent,
+		OrderPipe,
+		PrintOrderPipe
 	],
 	imports: [
 		BrowserModule,
@@ -56,7 +61,7 @@ import { Constants } from './objects/constants';
 		MatRippleModule,
 		MatButtonModule
 	],
-	providers: [],
+	providers: [OrderPipe],
 	bootstrap: [AppComponent]
 })
 export class AppModule {

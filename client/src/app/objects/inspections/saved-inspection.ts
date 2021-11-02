@@ -1,7 +1,7 @@
 import { SavedItem } from './saved-items/saved-item';
-import { Builder } from '../builder';
 import { ItemBudget } from '../item-budget';
-import { Constants } from '../constants';
+import { Constants } from '../../utils/constants';
+import { Builder } from '../../utils/builder';
 
 export class SavedInspection {
 

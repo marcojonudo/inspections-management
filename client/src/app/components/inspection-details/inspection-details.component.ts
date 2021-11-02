@@ -11,6 +11,8 @@ import { EmployeeService } from '../../services/employee.service';
 import { OrderInspectionVehicle } from '../../objects/order-inspection-vehicle';
 import { SavedInspection } from '../../objects/inspections/saved-inspection';
 import { SavedItem } from '../../objects/inspections/saved-items/saved-item';
+import { Router } from '@angular/router';
+import { Constants } from '../../utils/constants';
 
 @Component({
 	selector: 'app-inspection-details',
@@ -39,7 +41,8 @@ export class InspectionDetailsComponent {
 	constructor(
 		private inspectionService: InspectionService,
 		private translate: TranslateService,
-		private cdRef: ChangeDetectorRef
+		private cdRef: ChangeDetectorRef,
+		private router: Router
 	) {
 		this.columnsToDisplay = this.COLUMNS;
 		this.mechanics = [];
@@ -52,6 +55,10 @@ export class InspectionDetailsComponent {
 			).map(employeeCode => EmployeeService.findEmployee(employeeCode)) : [];
 			this.cdRef.detectChanges();
 		});
+	}
+
+	get inspectionPath(): string {
+		return Constants.PATH.INSPECTION;
 	}
 
 	buildData(orderInspection: OrderInspectionVehicle, savedInspection: SavedInspection, columnsData: any = this.COLUMNS_DATA): Column[] {
@@ -113,6 +120,10 @@ export class InspectionDetailsComponent {
 	updateAcceptedBudget(orderNumber: number, itemCode: string, accepted: boolean): void {
 		const budgetNotification = InspectionService.findBudgetNotification(orderNumber, itemCode);
 		this.inspectionService.updateAcceptedBudget(budgetNotification, accepted).subscribe();
+	}
+
+	openInspection(): void {
+		this.router.navigate([Constants.PATH.INSPECTION]);
 	}
 
 }
