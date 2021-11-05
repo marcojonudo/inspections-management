@@ -3,6 +3,7 @@ package inspections.management.domains.fviberi
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonInclude
 import grails.gorm.annotation.Entity
+import inspections.management.pogos.vehicles.Vehicle
 import inspections.management.utils.Constants
 import org.grails.datastore.gorm.GormEntity
 
@@ -17,6 +18,7 @@ class Order implements GormEntity<Order> {
 
 	@JsonFormat(pattern = Constants.DateFormat.yyyy_MM_dd, timezone = Constants.SPAIN_TIMEZONE)
 	LocalDate day
+	String carIdentifier
 	Vehicle vehicle
 	Client client
 	String sellerCode
@@ -37,7 +39,7 @@ class Order implements GormEntity<Order> {
 		number column: 'nuordrep'
 		day column: 'feordrep'
 		state column: 'clsituac'
-		vehicle column: 'numatric', lazy: false
+		carIdentifier column: 'numatric'
 		client column: 'coclient', fetch: 'join'
 		sellerCode column: 'covended'
 		lines fetch: 'join'
@@ -47,6 +49,6 @@ class Order implements GormEntity<Order> {
 		version false
 	}
 
-	static transients = ['code', 'mechanicCode', 'budgets']
+	static transients = ['code', 'mechanicCode', 'budgets', 'vehicle']
 
 }
