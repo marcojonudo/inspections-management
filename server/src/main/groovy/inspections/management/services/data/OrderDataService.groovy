@@ -6,6 +6,9 @@ import grails.gorm.transactions.Transactional
 import inspections.management.domains.fviberi.Budget
 import inspections.management.domains.fviberi.Order
 import inspections.management.domains.fviberi.OrderTime
+import inspections.management.domains.fviberi.vehicle.IVehicle
+import inspections.management.services.data.vehicles.CarDataService
+import inspections.management.services.data.vehicles.ScooterDataService
 import inspections.management.utils.Constants
 
 import javax.inject.Inject
@@ -17,6 +20,8 @@ abstract class OrderDataService {
 
 	@Inject OrderTimeDataService orderTimeDataService
 	@Inject BudgetDataService budgetDataService
+	@Inject CarDataService carDataService
+	@Inject ScooterDataService scooterDataService
 
 	@Where({ day == day && !(state in Constants.CLOSED_ORDER_STATES) })
 	abstract List<Order> findAllOrders(LocalDate day)
@@ -49,6 +54,9 @@ abstract class OrderDataService {
 		}.flatten()
 		List<Budget> budgets = budgetNumbers ? budgetDataService.findAll(budgetNumbers) : []
 		orders.each { Order order ->
+			IVehicle vehicle = carDataService.find(order.carIdentifier) ?: scooterDataService.find(order.carIdentifier)
+			order.vehicle = vehicle.buildVehicle()
+
 			OrderTime orderTime = ordersTime.find { it.orderNumber == order.number }
 			order.code = orderTime.code
 			order.mechanicCode = orderTime.mechanicCode

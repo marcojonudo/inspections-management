@@ -6,6 +6,8 @@ import { InspectionService } from '../../services/inspection.service';
 import { OrderInspectionVehicle } from '../../objects/order-inspection-vehicle';
 import { Subscription } from 'rxjs';
 import { Constants } from '../../utils/constants';
+import { ItemBudget } from '../../objects/item-budget';
+import { Budget } from '../../objects/orders/budget';
 
 @Component({
 	selector: 'app-summary',
@@ -50,7 +52,7 @@ export class SummaryComponent implements OnDestroy {
 		return InspectionService.orderInspections;
 	}
 
-	findAllItemBudgetLength(budgetType: string): number {
+	findAllItemBudgetLength(budgetType: string = undefined): number {
 		return InspectionService.findAllItemBudgets(budgetType).length;
 	}
 
@@ -62,19 +64,26 @@ export class SummaryComponent implements OnDestroy {
 		return InspectionService.findBudgetsPrice();
 	}
 
-	findAllBudgets(): number {
-		return InspectionService.findAllBudgetNotifications().length;
+	findDoneBudgets(): ItemBudget[] {
+		const doneBudgets = [];
+		InspectionService.orderInspections.forEach(orderInspection => {
+			const savedInspection = InspectionService.findSavedInspection(orderInspection.order.number);
+			const doneOrderBudgets = (savedInspection ? savedInspection.itemBudgets : []).filter(itemBudget =>
+				InspectionService.checkExistentBudget(itemBudget.itemCode, orderInspection.order.budgets)
+			);
+			doneBudgets.push(...doneOrderBudgets);
+		});
+		return doneBudgets;
 	}
 
-	findAcceptedBudgets(): number {
-		const allBudgetNotifications = InspectionService.findAllBudgetNotifications();
-		return allBudgetNotifications.filter(b => b.accepted).length;
+	findAllBudgets(): Budget[] {
+		console.log('all budgets', InspectionService.findAllBudgets());
+		return InspectionService.findAllBudgets();
 	}
 
-	findAcceptedPercentage(): number {
-		const allBudgetNotifications = InspectionService.findAllBudgetNotifications();
-		const acceptedBudgetNotifications = allBudgetNotifications.filter(b => b.accepted);
-		return allBudgetNotifications.length ? acceptedBudgetNotifications.length / allBudgetNotifications.length : 0;
+	findAcceptedBudgets(): Budget[] {
+		console.log('accepted budgets', this.findAllBudgets().filter(b => InspectionService.checkAcceptedBudget(b)));
+		return this.findAllBudgets().filter(b => InspectionService.checkAcceptedBudget(b));
 	}
 
 	findClosedOrders(): number {

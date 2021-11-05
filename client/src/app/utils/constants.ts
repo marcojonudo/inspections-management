@@ -6,12 +6,17 @@ export class Constants {
 	static readonly LOCAL_STORAGE: any = {
 		LANGUAGE: 'language',
 		EMPLOYEES: 'employees',
-		ITEM_BUDGETS: 'itemBudgets'
+		ITEM_BUDGETS: 'itemBudgets',
+		ITEM_ARTICLE_CODES: 'itemArticleCodes'
 	};
 
 	static readonly BUDGET_TYPE: any = {
 		URGENT: 'URGENT',
 		SECONDARY: 'SECONDARY'
+	};
+
+	static readonly BUDGET_STATE: any = {
+		O: 'O'
 	};
 
 	static readonly BUDGET_TYPE_ORDER: any = {

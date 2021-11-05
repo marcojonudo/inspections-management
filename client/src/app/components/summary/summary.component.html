@@ -32,7 +32,7 @@
         <mat-card-content>
 			<div class="content-block">
 				<span translate>summary.sells</span>
-				<span class="color-correct">{{findBudgetsPrice()}}€</span>
+				<span class="color-correct">{{findBudgetsPrice() | number}}€</span>
 			</div>
         </mat-card-content>
     </mat-card>
@@ -40,11 +40,11 @@
         <mat-card-content>
 			<div class="content-block">
 				<span translate>summary.budgets</span>
-				<span class="test">{{findAcceptedBudgets()}}/{{findAllBudgets()}}</span>
+				<span class="smaller-font">{{findDoneBudgets().length}}/{{findAllItemBudgetLength()}}</span>
 			</div>
 			<div class="content-block">
 				<span translate>summary.acceptPercentage</span>
-				<span class="color-correct test">{{findAcceptedPercentage() | percent: '2.1'}}</span>
+				<span class="color-correct smaller-font">{{(findAcceptedBudgets().length / findAllBudgets().length) | percent}}</span>
 			</div>
         </mat-card-content>
     </mat-card>
@@ -60,11 +60,11 @@
         <mat-card-content>
 			<div class="content-block">
 				<span translate>summary.completedInspections</span>
-				<span class="test">{{findFinishedInspections()}}/{{orderInspections.length}}</span>
+				<span class="smaller-font">{{findFinishedInspections()}}/{{orderInspections.length}}</span>
 			</div>
             <div class="content-block">
                 <span translate>summary.detectedProblems</span>
-                <span class="color-correct test">{{findWrongItemsPercentage() | percent: '2.1'}}</span>
+                <span class="color-correct smaller-font">{{findWrongItemsPercentage() | percent}}</span>
             </div>
         </mat-card-content>
     </mat-card>

@@ -16,11 +16,4 @@ class BudgetNotification implements GormEntity<BudgetNotification> {
 	@JsonFormat(pattern = Constants.DateTimeFormat.yyyy_MM_dd_HH_mm_ss, timezone = Constants.SPAIN_TIMEZONE)
 	LocalDateTime notified = LocalDateTime.now()
 
-	@JsonFormat(pattern = Constants.DateTimeFormat.yyyy_MM_dd_HH_mm_ss, timezone = Constants.SPAIN_TIMEZONE)
-	LocalDateTime accepted
-
-	static constraints = {
-		accepted nullable: true
-	}
-
 }

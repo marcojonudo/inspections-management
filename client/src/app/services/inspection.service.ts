@@ -68,10 +68,6 @@ export class InspectionService {
 		InspectionService.budgetNotifications = [];
 	}
 
-	// static findOrder(orderNumber: number, orders: Order[] = this.orders): Order {
-	// 	return orders.find(o => o.number === orderNumber);
-	// }
-
 	static findOrderInspection(
 		orderNumber: number, orderInspections: OrderInspectionVehicle[] = this.orderInspections
 	): OrderInspectionVehicle {
@@ -114,12 +110,6 @@ export class InspectionService {
 		return Utils.sort(types, (type) => Constants.BUDGET_TYPE_ORDER[type])[0];
 	}
 
-	static findBudgetNotification(
-		orderNumber: number, itemCode: string, budgetNotifications: BudgetNotification[] = this.budgetNotifications
-	): BudgetNotification {
-		return budgetNotifications.find(c => c.orderNumber === orderNumber && c.itemCode === itemCode);
-	}
-
 	static findBudgetNotifications(
 		orderNumber: number, budgetNotifications: BudgetNotification[] = this.budgetNotifications
 	): BudgetNotification[] {
@@ -152,20 +142,16 @@ export class InspectionService {
 		let price = 0;
 		orderInspections.forEach(orderInspection => {
 			orderInspection.order.budgets.forEach(budget => {
+				const acceptedBudget = InspectionService.checkAcceptedBudget(budget);
 				budget.lines.filter(l => l.price).forEach(line => {
-					price += line.units * line.price;
+					/* Sólo se suma el precio si el presupuesto ha sido aceptado */
+					if (acceptedBudget) {
+						price += line.units * line.price;
+					}
 				});
 			});
 		});
 		return price;
-	}
-
-	static findAllBudgetNotifications(orderInspections: OrderInspectionVehicle[] = this.orderInspections): BudgetNotification[] {
-		const allBudgetNotifications = [];
-		orderInspections.forEach(orderInspection => {
-			allBudgetNotifications.push(...InspectionService.findBudgetNotifications(orderInspection.order.number));
-		});
-		return allBudgetNotifications;
 	}
 
 	static findGroupedItems(
@@ -208,6 +194,43 @@ export class InspectionService {
 		return `data:image/png;base64,${image}`;
 	}
 
+	static findBudget(itemCode: string, budgets: Budget[], itemArticleCodes: ItemArticleCode[] = this.itemArticleCodes): Budget {
+		return budgets.find(b =>
+			b.lines.find(l =>
+				itemArticleCodes.find(i => i.articleCode === l.articleCode) !== undefined
+			) !== undefined
+		);
+	}
+
+	static checkAcceptedBudget(budget: Budget): boolean {
+		return budget && budget.state === Constants.BUDGET_STATE.O;
+	}
+
+	static findAllBudgets(orderInspections: OrderInspectionVehicle[] = this.orderInspections): Budget[] {
+		return [].concat(...orderInspections.map(o => o.order.budgets));
+	}
+
+	static findSelectItems(savedInspections: SavedInspection[] = this.savedInspections): SelectItem[] {
+		const items = [];
+		savedInspections.forEach(savedInspection =>
+			items.push(...savedInspection.items.filter(i => i.item.type === Constants.ITEM_TYPE.SELECT).map(i => i.item))
+		);
+		return items;
+	}
+
+	static findSelectItemOptions(): SelectItemOption[] {
+		const options = [];
+		this.findSelectItems().forEach((item: SelectItem) => {
+			item.options.forEach((option: SelectItemOption) => {
+				const existent = options.find(o => o.code === option.code);
+				if (!existent) {
+					options.push(option);
+				}
+			});
+		});
+		return options;
+	}
+
 	findLanguage(): Observable<string> {
 		const language = LocalStorageService.getItem(Constants.LOCAL_STORAGE.LANGUAGE);
 		return (language ? of(language) : this.http.get(Url.language(), { responseType: 'text' })).pipe(
@@ -226,13 +249,11 @@ export class InspectionService {
 				console.log('Opened orders', openedOrders);
 
 				if (openedOrders.length) {
-					const articles = this.findArticles(openedOrders);
 					const orderNumbers = openedOrders.map(o => o.number);
-					const budgetNotificationsUrl = `${Url.budgetNotification()}&orderNumbers=${orderNumbers.join('&orderNumbers=')}`;
+					const budgetNotificationsUrl = `${Url.budgetNotification()}?orderNumbers=${orderNumbers.join('&orderNumbers=')}`;
 					return forkJoin([
 						this.findItemBudgets(),
-						InspectionService.itemArticleCodes || articles.length ?
-							of(InspectionService.itemArticleCodes) : this.http.post(Url.articleItems(), articles),
+						this.findItemArticleCodes(),
 						this.http.post(Url.inspections(), orders),
 						this.http.post(Url.savedInspections(), orderNumbers),
 						this.http.get(budgetNotificationsUrl)
@@ -271,6 +292,11 @@ export class InspectionService {
 		return savedItemBudgets ? of(savedItemBudgets) : this.http.get(Url.itemBudgets());
 	}
 
+	findItemArticleCodes(): Observable<any> {
+		const savedItemArticleCodes = LocalStorageService.getItem(Constants.LOCAL_STORAGE.ITEM_ARTICLE_CODES);
+		return savedItemArticleCodes ? of(savedItemArticleCodes) : this.http.get(Url.articleItems());
+	}
+
 	buildItemBudgets(itemBudgets: any[]): ItemBudget[] {
 		const savedItemBudgets = LocalStorageService.getItem(Constants.LOCAL_STORAGE.ITEM_BUDGETS);
 		if (savedItemBudgets) {
@@ -291,12 +317,6 @@ export class InspectionService {
 			}
 		});
 		return allOrderInspections;
-	}
-
-	findArticles(orders: Order[]): number[] {
-		return [].concat(...orders.map(o => o.lines.map(l => l.articleCode))).filter((value, index, self) =>
-			self.indexOf(value) === index
-		);
 	}
 
 	findOrders(filters: OrdersFilter[]): Observable<any> {
@@ -337,13 +357,6 @@ export class InspectionService {
 				);
 				this.budgetNotificationsSubject.next(InspectionService.budgetNotifications);
 			})
-		);
-	}
-
-	updateAcceptedBudget(budgetNotification: BudgetNotification, accepted: boolean): Observable<any> {
-		this.budgetNotificationsSubject.next([budgetNotification]);
-		return this.http.patch(Url.budgetNotification(accepted), budgetNotification).pipe(
-			tap(() => this.budgetNotificationsSubject.next(InspectionService.budgetNotifications))
 		);
 	}
 
