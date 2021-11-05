@@ -13,11 +13,18 @@ import { Url } from '../utils/url';
 export class EmployeeService {
 
 	static employees: Employee[];
+	static employee: Employee;
 
 	constructor(private http: HttpClient) {}
 
 	static findEmployee(code: string, employees: Employee[] = this.employees): Employee {
 		return employees.find(e => e.code === code);
+	}
+
+	static setEmployee(employeeCode: string): Employee {
+		this.employee = this.findEmployee(employeeCode);
+		LocalStorageService.setItem(Constants.LOCAL_STORAGE.EMPLOYEE, this.employee);
+		return this.employee;
 	}
 
 	static setEmployees(employees: any): void {

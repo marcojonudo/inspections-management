@@ -1,5 +1,6 @@
 import { ItemVehicleData } from './item-vehicle-data';
 import { ItemCategory } from '../item-category';
+import { ItemRelation } from '../item-relation';
 
 export class Item {
 
@@ -11,6 +12,7 @@ export class Item {
 	vehicleData: ItemVehicleData;
 	category: ItemCategory;
 	header: string;
+	relations: ItemRelation[];
 
 	constructor(item: any) {
 		this.type = item.type;
@@ -18,9 +20,10 @@ export class Item {
 		this.name = item.name;
 		this.order = item.order;
 		this.printOrder = item.printOrder;
-		this.vehicleData = new ItemVehicleData(item.vehicleData);
+		// this.vehicleData = new ItemVehicleData(item.vehicleData);
 		this.category = item.category ? new ItemCategory(item.category) : undefined;
 		this.header = item.header;
+		// this.relations = item.relations.map(relation => new ItemRelation())
 	}
 
 }

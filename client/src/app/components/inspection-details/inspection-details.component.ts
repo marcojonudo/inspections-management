@@ -12,6 +12,8 @@ import { SavedInspection } from '../../objects/inspections/saved-inspection';
 import { SavedItem } from '../../objects/inspections/saved-items/saved-item';
 import { Router } from '@angular/router';
 import { Constants } from '../../utils/constants';
+import { MatDialog } from '@angular/material/dialog';
+import { InspectionComponent } from '../inspection/inspection.component';
 
 @Component({
 	selector: 'app-inspection-details',

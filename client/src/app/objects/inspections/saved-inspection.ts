@@ -10,6 +10,7 @@ export class SavedInspection {
 	state: string;
 	items: SavedItem[];
 	itemBudgets: ItemBudget[];
+	orderInspection: boolean;
 
 	constructor(savedInspection: any, itemBudgets: ItemBudget[]) {
 		this.orderNumber = savedInspection.orderNumber;
@@ -22,6 +23,7 @@ export class SavedInspection {
 			);
 			return item && item.filled && item.findValue() !== Constants.SELECT_ITEM_OPTION_CODE.C;
 		});
+		this.orderInspection = savedInspection.orderInspection;
 	}
 
 }

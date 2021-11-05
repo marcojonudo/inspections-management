@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, map, mergeMap, tap } from 'rxjs/operators';
-import { forkJoin, Observable, of, Subject } from 'rxjs';
+import { catchError, finalize, map, mergeMap, tap } from 'rxjs/operators';
+import { forkJoin, from, Observable, of, Subject } from 'rxjs';
 import { LocalStorageService } from './local-storage.service';
 import { OrdersFilter } from '../objects/filters/orders-filter';
 import { TodayOrdersFilter } from '../objects/filters/today-orders-filter';
@@ -19,6 +19,15 @@ import { Category } from '../objects/list-elements/category';
 import { Constants } from '../utils/constants';
 import { Utils } from '../utils/utils';
 import { Url } from '../utils/url';
+import { SavedItem } from '../objects/inspections/saved-items/saved-item';
+import { Builder } from '../utils/builder';
+import { ItemRelation } from '../objects/inspections/item-relation';
+import { SelectSavedItem } from '../objects/inspections/saved-items/select-saved-item';
+import { CountryHandler } from '../objects/country-info/country-handler';
+import { SpainHandler } from '../objects/country-info/spain-handler';
+import { PortugalHandler } from '../objects/country-info/portugal-handler';
+import { SelectItemOption } from '../objects/inspections/items/select-item-option';
+import { SelectItem } from '../objects/inspections/items/select-item';
 
 @Injectable({
 	providedIn: 'root'
@@ -31,6 +40,7 @@ export class InspectionService {
 	static itemArticleCodes: ItemArticleCode[];
 	static budgetNotifications: BudgetNotification[];
 	static selectedOrderInspection: OrderInspectionVehicle;
+	static countryHandler: CountryHandler;
 
 	private static readonly LEVEL_ELEMENTS: ((item: Item) => NameElement)[] = [
 		(item: Item) => item.vehicleData.garagePosition,
@@ -44,6 +54,25 @@ export class InspectionService {
 		SN: '#d23636',
 		RA: '#3681d2',
 		RR: '#3681d2'
+	};
+
+	private static readonly ITEM_RELATION_ACTION: any = {
+		HIDE: (targetSavedItem: SelectSavedItem, newValue: string, employeeCode: string) =>
+			targetSavedItem.updateHidden(employeeCode, true),
+		REPLICATE: (targetSavedItem: SelectSavedItem, newValue: string, employeeCode: string) =>
+			targetSavedItem.update(newValue, employeeCode)
+	};
+
+	private static readonly ITEM_RELATION_RESTORE_ACTION: any = {
+		HIDE: (targetSavedItem: SelectSavedItem, newValue: string, employeeCode: string) =>
+			targetSavedItem.updateHidden(employeeCode, false),
+		REPLICATE: (targetSavedItem: SelectSavedItem, newValue: string, employeeCode: string) =>
+			targetSavedItem.update(Constants.SELECT_ITEM_OPTION_CODE.P, employeeCode)
+	};
+
+	static readonly COUNTRY_HANDLER_DECIDER: any = {
+		es: new SpainHandler(),
+		pt: new PortugalHandler()
 	};
 
 	filters: OrdersFilter[];
@@ -231,11 +260,56 @@ export class InspectionService {
 		return options;
 	}
 
+	static updateItem(
+		savedItem: SavedItem,
+		item: Item,
+		value: string,
+		savedInspection: SavedInspection
+	): Observable<ItemRelation> {
+		// const savedItem = savedInspection.items.find(i => i.item.name === item.name);
+
+		/* Antes de actualizar el valor, se debe comprobar si hay alguna relación que deshacer. Por ejemplo, al tener
+		 * 'Pastilla de freno' el valor 'No aplica', el espesor está oculto; sin embargo, en cuanto se actualiza el
+		 * valor de la primera, el segundo debe volver a aparecer (se está deshaciendo la relación) */
+		this.updateRelations(
+			savedItem, savedItem.findValue(), item.relations, this.ITEM_RELATION_RESTORE_ACTION, savedInspection
+		).subscribe();
+		savedItem.update(value, '');
+
+		return this.updateRelations(savedItem, savedItem.findValue(), item.relations, this.ITEM_RELATION_ACTION, savedInspection).pipe(
+			finalize(() => {
+				LocalStorageService.setItem(Constants.LOCAL_STORAGE.SAVED_INSPECTION, savedInspection);
+			})
+		);
+	}
+
+	static updateRelations(
+		savedItem: SavedItem, value: string, relations: ItemRelation[], actions: any, savedInspection: SavedInspection
+	): Observable<ItemRelation> {
+		return from(relations).pipe(
+			tap(itemRelation => InspectionService.handleRelation(savedItem, value, itemRelation, actions, savedInspection))
+		);
+	}
+
+	static handleRelation(
+		savedItem: SavedItem,
+		value: string,
+		itemRelation: ItemRelation,
+		actions: any,
+		savedInspection: SavedInspection
+	): void {
+		if (value === itemRelation.matchText) {
+			const targetSavedItem = savedInspection.items.find(i => i.item.code === itemRelation.targetItem.code);
+			actions[itemRelation.action](targetSavedItem, savedItem.findValue(), '');
+		}
+	}
+
 	findLanguage(): Observable<string> {
 		const language = LocalStorageService.getItem(Constants.LOCAL_STORAGE.LANGUAGE);
 		return (language ? of(language) : this.http.get(Url.language(), { responseType: 'text' })).pipe(
 			catchError(() => of(Constants.DEFAULT_LANGUAGE)),
 			tap((lang: string) => {
+				InspectionService.countryHandler = InspectionService.COUNTRY_HANDLER_DECIDER[lang];
 				LocalStorageService.setItem(Constants.LOCAL_STORAGE.LANGUAGE, lang);
 				console.log('Language', lang);
 			})
@@ -280,7 +354,7 @@ export class InspectionService {
 		InspectionService.itemBudgets = this.buildItemBudgets(data[0]);
 		InspectionService.itemArticleCodes = InspectionService.itemArticleCodes.length ?
 			InspectionService.itemArticleCodes : data[1].map(i => new ItemArticleCode(i));
-		InspectionService.savedInspections = data[3].map(d => new SavedInspection(d, InspectionService.itemBudgets));
+		InspectionService.savedInspections = data[3].map(d => Builder.buildSavedInspection(d, InspectionService.itemBudgets));
 		InspectionService.budgetNotifications = data[4].map(b => new BudgetNotification(b));
 
 		const orderInspections = data[2].map(d => new OrderInspectionVehicle(d));
@@ -310,7 +384,7 @@ export class InspectionService {
 	buildOrderInspections(orderInspections: OrderInspectionVehicle[], savedInspections: SavedInspection[]): OrderInspectionVehicle[] {
 		const allOrderInspections = [];
 		orderInspections.forEach(orderInspection => {
-			/* Cuenta como revisión si tiene una asociada, o si tiene una guardad previamente (caso de una OR sin revisión en la que se ha
+			/* Cuenta como revisión si tiene una asociada, o si tiene una guardada previamente (caso de una OR sin revisión en la que se ha
 			 * destacado algún aspecto incorrecto) */
 			if (orderInspection.inspection || savedInspections.find(s => s.orderNumber === orderInspection.order.number) !== undefined) {
 				allOrderInspections.push(orderInspection);

@@ -16,7 +16,7 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatRippleModule } from '@angular/material/core';
 import { ToolsBarComponent } from './components/tools-bar/tools-bar.component';
@@ -26,6 +26,11 @@ import { InspectionComponent } from './components/inspection/inspection.componen
 import { OrderPipe } from './pipes/order.pipe';
 import { PrintOrderPipe } from './pipes/print-order.pipe';
 import { Constants } from './utils/constants';
+import { MatDialogModule } from '@angular/material/dialog';
+import { InitComponent } from './components/init/init.component';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
 	declarations: [
@@ -38,7 +43,8 @@ import { Constants } from './utils/constants';
 		ToolsBarComponent,
 		InspectionComponent,
 		OrderPipe,
-		PrintOrderPipe
+		PrintOrderPipe,
+		InitComponent
 	],
 	imports: [
 		BrowserModule,
@@ -59,7 +65,12 @@ import { Constants } from './utils/constants';
 		MatButtonToggleModule,
 		MatSlideToggleModule,
 		MatRippleModule,
-		MatButtonModule
+		MatButtonModule,
+		MatDialogModule,
+		MatFormFieldModule,
+		MatInputModule,
+		ReactiveFormsModule,
+		MatSnackBarModule
 	],
 	providers: [OrderPipe],
 	bootstrap: [AppComponent]

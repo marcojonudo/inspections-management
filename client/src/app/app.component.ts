@@ -1,17 +1,18 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
-import { leaveAnimation } from './animations';
+import { leaveAnimation, routeAnimations } from './animations';
 import { InspectionService } from './services/inspection.service';
 import { TranslateService } from '@ngx-translate/core';
 import { LoadingService } from './services/loading.service';
 import { forkJoin } from 'rxjs';
 import { EmployeeService } from './services/employee.service';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
 	selector: 'app-root',
 	templateUrl: './app.component.html',
 	styleUrls: ['./app.component.sass'],
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	animations: [leaveAnimation]
+	animations: [routeAnimations, leaveAnimation]
 })
 export class AppComponent {
 	title = 'Gestión de revisiones';
@@ -39,6 +40,10 @@ export class AppComponent {
 			this.loading = loading;
 			this.cdRef.detectChanges();
 		});
+	}
+
+	prepareRoute(outlet: RouterOutlet): void {
+		return outlet && outlet.activatedRouteData && outlet.activatedRouteData.animation;
 	}
 
 }

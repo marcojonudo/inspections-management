@@ -2,12 +2,27 @@ export class Constants {
 
 	static readonly DEFAULT_LANGUAGE: string = 'es';
 	static readonly DETECTED_ANOMALIES_CODE = 'AD';
+	static readonly EMPLOYEE_CODE_MAX_LENGTH: number = 7;
 
 	static readonly LOCAL_STORAGE: any = {
 		LANGUAGE: 'language',
 		EMPLOYEES: 'employees',
+		EMPLOYEE: 'employee',
 		ITEM_BUDGETS: 'itemBudgets',
 		ITEM_ARTICLE_CODES: 'itemArticleCodes'
+	};
+
+	static readonly MESSAGE_CODE: any = {
+		EMPLOYEE_NOT_FOUND: 'EMPLOYEE_NOT_FOUND'
+	};
+
+	static readonly TRANSLATION_CODE: any = {
+		REQUIRED_EMPLOYEE_CODE: 'requiredEmployeeCode',
+		EMPLOYEE_CODE_MIN_LENGTH: 'employeeCodeMinLength'
+	};
+
+	static readonly VALIDATION_ERROR: any = {
+		REQUIRED: 'required'
 	};
 
 	static readonly BUDGET_TYPE: any = {
@@ -55,6 +70,15 @@ export class Constants {
 
 	public static readonly PATH: any = {
 		INSPECTION: '/inspection',
+	};
+
+	static readonly SNACK_BAR: any = {
+		DURATION: 3000,
+		TYPE: {
+			SUCCESS: 'SUCCESS',
+			WARNING: 'WARNING',
+			ERROR: 'ERROR'
+		}
 	};
 
 }

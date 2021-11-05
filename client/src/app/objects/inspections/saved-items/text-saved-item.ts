@@ -13,4 +13,15 @@ export class TextSavedItem extends SavedItem {
 		return this.text;
 	}
 
+	update(text: string, employeeCode: string): void {
+		this.text = text;
+		this.updateCommonFields(employeeCode);
+	}
+
+	reset(employeeCode: string): void {
+		this.text = undefined;
+		this.image = undefined;
+		this.updateCommonFields(employeeCode);
+	}
+
 }

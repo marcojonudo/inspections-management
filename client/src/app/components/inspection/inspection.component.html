@@ -24,16 +24,23 @@
 	<ng-template #itemTemplate let-elem>
 		<div class="items-info">
 			<div *ngFor="let item of elem.items | printOrder" class="item" [class.highlight]="checkWrongItem(item)">
-				<div translate class="item-text">inspection.item.{{item.item.code}}</div>
-				<mat-icon
+				<div
 					*ngIf="checkItemType(item.item.type, selectType); else textItemText"
-					class="item-data"
-					[style.color]="findIconColor(findSelectSavedItem(item).value)">
-					{{findSelectIcon(findSelectSavedItem(item))}}
-				</mat-icon>
+					matRipple
+					(click)="toggleSelectOption(findSelectSavedItem(item))">
+					<div translate class="item-text">inspection.item.{{item.item.code}}</div>
+					<mat-icon
+						class="item-data"
+						[style.color]="findIconColor(findSelectSavedItem(item).value)">
+						{{findSelectIcon(findSelectSavedItem(item))}}
+					</mat-icon>
+				</div>
 				<ng-template #textItemText>
-					<span class="item-text-value">{{findTextSavedItem(item).text ? findTextSavedItem(item).text : '-'}}</span>
-					<span class="item-unit">{{findTextItemUnit(item)}}</span>
+					<div>
+						<div translate class="item-text">inspection.item.{{item.item.code}}</div>
+						<span class="item-text-value">{{findTextSavedItem(item).text ? findTextSavedItem(item).text : '-'}}</span>
+						<span class="item-unit">{{findTextItemUnit(item)}}</span>
+					</div>
 				</ng-template>
 			</div>
 		</div>
