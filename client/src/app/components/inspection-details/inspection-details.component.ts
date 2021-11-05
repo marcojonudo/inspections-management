@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { InspectionService } from '../../services/inspection.service';
 import { Subscription } from 'rxjs';
-import { Order } from '../../objects/orders/order';
 import { Column } from '../inspections/inspections.component';
 import { ItemBudget } from '../../objects/item-budget';
 import { TranslateService } from '@ngx-translate/core';
@@ -22,12 +21,12 @@ import { Constants } from '../../utils/constants';
 })
 export class InspectionDetailsComponent {
 
-	private COLUMNS: string[] = ['item', 'image', 'doneBudget', 'clientContact', 'acceptedBudget'];
+	private COLUMNS: string[] = ['item', 'image', 'doneBudget', 'clientContact', 'acceptedBudget', 'inspectionButton'];
 
 	private COLUMNS_DATA: any = {
 		item: (i: ItemBudget) => i,
 		image: (i: ItemBudget, savedItem: SavedItem) => savedItem.image,
-		orderNumber: (i: ItemBudget, savedItem: SavedItem, o: Order) => o.number
+		budget: (i: ItemBudget, savedItem: SavedItem, budget: Budget) => budget
 	};
 
 	private selectedOrderSubscription: Subscription;
@@ -49,6 +48,8 @@ export class InspectionDetailsComponent {
 		this.selectedOrderSubscription = this.inspectionService.selectedOrderInspection$.subscribe(orderInspection => {
 			this.orderInspection = orderInspection;
 			this.savedInspection = InspectionService.findSavedInspection(this.orderInspection.order.number);
+			console.log('Selected order inspection', this.orderInspection);
+			console.log('Selected saved inspection', this.savedInspection);
 			this.data = this.buildData(this.orderInspection, this.savedInspection);
 			this.mechanics = this.savedInspection ? this.savedInspection.items.map(i => i.employeeCode).filter(
 				(value, index, self) => self.indexOf(value) === index
@@ -57,19 +58,16 @@ export class InspectionDetailsComponent {
 		});
 	}
 
-	get inspectionPath(): string {
-		return Constants.PATH.INSPECTION;
-	}
-
 	buildData(orderInspection: OrderInspectionVehicle, savedInspection: SavedInspection, columnsData: any = this.COLUMNS_DATA): Column[] {
 		const data = [];
 		const allColumns = Object.keys(columnsData);
 		if (savedInspection) {
 			savedInspection.itemBudgets.forEach(itemBudget => {
 				const row = {};
+				const savedItem = savedInspection.items.find(i => i.item.code === itemBudget.itemCode);
+				const budget = InspectionService.findBudget(itemBudget.itemCode, orderInspection.order.budgets);
 				allColumns.forEach(key => {
-					const savedItem = savedInspection.items.find(i => i.item.code === itemBudget.itemCode);
-					row[key] = columnsData[key](itemBudget, savedItem, orderInspection.order);
+					row[key] = columnsData[key](itemBudget, savedItem, budget);
 				});
 				data.push(row);
 			});
@@ -93,9 +91,8 @@ export class InspectionDetailsComponent {
 		return InspectionService.findBudgetNotifications(orderNumber).length > 0;
 	}
 
-	checkAcceptedBudget(orderNumber: number, itemCode: string): boolean {
-		const budgetNotification = InspectionService.findBudgetNotification(orderNumber, itemCode);
-		return budgetNotification && budgetNotification.accepted !== undefined;
+	checkAcceptedBudget(budget: Budget): boolean {
+		return InspectionService.checkAcceptedBudget(budget);
 	}
 
 	openImage(a): void {
@@ -115,11 +112,6 @@ export class InspectionDetailsComponent {
 			observable = this.inspectionService.deleteBudgetNotification(orderInspection.order.number);
 		}
 		observable.subscribe(() => this.cdRef.detectChanges());
-	}
-
-	updateAcceptedBudget(orderNumber: number, itemCode: string, accepted: boolean): void {
-		const budgetNotification = InspectionService.findBudgetNotification(orderNumber, itemCode);
-		this.inspectionService.updateAcceptedBudget(budgetNotification, accepted).subscribe();
 	}
 
 	openInspection(): void {

@@ -118,7 +118,7 @@ class InspectionController {
         return a
     }
 
-    @Post("/articleItems")
+    @Get("/articleItems")
     @Operation(
         summary = "Obtiene la relación entre artículos e items",
         description = "Obtiene la relación entre artículos e items"
@@ -128,8 +128,8 @@ class InspectionController {
         description = "Lista de artículos e items",
         content = @Content(array = @ArraySchema(schema = @Schema(implementation = ItemArticleCode)))
     )
-    List<ItemArticleCode> findArticleItems(@Body List<Integer> articleCodes) {
-        return itemArticleCodeDataService.findAll(articleCodes)
+    List<ItemArticleCode> findArticleItems() {
+        return itemArticleCodeDataService.findAll()
     }
 
     @Get("/itemBudgets")
@@ -156,8 +156,8 @@ class InspectionController {
         description = "Lista de información de BD",
         content = @Content(array = @ArraySchema(schema = @Schema(implementation = BudgetNotification)))
     )
-    List<BudgetNotification> findBudgetNotifications(@QueryValue List<Integer> orderNumbers) {
-        return budgetNotificationDataService.findAll(orderNumbers)
+    HttpResponse<List<BudgetNotification>> findBudgetNotifications(@QueryValue List<Integer> orderNumbers) {
+        return HttpResponse.ok(budgetNotificationDataService.findAll(orderNumbers))
     }
 
     @Post("/budgetNotification")
@@ -193,10 +193,8 @@ class InspectionController {
         description = "Actualiza un presupuesto aceptado"
     )
     @ApiResponse(responseCode = "200", description = "Presupuesto actualizado")
-    void deleteBudgetNotification(@Body BudgetNotification budgetNotification, @QueryValue boolean accepted) {
-        budgetNotificationDataService.update(
-            budgetNotification.orderNumber, budgetNotification.itemCode, accepted ? LocalDateTime.now() : null
-        )
+    void deleteBudgetNotification(@Body BudgetNotification budgetNotification) {
+        budgetNotificationDataService.update(budgetNotification.orderNumber, budgetNotification.itemCode)
     }
 
 }

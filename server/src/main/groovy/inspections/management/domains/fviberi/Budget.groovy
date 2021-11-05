@@ -9,6 +9,7 @@ import org.grails.datastore.gorm.GormEntity
 class Budget implements GormEntity<Budget> {
 
 	int number
+	String state
 
 	static hasMany = [lines: BudgetLine]
 
@@ -17,6 +18,7 @@ class Budget implements GormEntity<Budget> {
 		table 'fvcabpto'
 
 		number column: 'nupresup'
+		state column: 'clsituac'
 		lines fetch: 'join'
 
 		id generator: 'assigned', name: 'number'

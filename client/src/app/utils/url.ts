@@ -26,8 +26,8 @@ export class Url {
 		return `${environment.serverUrl}/inspection/itemBudgets`;
 	}
 
-	static budgetNotification(accepted: boolean = undefined): string {
-		return `${environment.serverUrl}/inspection/budgetNotification?accepted=${accepted}`;
+	static budgetNotification(): string {
+		return `${environment.serverUrl}/inspection/budgetNotification`;
 	}
 
 	static employees(): string {

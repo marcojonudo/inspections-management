@@ -24,7 +24,7 @@
 			</ng-container>
 			<ng-container matColumnDef="mechanic">
 				<th mat-header-cell *matHeaderCellDef>{{findColumnName(columnsToDisplay[5])}}</th>
-				<td mat-cell *matCellDef="let element">{{element.mechanic ? findMechanic(element.mechanic).name : '-'}}</td>
+				<td mat-cell *matCellDef="let element">{{element.mechanic ? findMechanic(element.mechanic)?.name : '-'}}</td>
 			</ng-container>
 			<ng-container matColumnDef="budgets">
 				<th mat-header-cell *matHeaderCellDef>{{findColumnName(columnsToDisplay[6])}}</th>

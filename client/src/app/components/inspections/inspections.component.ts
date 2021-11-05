@@ -119,8 +119,9 @@ export class InspectionsComponent implements OnDestroy {
 	}
 
 	checkAcceptedBudgets(orderNumber: number): boolean {
-		const budgetNotifications = InspectionService.findBudgetNotifications(orderNumber);
-		return budgetNotifications.find(budgetNotification => !budgetNotification.accepted) === undefined;
+		const orderInspection = InspectionService.findOrderInspection(orderNumber);
+		return orderInspection.order.budgets.length &&
+			orderInspection.order.budgets.find(b => !InspectionService.checkAcceptedBudget(b)) === undefined;
 	}
 
 	checkSelectedOrder(orderNumber: number): boolean {

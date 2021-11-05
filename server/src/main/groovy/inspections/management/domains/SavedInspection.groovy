@@ -11,6 +11,7 @@ import java.time.LocalDateTime
 @Entity
 class SavedInspection implements GormEntity<SavedInspection> {
 
+	String inspectionTypeCode
 	int orderNumber
 	String employeeCode
 	State state
@@ -20,10 +21,6 @@ class SavedInspection implements GormEntity<SavedInspection> {
 	LocalDateTime saved
 
 	static hasMany = [items: SavedItem]
-
-	static constraints = {
-		name maxSize: 45
-	}
 
 	static mapping = {
 		items fetch: 'join'
