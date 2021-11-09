@@ -129,24 +129,18 @@ header
 
 @media print
 
-	\:host
-		position: relative
+	header
+		position: fixed
+		top: 0
 
-		header
-			position: fixed
-			top: 0
-			height: 200px
-			width: 100%
-			background-color: red
+	mat-card
 
-		mat-card
+		.mat-card-header .mat-card-title, .mat-card-content
+			font-size: 1em
 
-			.mat-card-header .mat-card-title, .mat-card-content
-				font-size: 1em
+	#logo
+		display: block
 
-		#logo
-			display: block
-
-		#legend
-			font-size: $tiny-font
-			line-height: 1
+	#legend
+		font-size: $tiny-font
+		line-height: 1

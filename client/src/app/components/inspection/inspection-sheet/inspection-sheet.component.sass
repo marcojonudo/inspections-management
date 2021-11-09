@@ -36,7 +36,7 @@
 		margin-bottom: 2px
 
 	mat-card
-		padding: $tiny-gap
+		padding: $tiny-gap 0
 		margin: 0 $tiny-gap
 
 		.mat-card-header .mat-card-title, .mat-card-content
@@ -93,7 +93,7 @@
 							position: relative
 							@include flex-center
 							justify-content: space-between
-							padding: $tiny-gap
+							padding: $tiny-gap $small-gap
 
 							.item-text
 								width: 88%
@@ -140,6 +140,7 @@
 				width: 100%
 				display: flex
 				flex-direction: column
+				padding: $tiny-gap $small-gap
 
 				& > div
 					line-height: 1.5
@@ -147,7 +148,9 @@
 @media print
 
 	#sheet-container
-		top: 194px
+		top: 195px
+		width: 100%
+		height: 100%
 
 	#logo
 		display: block
@@ -155,6 +158,9 @@
 	.category
 		font-size: $small-font
 		margin: 0 0 $tiny-gap 0 !important
+
+		mat-card
+			padding: $tiny-gap !important
 
 		mat-card-header
 			align-items: center
@@ -175,9 +181,11 @@
 				padding: 0 $small-gap 0 $tiny-gap !important
 
 				& > div
-
 					padding: 0 !important
 
 					mat-icon
 						@include flex-center
 						font-size: $bigger-font
+
+		.text-area-card .mat-card-content
+			padding: $tiny-gap !important
