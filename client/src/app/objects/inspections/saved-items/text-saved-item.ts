@@ -13,6 +13,10 @@ export class TextSavedItem extends SavedItem {
 		return this.text;
 	}
 
+	isFilled(): boolean {
+		return this.findValue() !== undefined && this.findValue() !== '';
+	}
+
 	update(text: string, employeeCode: string): void {
 		this.text = text;
 		this.updateCommonFields(employeeCode);

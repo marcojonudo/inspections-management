@@ -311,6 +311,15 @@
 			"ITV": "Resultado ITV",
 			"S": "Seguridad",
 			"T": "Transmisión"
+		},
+		"selectItemOption": {
+			"C": "Correcto",
+			"PS": "Planificar sustitución",
+			"SN": "Sustitución necesaria",
+			"RA": "Realizado ajuste/cambio",
+			"RR": "Realizado relleno",
+			"NA": "No aplica",
+			"P": "Selección pendiente"
 		}
 	},
 	"inspections": {
@@ -332,5 +341,55 @@
 			"item": "Item",
 			"image": ""
 		}
+	},
+	"print": {
+		"info": "Información",
+		"adviser": "Asesor",
+		"mechanic": "Mecánico",
+		"mechanics": "Mecánicos",
+		"day": "Día",
+		"orderNumber": "Nº orden",
+		"centre": "Centro",
+		"vehicle": "Vehículo",
+		"client": "Cliente",
+		"summary": "Resumen",
+		"numberPlate": "Matrícula",
+		"model": "Modelo",
+		"cylinder": "Cilindrada",
+		"engine": "Motor",
+		"power": "Potencia",
+		"registration": "Matriculación",
+		"category": {
+			"I": "Iluminación",
+			"C": "Carrocería",
+			"N": "Neumáticos",
+			"EM": "Elementos mecánicos",
+			"SE": "Sistema de escape",
+			"CL": "Calidad líquidos",
+			"NL": "Niveles líquidos",
+			"SC": "Sistema de carga",
+			"D": "Diagnosis",
+			"DI": "Dirección",
+			"DO": "Documentación",
+			"EE": "Elementos eléctricos",
+			"E": "Equipo",
+			"F": "Frenómetro",
+			"G": "Gases",
+			"ITV": "Resultado ITV",
+			"S": "Seguridad",
+			"T": "Transmisión"
+		}
+	},
+	"dialog": {
+		"employeeCode": "Código de empleado",
+		"introduceEmployeeCode": "Introduce el código de empleado"
+	},
+	"validation": {
+		"requiredEmployeeCode": "Debes introducir un código de empleado"
+	},
+	"message": {
+		"EMPLOYEE_NOT_FOUND": "Empleado no encontrado. Accede a la aplicación de horarios para sincronizarlos y prueba de nuevo",
+		"ERROR_SAVING_INSPECTION": "Error al guardar la revisión. Por favor, inténtalo de nuevo",
+		"SAVED_INSPECTION": "Revisión guardada correctamente"
 	}
 }

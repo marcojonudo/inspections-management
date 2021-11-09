@@ -1,9 +1,11 @@
 package inspections.management.domains
 
 import grails.gorm.annotation.Entity
+import groovy.transform.TupleConstructor
 import org.grails.datastore.gorm.GormEntity
 
 @Entity
+@TupleConstructor
 class Image implements GormEntity<Image> {
 
 	byte[] image

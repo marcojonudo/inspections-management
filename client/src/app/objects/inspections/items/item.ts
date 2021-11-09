@@ -20,10 +20,8 @@ export class Item {
 		this.name = item.name;
 		this.order = item.order;
 		this.printOrder = item.printOrder;
-		// this.vehicleData = new ItemVehicleData(item.vehicleData);
 		this.category = item.category ? new ItemCategory(item.category) : undefined;
 		this.header = item.header;
-		// this.relations = item.relations.map(relation => new ItemRelation())
 	}
 
 }

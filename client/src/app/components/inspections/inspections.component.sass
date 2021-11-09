@@ -1,12 +1,23 @@
 @import "abstracts/mixins"
 
-.table-container-wrapper
-	height: 100%
+\:host
+	text-transform: uppercase
 
-	td
-		text-align: center
+	.table-container-wrapper
+		height: 100%
 
-		&.mat-cell
+		td
+			text-align: center
+
+			&.mat-cell
+
+				&:first-of-type
+					padding-left: $small-gap
+
+				&:last-of-type
+					padding-right: $small-gap
+
+		th.mat-header-cell
 
 			&:first-of-type
 				padding-left: $small-gap
@@ -14,17 +25,9 @@
 			&:last-of-type
 				padding-right: $small-gap
 
-	th.mat-header-cell
+		tr
+			cursor: pointer
+			transition: background-color $fast-transition
 
-		&:first-of-type
-			padding-left: $small-gap
-
-		&:last-of-type
-			padding-right: $small-gap
-
-	tr
-		cursor: pointer
-		transition: background-color $fast-transition
-
-	.highlight
-		background-color: $grey
+		.highlight
+			background-color: $grey

@@ -1,32 +1,29 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { InspectionService } from '../../services/inspection.service';
-import { Constants } from '../../utils/constants';
-import { FormControl, Validators } from '@angular/forms';
+import { MatDialogRef } from '@angular/material/dialog';
 import { EmployeeService } from '../../services/employee.service';
-import { SnackBarService } from '../../services/snack-bar.service';
-import { Router } from '@angular/router';
+import { InspectionService } from '../../services/inspection.service';
+import { FormControl, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
+import { Constants } from '../../utils/constants';
 import { TranslateService } from '@ngx-translate/core';
+import { SnackBarService } from '../../services/snack-bar.service';
 
 @Component({
-	selector: 'app-init',
-	templateUrl: './init.component.html',
-	styleUrls: ['./init.component.sass'],
+	selector: 'app-employee-dialog',
+	templateUrl: './employee-dialog.component.html',
+	styleUrls: ['./employee-dialog.component.sass'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class InitComponent {
+export class EmployeeDialogComponent {
 
 	employeeCode: FormControl;
 
 	constructor(
-		private router: Router,
-		private snackBarService: SnackBarService,
-		private translateService: TranslateService
+		private dialogRef: MatDialogRef<EmployeeDialogComponent>,
+		private translateService: TranslateService,
+		private snackBarService: SnackBarService
 	) {
-		this.employeeCode = new FormControl(
-			'',
-			[Validators.required].concat(InspectionService.countryHandler.findEmployeeCodeCustomValidations())
-		);
+		this.employeeCode = new FormControl('');
 	}
 
 	get employeeCodeMaxLength(): number {
@@ -50,7 +47,7 @@ export class InitComponent {
 	searchEmployee(employeeCode: FormControl = this.employeeCode): void {
 		const employee = EmployeeService.setEmployee(employeeCode.value);
 		if (employee) {
-			this.router.navigate([Constants.PATH.INSPECTION]);
+			this.dialogRef.close(employee.code);
 		} else if (employeeCode.value.length === Constants.EMPLOYEE_CODE_MAX_LENGTH) {
 			this.snackBarService.open(
 				Constants.MESSAGE_CODE.EMPLOYEE_NOT_FOUND, Constants.SNACK_BAR.TYPE.WARNING

@@ -22,15 +22,18 @@ import { MatRippleModule } from '@angular/material/core';
 import { ToolsBarComponent } from './components/tools-bar/tools-bar.component';
 import { MatButtonModule } from '@angular/material/button';
 import * as dayjs from 'dayjs';
-import { InspectionComponent } from './components/inspection/inspection.component';
 import { OrderPipe } from './pipes/order.pipe';
 import { PrintOrderPipe } from './pipes/print-order.pipe';
 import { Constants } from './utils/constants';
-import { MatDialogModule } from '@angular/material/dialog';
-import { InitComponent } from './components/init/init.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialogModule } from '@angular/material/dialog';
+import { EmployeeDialogComponent } from './components/employee-dialog/employee-dialog.component';
+import { ChartsModule } from 'ng2-charts';
+import { InspectionSheetComponent } from './components/inspection/inspection-sheet/inspection-sheet.component';
+import { InspectionHeaderComponent } from './components/inspection/inspection-header/inspection-header.component';
+import { InspectionComponent } from './components/inspection/inspection.component';
 
 @NgModule({
 	declarations: [
@@ -41,10 +44,13 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 		InspectionsComponent,
 		InspectionDetailsComponent,
 		ToolsBarComponent,
-		InspectionComponent,
+		InspectionHeaderComponent,
 		OrderPipe,
 		PrintOrderPipe,
-		InitComponent
+		EmployeeDialogComponent,
+		InspectionSheetComponent,
+		InspectionHeaderComponent,
+		InspectionComponent
 	],
 	imports: [
 		BrowserModule,
@@ -66,11 +72,12 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 		MatSlideToggleModule,
 		MatRippleModule,
 		MatButtonModule,
-		MatDialogModule,
 		MatFormFieldModule,
 		MatInputModule,
 		ReactiveFormsModule,
-		MatSnackBarModule
+		MatSnackBarModule,
+		MatDialogModule,
+		ChartsModule
 	],
 	providers: [OrderPipe],
 	bootstrap: [AppComponent]

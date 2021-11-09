@@ -1,124 +1,32 @@
 @import "abstracts/mixins"
 
 \:host
+	width: 100%
+	height: 100%
+	position: absolute
+	@include flex-center
+	z-index: 2
+	backdrop-filter: blur(3px)
 
-	.image-category-content
-		width: 100%
-		display: grid
-		grid-template-columns: repeat(4, 1fr)
-
-		.image-item
-			@include flex-column-center
-			text-align: center
-
-			.image-container
-				height: 100%
-				@include flex-1
-				@include flex-center
-
-			img
-				width: 100%
-				height: auto
-				object-fit: cover
-				border-radius: $border-radius
-
-	.text-area-card
-		height: 8rem !important
-
-	canvas
-		display: inline-block !important
-		margin-bottom: 2px
-
-	mat-card
-		padding: $tiny-gap
-		margin: 0 $tiny-gap
-
-		.mat-card-header .mat-card-title, .mat-card-content
-			font-size: 1em
-			margin-bottom: 0 !important
-
-		.mat-card-avatar
-			height: auto
-			width: auto
-
-		.mat-card-header-text
-			display: flex
-			align-items: center
-
-	.category
+	#inspection-container
+		width: 60%
+		height: 100%
 		position: relative
-		margin: $small-gap 0
+		box-sizing: border-box
+		overflow-y: auto
+		padding: $medium-gap
+		background-color: $light-grey
+		box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.2), 0 6px 10px 0px rgba(0, 0, 0, 0.14), 0 1px 18px 0px rgba(0, 0, 0, 0.12)
 
-		&.fill
-			@include flex-1
+@media print
 
-		.highlight
-			font-weight: bold
+	\:host
+		position: relative !important
+		display: block !important
 
-		mat-card
-
-			.graph-container
-				width: 100%
-				height: 100%
-				position: absolute
-				top: 0
-				@include flex-center
-
-				.graph-info
-					width: 10%
-					position: absolute
-					right: 0
-
-			mat-card-content
-				display: flex
-
-				.items-info
-					width: 100%
-					display: grid
-					grid-template-columns: repeat(4, 1fr)
-
-					.item
-						overflow: hidden
-
-						& > div
-							width: 100%
-							position: relative
-							display: flex
-							align-items: center
-							padding: $tiny-gap
-
-							.item-text
-								width: 88%
-								overflow: hidden
-								white-space: nowrap
-								text-overflow: ellipsis
-
-							.item-data
-								width: 12%
-								@include flex-center
-
-							.item-text-value
-								@include flex-1
-								@include flex-center
-
-							.item-unit
-								line-height: 2.1
-								font-size: .8em
-
-							mat-icon
-								font-size: $bigger-font
-
-			& > div:not(:last-child)
-				@include flex-1
-
-		.text-area-card
-			height: calc(100% - .5rem)
-			max-height: 150px
-
-			.mat-card-content
-				width: 100%
-				display: flex
-				flex-direction: column
-
-				& > div
-					line-height: 1.5
+		#inspection-container
+			width: 100% !important
+			overflow-y: visible !important
+			padding: 0 !important
+			background-color: $white !important
+			box-shadow: none !important

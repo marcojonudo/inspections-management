@@ -13,7 +13,9 @@ class SavedInspection implements GormEntity<SavedInspection> {
 
 	String inspectionTypeCode
 	int orderNumber
+	String vehicle
 	String employeeCode
+	String sellerCode
 	State state
 	boolean orderInspection
 
@@ -28,9 +30,15 @@ class SavedInspection implements GormEntity<SavedInspection> {
 
 	enum State {
 
-		PENDING,
-		STARTED,
-		FINISHED
+		PENDING({ Set<SavedItem> items -> true }),
+		STARTED({ Set<SavedItem> items -> items.find { it.item.required && !it.filled } as boolean }),
+		FINISHED({ Set<SavedItem> items -> !items.find { it.item.required && !it.filled } as boolean })
+
+		final Closure<Boolean> check
+
+		State(Closure<Boolean> check) {
+			this.check = check;
+		}
 
 	}
 

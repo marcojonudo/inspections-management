@@ -15,8 +15,4 @@ export class PortugalHandler implements CountryHandler {
 		return 'mg';
 	}
 
-	findEmployeeCodeCustomValidations(): ValidatorFn[] {
-		return [];
-	}
-
 }

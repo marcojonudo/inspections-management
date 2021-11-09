@@ -1,0 +1,183 @@
+@import "abstracts/mixins"
+
+\:host
+
+	#sheet-container
+		position: relative
+
+		.image-category-content
+			width: 100%
+			display: grid
+			grid-template-columns: repeat(4, 1fr)
+
+		.image-item
+			@include flex-column-center
+			text-align: center
+
+			.image-container
+				height: 100%
+				@include flex-1
+				@include flex-center
+
+			img
+				width: 100%
+				height: auto
+				object-fit: cover
+				border-radius: $border-radius
+
+	.page-break
+		page-break-after: always
+
+	.text-area-card
+		height: 8rem !important
+
+	canvas
+		display: inline-block !important
+		margin-bottom: 2px
+
+	mat-card
+		padding: $tiny-gap
+		margin: 0 $tiny-gap
+
+		.mat-card-header .mat-card-title, .mat-card-content
+			font-size: 1em
+			margin-bottom: 0 !important
+
+		.mat-card-avatar
+			height: auto
+			width: auto
+
+		.mat-card-header-text
+			display: flex
+			align-items: center
+
+	.category
+		position: relative
+		margin: $small-gap 0
+
+		&.fill
+			@include flex-1
+
+		.highlight
+			font-weight: bold
+
+		mat-card
+
+			.graph-container
+				width: 100%
+				height: 100%
+				position: absolute
+				top: 0
+				@include flex-center
+
+				.graph-info
+					width: 10%
+					position: absolute
+					right: 0
+
+			mat-card-content
+				display: flex
+
+				.items-info
+					width: 100%
+					display: grid
+					grid-template-columns: repeat(4, 1fr)
+
+					.item
+						@include flex-center
+						overflow: hidden
+
+						& > div
+							width: 100%
+							height: 100%
+							position: relative
+							@include flex-center
+							justify-content: space-between
+							padding: $tiny-gap
+
+							.item-text
+								width: 88%
+								overflow: hidden
+								white-space: nowrap
+								text-overflow: ellipsis
+
+							.item-data
+								height: 100%
+								position: relative
+								display: flex
+								align-items: center
+
+								.select-item-icon
+									position: absolute
+									backface-visibility: hidden
+									transition: transform $medium-transition, color $medium-transition
+
+									&.front
+										transform: translateX(-100%) rotateY(0)
+
+									&.left
+										transform: translateX(-100%) rotateY(-180deg)
+
+									&.right
+										transform: translateX(-100%) rotateY(180deg)
+
+							.item-text-value
+								@include flex-1
+								@include flex-center
+
+							.item-unit
+								line-height: 2.1
+								font-size: .8em
+
+			& > div:not(:last-child)
+				@include flex-1
+
+		.text-area-card
+			height: calc(100% - .5rem)
+			max-height: 150px
+
+			.mat-card-content
+				width: 100%
+				display: flex
+				flex-direction: column
+
+				& > div
+					line-height: 1.5
+
+@media print
+
+	#sheet-container
+		top: 194px
+
+	#logo
+		display: block
+
+	.category
+		font-size: $small-font
+		margin: 0 0 $tiny-gap 0 !important
+
+		mat-card-header
+			align-items: center
+
+			mat-icon
+				width: .86rem
+				height: .86rem
+				font-size: .86rem
+
+			mat-card-title
+				height: .86rem
+				@include flex-center
+
+		.items-info
+			grid-auto-rows: 1rem
+
+			.item
+				padding: 0 $small-gap 0 $tiny-gap !important
+
+				& > div
+
+					padding: 0 !important
+
+					mat-icon
+						@include flex-center
+						font-size: $bigger-font

@@ -77,12 +77,10 @@ export class SummaryComponent implements OnDestroy {
 	}
 
 	findAllBudgets(): Budget[] {
-		console.log('all budgets', InspectionService.findAllBudgets());
 		return InspectionService.findAllBudgets();
 	}
 
 	findAcceptedBudgets(): Budget[] {
-		console.log('accepted budgets', this.findAllBudgets().filter(b => InspectionService.checkAcceptedBudget(b)));
 		return this.findAllBudgets().filter(b => InspectionService.checkAcceptedBudget(b));
 	}
 

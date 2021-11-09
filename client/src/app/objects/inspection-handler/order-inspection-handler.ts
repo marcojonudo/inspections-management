@@ -1,4 +1,5 @@
 import { InspectionHandler } from './inspection-handler';
+import { SavedInspection } from '../inspections/saved-inspection';
 
 export class OrderInspectionHandler implements InspectionHandler {
 
@@ -7,20 +8,8 @@ export class OrderInspectionHandler implements InspectionHandler {
 		return (selectedIndex + 1) % options + Math.floor(selectedIndex / (options - 1));
 	}
 
-	// findInspectionTitleCode(inspectionTypeCode: string): string {
-	// 	return inspectionTypeCode;
-	// }
-	//
-	// findSavedInspection(savedInspection: SavedInspection): SavedInspection {
-	// 	return savedInspection;
-	// }
-	//
-	// checkPrint(items: Item[]): boolean {
-	// 	return InspectionService.checkCompleteItems(items);
-	// }
-	//
-	// findSavedItems(savedInspection: SavedInspection): SavedItem[] {
-	// 	return savedInspection.items;
-	// }
+	findSavedInspection(savedInspection: SavedInspection): SavedInspection {
+		return savedInspection;
+	}
 
 }

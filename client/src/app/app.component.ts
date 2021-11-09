@@ -5,7 +5,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { LoadingService } from './services/loading.service';
 import { forkJoin } from 'rxjs';
 import { EmployeeService } from './services/employee.service';
-import { RouterOutlet } from '@angular/router';
 
 @Component({
 	selector: 'app-root',
@@ -36,14 +35,23 @@ export class AppComponent {
 			EmployeeService.setEmployees(data[1]);
 		});
 
+
+		// this.inspectionService.loadMainInfo().subscribe(() => {
+		// 	console.log('----------- LOADED');
+		// 	// this.loadingService.stop();
+		// 	this.loading = false;
+		// 	this.cdRef.detectChanges();
+		// });
+
 		this.loadingService.subscribe(loading => {
 			this.loading = loading;
 			this.cdRef.detectChanges();
 		});
 	}
 
-	prepareRoute(outlet: RouterOutlet): void {
-		return outlet && outlet.activatedRouteData && outlet.activatedRouteData.animation;
-	}
+	// prepareRoute(outlet: RouterOutlet): void {
+	// 	console.log(outlet, outlet && outlet.activatedRouteData && outlet.activatedRouteData.animation);
+	// 	return outlet && outlet.activatedRouteData && outlet.activatedRouteData.animation;
+	// }
 
 }

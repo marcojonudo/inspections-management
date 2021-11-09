@@ -1,0 +1,97 @@
+<div id="sheet-container">
+	<div
+		*ngFor="let elem of listElements | order; let i = index"
+		class="category"
+		[class.page-break]="checkCategoryBreak(elem)">
+		<mat-card *ngIf="checkCategoryElement(elem); else elementTemplate">
+			<mat-card-header>
+				<mat-icon mat-card-avatar>navigate_next</mat-icon>
+				<mat-card-title translate>inspection.category.{{elem.code}}</mat-card-title>
+			</mat-card-header>
+			<mat-card-content>
+				<ng-container *ngTemplateOutlet="itemTemplate; context: { $implicit: elem }"></ng-container>
+			</mat-card-content>
+		</mat-card>
+		<ng-template #elementTemplate>
+			<mat-card class="text-area-card">
+				<mat-card-header>
+					<mat-icon mat-card-avatar>navigate_next</mat-icon>
+					<mat-card-title translate>inspection.item.{{elem.item.code}}</mat-card-title>
+				</mat-card-header>
+				<mat-card-content>
+					<div *ngFor="let line of findTextAreaLines(findTextSavedItem(elem))" class="highlight">{{line}}</div>
+				</mat-card-content>
+			</mat-card>
+		</ng-template>
+	</div>
+	<ng-template #itemTemplate let-elem>
+		<div class="items-info">
+			<div *ngFor="let item of elem.items | printOrder" class="item" [class.highlight]="checkWrongItem(item)">
+				<div
+					*ngIf="checkItemType(item.item.type, selectType); else textItemText"
+					matRipple
+					(click)="toggleSelectOption(findSelectSavedItem(item))">
+					<div translate class="item-text">inspection.item.{{item.item.code}}</div>
+					<div class="item-data">
+						<mat-icon
+							*ngFor="let option of findSelectItem(item.item).options | order; let i = index"
+							class="select-item-icon"
+							[ngClass]="{
+								'front': checkSelectedOption(item.findValue(), option.code),
+								'left': checkLeftOption(findSelectSavedItem(item), findSelectItem(item.item).options, i),
+								'right': checkRightOption(findSelectSavedItem(item), findSelectItem(item.item).options, i)
+							}"
+							[style.color]="findIconColor(findSelectSavedItem(item).value)">
+							{{option.printIcon}}
+						</mat-icon>
+					</div>
+				</div>
+				<ng-template #textItemText>
+					<div>
+						<div translate class="item-text">inspection.item.{{item.item.code}}</div>
+						<span class="item-text-value">{{findTextSavedItem(item).text ? findTextSavedItem(item).text : '-'}}</span>
+						<span class="item-unit">{{findTextItemUnit(item)}}</span>
+					</div>
+				</ng-template>
+			</div>
+		</div>
+	</ng-template>
+	<div
+		*ngFor="let elem of imageListElements"
+		class="category"
+		[class.page-break]="elem.pageBreak">
+		<mat-card *ngIf="checkCategoryElement(elem.listElement); else elementTemplate">
+			<mat-card-header>
+				<mat-icon mat-card-avatar>navigate_next</mat-icon>
+				<mat-card-title translate>print.category.{{elem.listElement.code}}</mat-card-title>
+			</mat-card-header>
+			<mat-card-content>
+				<div class="image-category-content">
+					<div *ngFor="let item of elem.listElement.items | printOrder" class="image-item">
+						<div translate>inspection.item.{{item.item.code}}</div>
+						<div class="image-container">
+							<img [src]="findImageUrl(item.image.image)">
+						</div>
+					</div>
+				</div>
+			</mat-card-content>
+		</mat-card>
+		<ng-template #elementTemplate>
+			<mat-card>
+				<mat-card-header>
+					<mat-icon mat-card-avatar>navigate_next</mat-icon>
+					<mat-card-title translate>inspection.item.{{elem.listElement.item.code}}</mat-card-title>
+				</mat-card-header>
+				<mat-card-content>
+					<div class="image-category-content">
+						<div class="image-item" [class.span]="elem.listElement.image?.landscape">
+							<img [src]="findImageUrl(elem.listElement.image.image)" class="item-image">
+						</div>
+					</div>
+				</mat-card-content>
+			</mat-card>
+		</ng-template>
+	</div>
+</div>
+<!--<div style="page-break-after: always">hola</div>-->
+<!--<div style="page-break-after: always">que tal</div>-->

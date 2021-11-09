@@ -9,10 +9,10 @@ export abstract class SavedItem {
 	filled: Dayjs;
 	hidden: boolean;
 	employeeCode: string;
+	sellerCode: string;
 	image: Image;
 
 	protected constructor(savedItem: SavedItem) {
-		// this.item = new Item(savedItem.item);
 		this.item = savedItem.item;
 		this.employeeCode = savedItem.employeeCode;
 		if (savedItem) {
@@ -24,6 +24,8 @@ export abstract class SavedItem {
 
 	abstract findValue(): string;
 
+	abstract isFilled(): boolean;
+
 	abstract update(value: string, employeeCode: string): void;
 
 	abstract reset(employeeCode: string): void;
@@ -34,7 +36,7 @@ export abstract class SavedItem {
 	}
 
 	updateCommonFields(employeeCode: string): void {
-		this.employeeCode = employeeCode;
+		this.sellerCode = employeeCode;
 		this.filled = dayjs();
 	}
 

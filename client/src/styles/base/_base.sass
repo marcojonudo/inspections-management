@@ -2,7 +2,6 @@ html, body
 	height: 100%
 	user-select: none
 	-webkit-print-color-adjust: exact !important
-	text-transform: uppercase
 
 ::-webkit-scrollbar
 	width: 4px
@@ -22,7 +21,7 @@ html, body
 	max-width: 100% !important
 
 .warning-snack-bar
-	color: $white
+	color: $black
 	background-color: $highlight
 
 .success-snack-bar
@@ -32,9 +31,6 @@ html, body
 .error-snack-bar
 	color: $white
 	background-color: $red
-
-.mat-card-header-text
-	width: 100%
 
 .mat-button-toggle-label-content
 	line-height: unset !important
@@ -91,18 +87,10 @@ html, body
 .mat-column-inspectionButton
 	max-width: $big-gap
 
-	button
-		font-size: $big-font
-
-.cdk-overlay-pane
-	height: 90%
-
-.mat-dialog-container
-	padding-top: 0 !important
-	padding-bottom: 0 !important
-
-.mat-dialog-content
-	max-height: 100% !important
+.mat-card-header-text
+	display: flex
+	align-items: center
+	order: 1
 
 @media print
 
@@ -110,4 +98,4 @@ html, body
 		display: none !important
 
 	@page
-		margin: $small-gap $medium-gap
+		margin: 0 $medium-gap

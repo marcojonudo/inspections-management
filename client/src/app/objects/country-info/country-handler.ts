@@ -6,6 +6,4 @@ export interface CountryHandler {
 
 	findEmployeeCodePlaceholder(): string;
 
-	findEmployeeCodeCustomValidations(): any[];
-
 }

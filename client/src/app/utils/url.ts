@@ -14,6 +14,10 @@ export class Url {
 		return `${environment.serverUrl}/inspection/savedInspections`;
 	}
 
+	static savedInspection(): string {
+		return `${environment.serverUrl}/inspection/savedInspection`;
+	}
+
 	static language(): string {
 		return `${environment.serverUrl}/inspection/language`;
 	}
@@ -32,6 +36,10 @@ export class Url {
 
 	static employees(): string {
 		return `${environment.serverUrl}/inspection/employees`;
+	}
+
+	static centre(): string {
+		return `${environment.serverUrl}/inspection/centre`;
 	}
 
 }

@@ -9,11 +9,14 @@ export class Constants {
 		EMPLOYEES: 'employees',
 		EMPLOYEE: 'employee',
 		ITEM_BUDGETS: 'itemBudgets',
-		ITEM_ARTICLE_CODES: 'itemArticleCodes'
+		ITEM_ARTICLE_CODES: 'itemArticleCodes',
+		CENTRE: 'centre'
 	};
 
 	static readonly MESSAGE_CODE: any = {
-		EMPLOYEE_NOT_FOUND: 'EMPLOYEE_NOT_FOUND'
+		EMPLOYEE_NOT_FOUND: 'EMPLOYEE_NOT_FOUND',
+		ERROR_SAVING_INSPECTION: 'ERROR_SAVING_INSPECTION',
+		SAVED_INSPECTION: 'SAVED_INSPECTION'
 	};
 
 	static readonly TRANSLATION_CODE: any = {
@@ -65,10 +68,13 @@ export class Constants {
 
 	static readonly SELECT_ITEM_OPTION_CODE: any = {
 		C: 'C',
-		NA: 'NA'
+		NA: 'NA',
+		P: 'P'
 	};
 
 	public static readonly PATH: any = {
+		ROOT: '/',
+		HOME: '/home',
 		INSPECTION: '/inspection',
 	};
 
@@ -79,6 +85,21 @@ export class Constants {
 			WARNING: 'WARNING',
 			ERROR: 'ERROR'
 		}
+	};
+
+	static readonly HEADER_CARD: { [key: string]: string } = {
+		INFO: 'INFO',
+		CENTRE: 'CENTRE',
+		VEHICLE: 'VEHICLE'
+	};
+
+	static readonly EVENT: any = {
+		CLICK: 'click'
+	};
+
+	static readonly VEHICLE_TYPE: any = {
+		CAR: 'CAR',
+		SCOOTER: 'SCOOTER'
 	};
 
 }

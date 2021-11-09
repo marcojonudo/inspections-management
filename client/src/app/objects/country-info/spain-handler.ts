@@ -16,8 +16,4 @@ export class SpainHandler implements CountryHandler {
 		return '1234567';
 	}
 
-	findEmployeeCodeCustomValidations(): ValidatorFn[] {
-		return [Validators.minLength(Constants.EMPLOYEE_CODE_MAX_LENGTH)];
-	}
-
 }

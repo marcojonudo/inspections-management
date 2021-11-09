@@ -10,10 +10,10 @@ import { EmployeeService } from '../../services/employee.service';
 import { OrderInspectionVehicle } from '../../objects/order-inspection-vehicle';
 import { SavedInspection } from '../../objects/inspections/saved-inspection';
 import { SavedItem } from '../../objects/inspections/saved-items/saved-item';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Constants } from '../../utils/constants';
 import { MatDialog } from '@angular/material/dialog';
-import { InspectionComponent } from '../inspection/inspection.component';
+import { EmployeeDialogComponent } from '../employee-dialog/employee-dialog.component';
 
 @Component({
 	selector: 'app-inspection-details',
@@ -43,7 +43,9 @@ export class InspectionDetailsComponent {
 		private inspectionService: InspectionService,
 		private translate: TranslateService,
 		private cdRef: ChangeDetectorRef,
-		private router: Router
+		private router: Router,
+		private route: ActivatedRoute,
+		private dialog: MatDialog
 	) {
 		this.columnsToDisplay = this.COLUMNS;
 		this.mechanics = [];
@@ -117,7 +119,14 @@ export class InspectionDetailsComponent {
 	}
 
 	openInspection(): void {
-		this.router.navigate([Constants.PATH.INSPECTION]);
+		// const dialogRef = this.dialog.open(EmployeeDialogComponent);
+		// dialogRef.afterClosed().subscribe((employeeCode: string) => {
+		// 	if (employeeCode) {
+		// 		EmployeeService.setEmployee(employeeCode);
+				EmployeeService.setEmployee('1000241');
+				this.router.navigate([`${Constants.PATH.HOME}${Constants.PATH.INSPECTION}`]);
+			// }
+		// });
 	}
 
 }

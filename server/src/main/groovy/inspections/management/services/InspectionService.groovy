@@ -2,14 +2,17 @@ package inspections.management.services
 
 import groovy.transform.CompileStatic
 import inspections.management.domains.InspectionVehicle
+import inspections.management.domains.SavedInspection
 import inspections.management.domains.fviberi.Order
 import inspections.management.domains.items.Item
 import inspections.management.pogos.OrderInspection
+import inspections.management.pogos.logs.Log
 import inspections.management.services.data.InspectionVehicleDataService
 import inspections.management.services.data.ItemBudgetDataService
 import inspections.management.services.data.OrderDataService
 import inspections.management.services.data.SavedInspectionDataService
 import inspections.management.utils.Builder
+import inspections.management.utils.Constants
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -96,6 +99,27 @@ class InspectionService {
 			inspectionVehicle = Builder.buildInspectionVehicle(maxInspection, items)
 		}
 		return inspectionVehicle
+	}
+
+	/**
+	 * Guarda o actualiza una revisión
+	 * @param inspection Revisión
+	 * @param orderNumber Número de orden
+	 * @param employeeCode Código del empleado que guarda la revisión
+	 * @return Revisión guardada
+	 */
+	SavedInspection saveInspection(SavedInspection savedInspection, int orderNumber, String employeeCode) {
+		LOG.info(new Log((Map) [sellerCode: employeeCode, orderNumber: orderNumber, inspectionTypeCode: savedInspection.inspectionTypeCode, vehicle: savedInspection.vehicle, message: Constants.Message.SAVING_INSPECTION]).toString())
+		SavedInspection newSavedInspection = null
+		try {
+			SavedInspection existent = savedInspectionDataService.find(orderNumber)
+			newSavedInspection = savedInspectionDataService.update(savedInspection, existent)
+			LOG.info(new Log((Map) [employeeCode: employeeCode, orderNumber: orderNumber, inspectionTypeCode: savedInspection.inspectionTypeCode, vehicle: savedInspection.vehicle, message: Constants.Message.SAVED_INSPECTION]).toString())
+		} catch (all) {
+			all.printStackTrace()
+			LOG.error(new Log((Map) [employeeCode: employeeCode, orderNumber: orderNumber, inspectionTypeCode: savedInspection.inspectionTypeCode, vehicle: savedInspection.vehicle, exceptionMessage: all.message, message: Constants.Message.ERROR_SAVING_INSPECTION]).toString())
+		}
+		return newSavedInspection
 	}
 
 }

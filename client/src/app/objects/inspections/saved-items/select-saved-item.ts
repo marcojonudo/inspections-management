@@ -14,11 +14,14 @@ export class SelectSavedItem extends SavedItem {
 		return this.value;
 	}
 
+	isFilled(): boolean {
+		return this.findValue() !== Constants.SELECT_ITEM_OPTION_CODE.P;
+	}
+
 	update(value: string, employeeCode: string): void {
 		this.value = value;
 		this.updateCommonFields(employeeCode);
 	}
-
 
 	reset(employeeCode: string): void {
 		this.value = Constants.SELECT_ITEM_OPTION_CODE.P;

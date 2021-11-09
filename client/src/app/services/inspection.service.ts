@@ -28,6 +28,13 @@ import { SpainHandler } from '../objects/country-info/spain-handler';
 import { PortugalHandler } from '../objects/country-info/portugal-handler';
 import { SelectItemOption } from '../objects/inspections/items/select-item-option';
 import { SelectItem } from '../objects/inspections/items/select-item';
+import { Centre } from '../objects/centre';
+import { Employee } from '../objects/employee';
+import { EmployeeService } from './employee.service';
+import { OrderInspectionHandler } from '../objects/inspection-handler/order-inspection-handler';
+import { DetectedFaultsHandler } from '../objects/inspection-handler/detected-faults-handler';
+import { InspectionHandler } from '../objects/inspection-handler/inspection-handler';
+import * as dayjs from 'dayjs';
 
 @Injectable({
 	providedIn: 'root'
@@ -40,7 +47,11 @@ export class InspectionService {
 	static itemArticleCodes: ItemArticleCode[];
 	static budgetNotifications: BudgetNotification[];
 	static selectedOrderInspection: OrderInspectionVehicle;
+	static selectedSavedInspection: SavedInspection;
 	static countryHandler: CountryHandler;
+	static centre: Centre;
+	static selectItemOptions: SelectItemOption[];
+	static inspectionHandler: InspectionHandler;
 
 	private static readonly LEVEL_ELEMENTS: ((item: Item) => NameElement)[] = [
 		(item: Item) => item.vehicleData.garagePosition,
@@ -264,7 +275,8 @@ export class InspectionService {
 		savedItem: SavedItem,
 		item: Item,
 		value: string,
-		savedInspection: SavedInspection
+		savedInspection: SavedInspection,
+		employee: Employee = EmployeeService.employee
 	): Observable<ItemRelation> {
 		// const savedItem = savedInspection.items.find(i => i.item.name === item.name);
 
@@ -274,7 +286,7 @@ export class InspectionService {
 		this.updateRelations(
 			savedItem, savedItem.findValue(), item.relations, this.ITEM_RELATION_RESTORE_ACTION, savedInspection
 		).subscribe();
-		savedItem.update(value, '');
+		savedItem.update(value, employee.code);
 
 		return this.updateRelations(savedItem, savedItem.findValue(), item.relations, this.ITEM_RELATION_ACTION, savedInspection).pipe(
 			finalize(() => {
@@ -296,11 +308,12 @@ export class InspectionService {
 		value: string,
 		itemRelation: ItemRelation,
 		actions: any,
-		savedInspection: SavedInspection
+		savedInspection: SavedInspection,
+		employee: Employee = EmployeeService.employee
 	): void {
 		if (value === itemRelation.matchText) {
 			const targetSavedItem = savedInspection.items.find(i => i.item.code === itemRelation.targetItem.code);
-			actions[itemRelation.action](targetSavedItem, savedItem.findValue(), '');
+			actions[itemRelation.action](targetSavedItem, savedItem.findValue(), employee.code);
 		}
 	}
 
@@ -330,7 +343,8 @@ export class InspectionService {
 						this.findItemArticleCodes(),
 						this.http.post(Url.inspections(), orders),
 						this.http.post(Url.savedInspections(), orderNumbers),
-						this.http.get(budgetNotificationsUrl)
+						this.http.get(budgetNotificationsUrl),
+						this.findCentre()
 					]);
 				} else {
 					return of([]);
@@ -346,6 +360,7 @@ export class InspectionService {
 				console.log('Order inspections', InspectionService.orderInspections);
 				console.log('Saved inspections', InspectionService.savedInspections);
 				console.log('Client budget notifications', InspectionService.budgetNotifications);
+				console.log('Centre', InspectionService.centre);
 			})
 		);
 	}
@@ -359,6 +374,14 @@ export class InspectionService {
 
 		const orderInspections = data[2].map(d => new OrderInspectionVehicle(d));
 		InspectionService.orderInspections = this.buildOrderInspections(orderInspections, InspectionService.savedInspections);
+
+		InspectionService.centre = new Centre(data[5]);
+		InspectionService.selectItemOptions = InspectionService.findSelectItemOptions();
+	}
+
+	findCentre(): Observable<any> {
+		const savedCentre = LocalStorageService.getItem(Constants.LOCAL_STORAGE.CENTRE);
+		return savedCentre ? of(savedCentre) : this.http.get(Url.centre());
 	}
 
 	findItemBudgets(): Observable<any> {
@@ -413,6 +436,9 @@ export class InspectionService {
 
 	selectOrder(orderNumber: number): void {
 		InspectionService.selectedOrderInspection = InspectionService.findOrderInspection(orderNumber);
+		InspectionService.selectedSavedInspection = InspectionService.findSavedInspection(orderNumber);
+		InspectionService.inspectionHandler = InspectionService.selectedSavedInspection.orderInspection ?
+			new OrderInspectionHandler() : new DetectedFaultsHandler();
 		this.selectedOrderInspectionSubject.next(InspectionService.selectedOrderInspection);
 	}
 
@@ -432,6 +458,18 @@ export class InspectionService {
 				this.budgetNotificationsSubject.next(InspectionService.budgetNotifications);
 			})
 		);
+	}
+
+	saveInspection(
+		savedInspection: SavedInspection = InspectionService.selectedSavedInspection,
+		handler: InspectionHandler = InspectionService.inspectionHandler,
+		employee: Employee = EmployeeService.employee
+	): Observable<any> {
+		const body = handler.findSavedInspection(savedInspection);
+		body.sellerCode = employee.code;
+		body.saved = dayjs();
+		console.log('Saving inspection', body);
+		return this.http.patch(Url.savedInspection(), body);
 	}
 
 }

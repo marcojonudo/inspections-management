@@ -2,7 +2,9 @@ package inspections.management.domains.savedItems
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import grails.gorm.annotation.Entity
+import inspections.management.deserializers.SavedItemDeserializer
 import inspections.management.domains.Image
 import inspections.management.domains.SavedInspection
 import inspections.management.domains.items.Item
@@ -12,6 +14,7 @@ import org.grails.datastore.gorm.GormEntity
 import java.time.LocalDateTime
 
 @Entity
+@JsonDeserialize(using = SavedItemDeserializer)
 abstract class SavedItem implements GormEntity<SavedItem> {
 
 	@JsonIgnore
@@ -19,6 +22,7 @@ abstract class SavedItem implements GormEntity<SavedItem> {
 
 	Item item
 	String employeeCode
+	String sellerCode
 	boolean hidden
 	Image image
 	boolean restrictive
@@ -30,6 +34,8 @@ abstract class SavedItem implements GormEntity<SavedItem> {
 
 	static constraints = {
 		filled nullable: true
+		image nullable: true
+		sellerCode nullable: true
 	}
 
 	static mapping = {
