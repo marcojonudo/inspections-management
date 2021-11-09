@@ -49,8 +49,10 @@
 				<ng-template #textItemText>
 					<div>
 						<div translate class="item-text">inspection.item.{{item.item.code}}</div>
-						<span class="item-text-value">{{findTextSavedItem(item).text ? findTextSavedItem(item).text : '-'}}</span>
-						<span class="item-unit">{{findTextItemUnit(item)}}</span>
+							<span class="item-text-value" [class.unit]="findTextItemUnit(item)">
+								{{findTextSavedItem(item).text ? findTextSavedItem(item).text : '-'}}
+							</span>
+							<span class="item-unit">{{findTextItemUnit(item)}}</span>
 					</div>
 				</ng-template>
 			</div>

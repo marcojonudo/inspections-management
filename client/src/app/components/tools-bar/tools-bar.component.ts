@@ -9,7 +9,6 @@ import { NavigationEnd, Router } from '@angular/router';
 import { filter, finalize } from 'rxjs/operators';
 import { Constants } from '../../utils/constants';
 import { animate, style, transition, trigger } from '@angular/animations';
-import { SavedInspection } from '../../objects/inspections/saved-inspection';
 import { SnackBarService } from '../../services/snack-bar.service';
 
 @Component({
