@@ -34,6 +34,7 @@ import { ChartsModule } from 'ng2-charts';
 import { InspectionSheetComponent } from './components/inspection/inspection-sheet/inspection-sheet.component';
 import { InspectionHeaderComponent } from './components/inspection/inspection-header/inspection-header.component';
 import { InspectionComponent } from './components/inspection/inspection.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
 	declarations: [
@@ -77,7 +78,8 @@ import { InspectionComponent } from './components/inspection/inspection.componen
 		ReactiveFormsModule,
 		MatSnackBarModule,
 		MatDialogModule,
-		ChartsModule
+		ChartsModule,
+		MatProgressSpinnerModule
 	],
 	providers: [OrderPipe],
 	bootstrap: [AppComponent]

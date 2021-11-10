@@ -10,6 +10,7 @@ import { SavedItem } from '../../objects/inspections/saved-items/saved-item';
 import { EmployeeService } from '../../services/employee.service';
 import { Employee } from '../../objects/employee';
 import { Constants } from '../../utils/constants';
+import { SnackBarService } from '../../services/snack-bar.service';
 
 export interface Column {
 	order: number;
@@ -58,7 +59,8 @@ export class InspectionsComponent implements OnDestroy {
 	constructor(
 		private inspectionService: InspectionService,
 		private translate: TranslateService,
-		private cdRef: ChangeDetectorRef
+		private cdRef: ChangeDetectorRef,
+		private snackBarService: SnackBarService
 	) {
 		this.columnsToDisplay = this.COLUMNS;
 		this.data = this.buildData(InspectionService.orderInspections);
@@ -129,7 +131,10 @@ export class InspectionsComponent implements OnDestroy {
 	}
 
 	selectOrder(orderNumber: number): void {
-		this.inspectionService.selectOrder(orderNumber);
+		const existentSavedInspection = this.inspectionService.selectOrder(orderNumber);
+		if (!existentSavedInspection) {
+			this.snackBarService.open(Constants.MESSAGE_CODE.ORDER_WITHOUT_SAVED_INSPECTION, Constants.SNACK_BAR.TYPE.WARNING);
+		}
 	}
 
 	findMechanicCode(order: Order, savedInspection: SavedInspection): string {

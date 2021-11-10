@@ -390,6 +390,7 @@
 	"message": {
 		"EMPLOYEE_NOT_FOUND": "Empleado no encontrado. Accede a la aplicación de horarios para sincronizarlos y prueba de nuevo",
 		"ERROR_SAVING_INSPECTION": "Error al guardar la revisión. Por favor, inténtalo de nuevo",
-		"SAVED_INSPECTION": "Revisión guardada correctamente"
+		"SAVED_INSPECTION": "Revisión guardada correctamente",
+		"ORDER_WITHOUT_SAVED_INSPECTION": "La orden no tiene una revisión guardada asociada"
 	}
 }

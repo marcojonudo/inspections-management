@@ -434,12 +434,17 @@ export class InspectionService {
 		return orderInspection && orderInspection.order.number === orderNumber;
 	}
 
-	selectOrder(orderNumber: number): void {
+	selectOrder(orderNumber: number): boolean {
+		let existentSavedInspection = false;
 		InspectionService.selectedOrderInspection = InspectionService.findOrderInspection(orderNumber);
 		InspectionService.selectedSavedInspection = InspectionService.findSavedInspection(orderNumber);
-		InspectionService.inspectionHandler = InspectionService.selectedSavedInspection.orderInspection ?
-			new OrderInspectionHandler() : new DetectedFaultsHandler();
-		this.selectedOrderInspectionSubject.next(InspectionService.selectedOrderInspection);
+		if (InspectionService.selectedSavedInspection) {
+			InspectionService.inspectionHandler = InspectionService.selectedSavedInspection.orderInspection ?
+				new OrderInspectionHandler() : new DetectedFaultsHandler();
+			this.selectedOrderInspectionSubject.next(InspectionService.selectedOrderInspection);
+			existentSavedInspection = true;
+		}
+		return existentSavedInspection;
 	}
 
 	createBudgetNotification(orderNumber: number, itemCodes: string[]): Observable<any> {
