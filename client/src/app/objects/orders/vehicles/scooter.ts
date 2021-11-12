@@ -1,0 +1,9 @@
+import { Vehicle } from './vehicle';
+
+export class Scooter extends Vehicle {
+
+	constructor(scooter: any) {
+		super(scooter);
+	}
+
+}

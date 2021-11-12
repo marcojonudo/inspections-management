@@ -2,10 +2,24 @@
 
 \:host
 	@include flex-column
+	text-transform: uppercase
 
 	.table-container-wrapper
 		@include flex-1
 		overflow-y: auto
+
+		.table-header
+			position: relative
+
+			button
+				position: absolute
+				right: 0
+
+	th button
+		@include flex-center
+
+		mat-icon
+			font-size: $big-font
 
 	td
 		position: relative

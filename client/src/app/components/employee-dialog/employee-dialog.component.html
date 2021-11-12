@@ -1,0 +1,17 @@
+<div class="no-print">
+	<div mat-dialog-content translate>
+		dialog.introduceEmployeeCode
+		<mat-form-field>
+			<mat-label translate>dialog.employeeCode</mat-label>
+			<input
+				matInput
+				[type]="findEmployeeCodeInputType()"
+				[placeholder]="findEmployeeCodePlaceholder()"
+				[formControl]="employeeCode"
+				[maxLength]="employeeCodeMaxLength"
+				(keyup)="searchEmployee()"
+				autocomplete="off">
+			<mat-error *ngIf="employeeCode.invalid">{{getEmployeeCodeErrorMessage() | async}}</mat-error>
+		</mat-form-field>
+	</div>
+</div>

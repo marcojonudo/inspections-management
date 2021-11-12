@@ -1,18 +1,26 @@
 import { SavedItem } from './saved-items/saved-item';
-import { Builder } from '../builder';
 import { ItemBudget } from '../item-budget';
-import { Constants } from '../constants';
+import { Constants } from '../../utils/constants';
+import { Builder } from '../../utils/builder';
+import { Dayjs } from 'dayjs';
 
 export class SavedInspection {
 
+	inspectionTypeCode: string;
 	orderNumber: number;
+	vehicle: string;
 	employeeCode: string;
+	sellerCode: string;
 	state: string;
 	items: SavedItem[];
 	itemBudgets: ItemBudget[];
+	orderInspection: boolean;
+	saved: Dayjs;
 
 	constructor(savedInspection: any, itemBudgets: ItemBudget[]) {
+		this.inspectionTypeCode = savedInspection.inspectionTypeCode;
 		this.orderNumber = savedInspection.orderNumber;
+		this.vehicle = savedInspection.vehicle;
 		this.employeeCode = savedInspection.employeeCode;
 		this.state = savedInspection.state;
 		this.items = savedInspection.items.map(i => Builder.buildSavedItem(i));
@@ -22,6 +30,7 @@ export class SavedInspection {
 			);
 			return item && item.filled && item.findValue() !== Constants.SELECT_ITEM_OPTION_CODE.C;
 		});
+		this.orderInspection = savedInspection.orderInspection;
 	}
 
 }

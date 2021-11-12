@@ -16,14 +16,25 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatRippleModule } from '@angular/material/core';
 import { ToolsBarComponent } from './components/tools-bar/tools-bar.component';
 import { MatButtonModule } from '@angular/material/button';
 import * as dayjs from 'dayjs';
-import { Dayjs } from 'dayjs';
-import { Constants } from './objects/constants';
+import { OrderPipe } from './pipes/order.pipe';
+import { PrintOrderPipe } from './pipes/print-order.pipe';
+import { Constants } from './utils/constants';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialogModule } from '@angular/material/dialog';
+import { EmployeeDialogComponent } from './components/employee-dialog/employee-dialog.component';
+import { ChartsModule } from 'ng2-charts';
+import { InspectionSheetComponent } from './components/inspection/inspection-sheet/inspection-sheet.component';
+import { InspectionHeaderComponent } from './components/inspection/inspection-header/inspection-header.component';
+import { InspectionComponent } from './components/inspection/inspection.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
 	declarations: [
@@ -33,7 +44,14 @@ import { Constants } from './objects/constants';
 		SummaryComponent,
 		InspectionsComponent,
 		InspectionDetailsComponent,
-		ToolsBarComponent
+		ToolsBarComponent,
+		InspectionHeaderComponent,
+		OrderPipe,
+		PrintOrderPipe,
+		EmployeeDialogComponent,
+		InspectionSheetComponent,
+		InspectionHeaderComponent,
+		InspectionComponent
 	],
 	imports: [
 		BrowserModule,
@@ -54,9 +72,16 @@ import { Constants } from './objects/constants';
 		MatButtonToggleModule,
 		MatSlideToggleModule,
 		MatRippleModule,
-		MatButtonModule
+		MatButtonModule,
+		MatFormFieldModule,
+		MatInputModule,
+		ReactiveFormsModule,
+		MatSnackBarModule,
+		MatDialogModule,
+		ChartsModule,
+		MatProgressSpinnerModule
 	],
-	providers: [],
+	providers: [OrderPipe],
 	bootstrap: [AppComponent]
 })
 export class AppModule {

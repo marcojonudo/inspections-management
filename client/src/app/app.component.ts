@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
-import { leaveAnimation } from './animations';
+import { leaveAnimation, routeAnimations } from './animations';
 import { InspectionService } from './services/inspection.service';
 import { TranslateService } from '@ngx-translate/core';
 import { LoadingService } from './services/loading.service';
@@ -11,7 +11,7 @@ import { EmployeeService } from './services/employee.service';
 	templateUrl: './app.component.html',
 	styleUrls: ['./app.component.sass'],
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	animations: [leaveAnimation]
+	animations: [routeAnimations, leaveAnimation]
 })
 export class AppComponent {
 	title = 'Gestión de revisiones';
@@ -35,10 +35,23 @@ export class AppComponent {
 			EmployeeService.setEmployees(data[1]);
 		});
 
+
+		// this.inspectionService.loadMainInfo().subscribe(() => {
+		// 	console.log('----------- LOADED');
+		// 	// this.loadingService.stop();
+		// 	this.loading = false;
+		// 	this.cdRef.detectChanges();
+		// });
+
 		this.loadingService.subscribe(loading => {
 			this.loading = loading;
 			this.cdRef.detectChanges();
 		});
 	}
+
+	// prepareRoute(outlet: RouterOutlet): void {
+	// 	console.log(outlet, outlet && outlet.activatedRouteData && outlet.activatedRouteData.animation);
+	// 	return outlet && outlet.activatedRouteData && outlet.activatedRouteData.animation;
+	// }
 
 }

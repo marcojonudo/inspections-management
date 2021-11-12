@@ -1,10 +1,24 @@
-<button mat-icon-button (click)="filterOrders(pendingFilter)" [class.highlight]="checkSelectedFilter(pendingFilter)">
-	<mat-icon>calendar_today</mat-icon>
-<!--	<mat-icon>chevron_left</mat-icon>-->
-</button>
 <button mat-icon-button (click)="filterOrders(todayFilter)" [class.highlight]="checkSelectedFilter(todayFilter)">
 	<mat-icon>today</mat-icon>
 </button>
+<span class="label">Hoy</span>
+<button mat-icon-button (click)="filterOrders(pendingFilter)" [class.highlight]="checkSelectedFilter(pendingFilter)">
+	<mat-icon>calendar_today</mat-icon>
+</button>
+<span class="label">Pend.</span>
 <button mat-icon-button (click)="filterOrders(allFilters)" [class.highlight]="checkSelectedFilter(allFilters)">
 	<mat-icon>date_range</mat-icon>
 </button>
+<span class="label">Todas</span>
+<div *ngIf="checkUrl(inspectionPath)">
+	<button mat-icon-button [@buttonAnimation] (click)="print()">
+		<mat-icon>print</mat-icon>
+	</button>
+	<button mat-icon-button [@buttonAnimation] (click)="goBack()">
+		<mat-icon>exit_to_app</mat-icon>
+	</button>
+	<button mat-icon-button [@buttonAnimation] (click)="save()" [disabled]="saving">
+		<mat-icon *ngIf="!saving">save</mat-icon>
+		<mat-spinner diameter="30" *ngIf="saving"></mat-spinner>
+	</button>
+</div>

@@ -21,7 +21,6 @@ export class LoadingService {
 	start(): void {
 		this.loading = true;
 		this.loadingSubject.next(this.loading);
-		console.log(0, this.loading, this.loadingSubject);
 	}
 
 	stop(): void {

@@ -1,0 +1,136 @@
+<header>
+	<div id="title" translate>
+		inspection.type.{{savedInspection.inspectionTypeCode}}
+		<img id="logo" src="assets/img/feuvert-logo.png">
+	</div>
+	<div id="info">
+		<mat-card id="info-card">
+			<mat-card-header>
+				<mat-icon mat-card-avatar>info</mat-icon>
+				<mat-card-title translate>print.info</mat-card-title>
+			</mat-card-header>
+			<mat-card-content>
+				<section class="key-value-section">
+					<div>
+						<div translate>print.day</div>
+						<div>{{today | date: 'dd/MM/yyyy'}}</div>
+					</div>
+					<div *ngIf="adviser">
+						<div translate>print.adviser</div>
+						<div>{{adviser.name | titlecase}}</div>
+					</div>
+					<div>
+						<div translate>print.orderNumber</div>
+						<div>{{order.code}} · {{order.number}}</div>
+					</div>
+					<div>
+						<div translate>{{'print.mechanic' + (mechanics.length > 1 ? 's' : '')}}</div>
+						<div class="column">
+							<div *ngFor="let mechanic of mechanics">
+								{{mechanic.name | titlecase}}
+							</div>
+						</div>
+					</div>
+				</section>
+				<section class="key-value-section">
+					<div>
+						<div translate>print.client</div>
+						<div>{{order.client.name | titlecase}}</div>
+					</div>
+				</section>
+			</mat-card-content>
+		</mat-card>
+		<mat-card>
+			<mat-card-header>
+				<mat-icon mat-card-avatar>home</mat-icon>
+				<mat-card-title translate>print.centre</mat-card-title>
+			</mat-card-header>
+			<mat-card-content>
+				<span>{{centre.name | titlecase}}</span>
+				<span>{{centre.addressLine1 | titlecase}}</span>
+				<span>{{centre.addressLine2 | titlecase}}</span>
+				<span>{{centre.addressLine3 | titlecase}}</span>
+				<span>{{centre.phoneNumber | titlecase}}</span>
+			</mat-card-content>
+		</mat-card>
+		<mat-card>
+			<mat-card-header>
+				<ng-container [ngSwitch]="order.vehicle.type">
+					<mat-icon *ngSwitchCase="carType" mat-card-avatar>directions_car</mat-icon>
+					<mat-icon *ngSwitchCase="scooterType" mat-card-avatar>electric_scooter</mat-icon>
+				</ng-container>
+				<mat-card-title translate>print.vehicle</mat-card-title>
+			</mat-card-header>
+			<mat-card-content [ngSwitch]="order.vehicle.type">
+				<section #vehicleSection *ngSwitchCase="carType" class="key-value-section">
+					<div>
+						<div translate>print.numberPlate</div>
+						<div>{{order.vehicle.identifier}}</div>
+					</div>
+					<div>
+						<div translate>print.model</div>
+						<div>{{order.vehicle.brand | titlecase}} {{order.vehicle.model | titlecase}}</div>
+					</div>
+					<div>
+						<div translate>print.cylinder</div>
+						<span>{{findCar(order.vehicle).cylinder ? findCar(order.vehicle).cylinder : '-'}}</span>
+					</div>
+					<div>
+						<div translate>print.engine</div>
+						<div>{{findCar(order.vehicle).engineCode ? findCar(order.vehicle).engineCode : '-'}}</div>
+					</div>
+					<div>
+						<div translate>print.power</div>
+						<div>{{findCar(order.vehicle).power ? findCar(order.vehicle).power + 'cv' : '-'}}</div>
+					</div>
+					<div>
+						<div translate>print.registration</div>
+						<div>{{findCar(order.vehicle).registrationYear ? findCar(order.vehicle).registrationYear : '-'}}</div>
+					</div>
+					<div *ngFor="let item of findHeaderItems(headerVehicleItem)">
+						<div>{{item.item.code | titlecase}}</div>
+						<div>{{item.findValue()}}</div>
+					</div>
+				</section>
+				<section #vehicleSection *ngSwitchCase="scooterType" class="key-value-section">
+					<div>
+						<div translate>print.numberPlate</div>
+						<div>{{order.vehicle.identifier}}</div>
+					</div>
+					<div>
+						<div translate>print.model</div>
+						<div>{{order.vehicle.brand | titlecase}} {{order.vehicle.model | titlecase}}</div>
+					</div>
+				</section>
+			</mat-card-content>
+		</mat-card>
+		<mat-card id="summary-card">
+			<mat-card-header>
+				<mat-icon mat-card-avatar>summarize</mat-icon>
+				<mat-card-title translate>print.summary</mat-card-title>
+			</mat-card-header>
+			<mat-card-content id="summary-container">
+				<div id="summary">
+					<canvas
+						baseChart
+						width="1px"
+						height="1px"
+						[chartType]="chartType"
+						[options]="options"
+						[colors]="colors"
+						[data]="findData()">
+					</canvas>
+				</div>
+			</mat-card-content>
+		</mat-card>
+	</div>
+	<mat-card>
+		<mat-card-content id="legend">
+			<div *ngFor="let label of groupLabels(findLabels())" class="label">
+				<div class="label-color" [style.background-color]="findIconColor(label.code)"></div>
+				<span translate>inspection.selectItemOption.{{label.code}}</span>
+			</div>
+		</mat-card-content>
+	</mat-card>
+</header>
+<router-outlet></router-outlet>

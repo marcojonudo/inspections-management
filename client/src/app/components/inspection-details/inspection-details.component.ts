@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { InspectionService } from '../../services/inspection.service';
 import { Subscription } from 'rxjs';
-import { Order } from '../../objects/orders/order';
 import { Column } from '../inspections/inspections.component';
 import { ItemBudget } from '../../objects/item-budget';
 import { TranslateService } from '@ngx-translate/core';
@@ -11,6 +10,10 @@ import { EmployeeService } from '../../services/employee.service';
 import { OrderInspectionVehicle } from '../../objects/order-inspection-vehicle';
 import { SavedInspection } from '../../objects/inspections/saved-inspection';
 import { SavedItem } from '../../objects/inspections/saved-items/saved-item';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Constants } from '../../utils/constants';
+import { MatDialog } from '@angular/material/dialog';
+import { EmployeeDialogComponent } from '../employee-dialog/employee-dialog.component';
 
 @Component({
 	selector: 'app-inspection-details',
@@ -20,12 +23,12 @@ import { SavedItem } from '../../objects/inspections/saved-items/saved-item';
 })
 export class InspectionDetailsComponent {
 
-	private COLUMNS: string[] = ['item', 'image', 'doneBudget', 'clientContact', 'acceptedBudget'];
+	private COLUMNS: string[] = ['item', 'image', 'doneBudget', 'clientContact', 'acceptedBudget', 'inspectionButton'];
 
 	private COLUMNS_DATA: any = {
 		item: (i: ItemBudget) => i,
 		image: (i: ItemBudget, savedItem: SavedItem) => savedItem.image,
-		orderNumber: (i: ItemBudget, savedItem: SavedItem, o: Order) => o.number
+		budget: (i: ItemBudget, savedItem: SavedItem, budget: Budget) => budget
 	};
 
 	private selectedOrderSubscription: Subscription;
@@ -39,13 +42,18 @@ export class InspectionDetailsComponent {
 	constructor(
 		private inspectionService: InspectionService,
 		private translate: TranslateService,
-		private cdRef: ChangeDetectorRef
+		private cdRef: ChangeDetectorRef,
+		private router: Router,
+		private route: ActivatedRoute,
+		private dialog: MatDialog
 	) {
 		this.columnsToDisplay = this.COLUMNS;
 		this.mechanics = [];
 		this.selectedOrderSubscription = this.inspectionService.selectedOrderInspection$.subscribe(orderInspection => {
 			this.orderInspection = orderInspection;
 			this.savedInspection = InspectionService.findSavedInspection(this.orderInspection.order.number);
+			console.log('Selected order inspection', this.orderInspection);
+			console.log('Selected saved inspection', this.savedInspection);
 			this.data = this.buildData(this.orderInspection, this.savedInspection);
 			this.mechanics = this.savedInspection ? this.savedInspection.items.map(i => i.employeeCode).filter(
 				(value, index, self) => self.indexOf(value) === index
@@ -60,9 +68,10 @@ export class InspectionDetailsComponent {
 		if (savedInspection) {
 			savedInspection.itemBudgets.forEach(itemBudget => {
 				const row = {};
+				const savedItem = savedInspection.items.find(i => i.item.code === itemBudget.itemCode);
+				const budget = InspectionService.findBudget(itemBudget.itemCode, orderInspection.order.budgets);
 				allColumns.forEach(key => {
-					const savedItem = savedInspection.items.find(i => i.item.code === itemBudget.itemCode);
-					row[key] = columnsData[key](itemBudget, savedItem, orderInspection.order);
+					row[key] = columnsData[key](itemBudget, savedItem, budget);
 				});
 				data.push(row);
 			});
@@ -86,9 +95,8 @@ export class InspectionDetailsComponent {
 		return InspectionService.findBudgetNotifications(orderNumber).length > 0;
 	}
 
-	checkAcceptedBudget(orderNumber: number, itemCode: string): boolean {
-		const budgetNotification = InspectionService.findBudgetNotification(orderNumber, itemCode);
-		return budgetNotification && budgetNotification.accepted !== undefined;
+	checkAcceptedBudget(budget: Budget): boolean {
+		return InspectionService.checkAcceptedBudget(budget);
 	}
 
 	openImage(a): void {
@@ -110,9 +118,14 @@ export class InspectionDetailsComponent {
 		observable.subscribe(() => this.cdRef.detectChanges());
 	}
 
-	updateAcceptedBudget(orderNumber: number, itemCode: string, accepted: boolean): void {
-		const budgetNotification = InspectionService.findBudgetNotification(orderNumber, itemCode);
-		this.inspectionService.updateAcceptedBudget(budgetNotification, accepted).subscribe();
+	openInspection(): void {
+		const dialogRef = this.dialog.open(EmployeeDialogComponent);
+		dialogRef.afterClosed().subscribe((employeeCode: string) => {
+			if (employeeCode) {
+				EmployeeService.setEmployee(employeeCode);
+				this.router.navigate([`${Constants.PATH.HOME}${Constants.PATH.INSPECTION}`]);
+			}
+		});
 	}
 
 }

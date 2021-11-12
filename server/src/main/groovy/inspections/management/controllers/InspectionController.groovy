@@ -5,6 +5,7 @@ import inspections.management.domains.BudgetNotification
 import inspections.management.domains.ItemArticleCode
 import inspections.management.domains.ItemBudget
 import inspections.management.domains.SavedInspection
+import inspections.management.domains.fviberi.Centre
 import inspections.management.domains.fviberi.Order
 import inspections.management.domains.schedules.EmployeeData
 import inspections.management.pogos.OrderInspection
@@ -24,7 +25,6 @@ import org.slf4j.LoggerFactory
 
 import javax.inject.Inject
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 
@@ -41,6 +41,24 @@ class InspectionController {
     @Inject private BudgetNotificationDataService budgetNotificationDataService
     @Inject private EmployeeDataDataService employeeDataDataService
     @Inject private SavedInspectionDataService savedInspectionDataService
+    @Inject private CentreDataService centreDataService
+
+    @Get("/centre")
+    @Operation(
+        summary = "Obtiene el centro",
+        description = "Obtiene el centro"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Centro encontrado",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = Centre))
+    )
+    @ApiResponse(
+        responseCode = "404", description = "Centro no encontrado"
+    )
+    Centre findCentre() {
+        return centreDataService.find()
+    }
 
     @Get("/language")
     @Operation(
@@ -118,7 +136,7 @@ class InspectionController {
         return a
     }
 
-    @Post("/articleItems")
+    @Get("/articleItems")
     @Operation(
         summary = "Obtiene la relación entre artículos e items",
         description = "Obtiene la relación entre artículos e items"
@@ -128,8 +146,8 @@ class InspectionController {
         description = "Lista de artículos e items",
         content = @Content(array = @ArraySchema(schema = @Schema(implementation = ItemArticleCode)))
     )
-    List<ItemArticleCode> findArticleItems(@Body List<Integer> articleCodes) {
-        return itemArticleCodeDataService.findAll(articleCodes)
+    List<ItemArticleCode> findArticleItems() {
+        return itemArticleCodeDataService.findAll()
     }
 
     @Get("/itemBudgets")
@@ -156,8 +174,8 @@ class InspectionController {
         description = "Lista de información de BD",
         content = @Content(array = @ArraySchema(schema = @Schema(implementation = BudgetNotification)))
     )
-    List<BudgetNotification> findBudgetNotifications(@QueryValue List<Integer> orderNumbers) {
-        return budgetNotificationDataService.findAll(orderNumbers)
+    HttpResponse<List<BudgetNotification>> findBudgetNotifications(@QueryValue List<Integer> orderNumbers) {
+        return HttpResponse.ok(budgetNotificationDataService.findAll(orderNumbers))
     }
 
     @Post("/budgetNotification")
@@ -193,10 +211,26 @@ class InspectionController {
         description = "Actualiza un presupuesto aceptado"
     )
     @ApiResponse(responseCode = "200", description = "Presupuesto actualizado")
-    void deleteBudgetNotification(@Body BudgetNotification budgetNotification, @QueryValue boolean accepted) {
-        budgetNotificationDataService.update(
-            budgetNotification.orderNumber, budgetNotification.itemCode, accepted ? LocalDateTime.now() : null
+    void deleteBudgetNotification(@Body BudgetNotification budgetNotification) {
+        budgetNotificationDataService.update(budgetNotification.orderNumber, budgetNotification.itemCode)
+    }
+
+    @Patch("/savedInspection")
+    @Operation(
+        summary = "Actualiza una revisión",
+        description = "Actualiza una revisión"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Revisión actualizada",
+        content = @Content(schema = @Schema(implementation = BudgetNotification))
+    )
+    @ApiResponse(responseCode = "500", description = "Error actualizando la revisión")
+    SavedInspection updateInspection(@Body SavedInspection savedInspection) {
+        return inspectionService.saveInspection(
+            savedInspection, savedInspection.orderNumber, savedInspection.sellerCode
         )
     }
+
 
 }

@@ -1,7 +1,8 @@
 import { OrderLine } from './order-line';
-import { Vehicle } from './vehicle';
 import { Client } from './client';
 import { Budget } from './budget';
+import { Vehicle } from './vehicles/vehicle';
+import { Builder } from '../../utils/builder';
 
 export class Order {
 
@@ -19,7 +20,7 @@ export class Order {
 		this.number = order.number;
 		this.code = order.code;
 		this.state = order.state;
-		this.vehicle = new Vehicle(order.vehicle);
+		this.vehicle = Builder.buildVehicle(order.vehicle);
 		this.client = new Client(order.client);
 		this.sellerCode = order.sellerCode;
 		this.mechanicCode = order.mechanicCode;

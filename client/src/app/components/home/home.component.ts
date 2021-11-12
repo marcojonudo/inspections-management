@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LoadingService } from '../../services/loading.service';
 
@@ -10,16 +10,12 @@ import { LoadingService } from '../../services/loading.service';
 })
 export class HomeComponent implements OnInit {
 
-	constructor(
-		private loadingService: LoadingService,
-		private cdRef: ChangeDetectorRef,
-		private activatedRoute: ActivatedRoute
-	) {}
+	constructor(private loadingService: LoadingService, private activatedRoute: ActivatedRoute) {}
 
 	ngOnInit(): void {
-		this.activatedRoute.data.subscribe(() => {
-			this.loadingService.stop();
-		});
+		this.activatedRoute.data.subscribe(() =>
+			this.loadingService.stop()
+		);
 	}
 
 }

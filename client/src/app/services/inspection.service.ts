@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Url } from '../objects/url';
-import { catchError, map, mergeMap, tap } from 'rxjs/operators';
-import { forkJoin, Observable, of, Subject } from 'rxjs';
+import { catchError, finalize, map, mergeMap, tap } from 'rxjs/operators';
+import { forkJoin, from, Observable, of, Subject } from 'rxjs';
 import { LocalStorageService } from './local-storage.service';
-import { Constants } from '../objects/constants';
 import { OrdersFilter } from '../objects/filters/orders-filter';
 import { TodayOrdersFilter } from '../objects/filters/today-orders-filter';
 import { Order } from '../objects/orders/order';
@@ -14,7 +12,29 @@ import { BudgetNotification } from '../objects/budget-notification';
 import { Budget } from '../objects/orders/budget';
 import { OrderInspectionVehicle } from '../objects/order-inspection-vehicle';
 import { SavedInspection } from '../objects/inspections/saved-inspection';
-import { InspectionVehicle } from '../objects/inspections/inspection-vehicle';
+import { ListElement } from '../objects/list-elements/list-element';
+import { NameElement } from '../objects/list-elements/name-element';
+import { Item } from '../objects/inspections/items/item';
+import { Category } from '../objects/list-elements/category';
+import { Constants } from '../utils/constants';
+import { Utils } from '../utils/utils';
+import { Url } from '../utils/url';
+import { SavedItem } from '../objects/inspections/saved-items/saved-item';
+import { Builder } from '../utils/builder';
+import { ItemRelation } from '../objects/inspections/item-relation';
+import { SelectSavedItem } from '../objects/inspections/saved-items/select-saved-item';
+import { CountryHandler } from '../objects/country-info/country-handler';
+import { SpainHandler } from '../objects/country-info/spain-handler';
+import { PortugalHandler } from '../objects/country-info/portugal-handler';
+import { SelectItemOption } from '../objects/inspections/items/select-item-option';
+import { SelectItem } from '../objects/inspections/items/select-item';
+import { Centre } from '../objects/centre';
+import { Employee } from '../objects/employee';
+import { EmployeeService } from './employee.service';
+import { OrderInspectionHandler } from '../objects/inspection-handler/order-inspection-handler';
+import { DetectedFaultsHandler } from '../objects/inspection-handler/detected-faults-handler';
+import { InspectionHandler } from '../objects/inspection-handler/inspection-handler';
+import * as dayjs from 'dayjs';
 
 @Injectable({
 	providedIn: 'root'
@@ -27,6 +47,44 @@ export class InspectionService {
 	static itemArticleCodes: ItemArticleCode[];
 	static budgetNotifications: BudgetNotification[];
 	static selectedOrderInspection: OrderInspectionVehicle;
+	static selectedSavedInspection: SavedInspection;
+	static countryHandler: CountryHandler;
+	static centre: Centre;
+	static selectItemOptions: SelectItemOption[];
+	static inspectionHandler: InspectionHandler;
+
+	private static readonly LEVEL_ELEMENTS: ((item: Item) => NameElement)[] = [
+		(item: Item) => item.vehicleData.garagePosition,
+		(item: Item) => item.vehicleData?.vehicleSection
+	];
+
+	private static readonly SELECT_ICON_COLOR: { [key: string]: string } = {
+		P: '#7b7979',
+		C: '#36d23d',
+		PS: '#ff6a00',
+		SN: '#d23636',
+		RA: '#3681d2',
+		RR: '#3681d2'
+	};
+
+	private static readonly ITEM_RELATION_ACTION: any = {
+		HIDE: (targetSavedItem: SelectSavedItem, newValue: string, employeeCode: string) =>
+			targetSavedItem.updateHidden(employeeCode, true),
+		REPLICATE: (targetSavedItem: SelectSavedItem, newValue: string, employeeCode: string) =>
+			targetSavedItem.update(newValue, employeeCode)
+	};
+
+	private static readonly ITEM_RELATION_RESTORE_ACTION: any = {
+		HIDE: (targetSavedItem: SelectSavedItem, newValue: string, employeeCode: string) =>
+			targetSavedItem.updateHidden(employeeCode, false),
+		REPLICATE: (targetSavedItem: SelectSavedItem, newValue: string, employeeCode: string) =>
+			targetSavedItem.update(Constants.SELECT_ITEM_OPTION_CODE.P, employeeCode)
+	};
+
+	static readonly COUNTRY_HANDLER_DECIDER: any = {
+		es: new SpainHandler(),
+		pt: new PortugalHandler()
+	};
 
 	filters: OrdersFilter[];
 
@@ -49,10 +107,6 @@ export class InspectionService {
 		InspectionService.itemArticleCodes = [];
 		InspectionService.budgetNotifications = [];
 	}
-
-	// static findOrder(orderNumber: number, orders: Order[] = this.orders): Order {
-	// 	return orders.find(o => o.number === orderNumber);
-	// }
 
 	static findOrderInspection(
 		orderNumber: number, orderInspections: OrderInspectionVehicle[] = this.orderInspections
@@ -93,21 +147,7 @@ export class InspectionService {
 	}
 
 	static findItemBudgetsMainType(types: string[]): string {
-		return types.sort((a, b) => {
-			if (Constants.BUDGET_TYPE_ORDER[a] < Constants.BUDGET_TYPE_ORDER[b]) {
-				return -1;
-			}
-			if (Constants.BUDGET_TYPE_ORDER[a] > Constants.BUDGET_TYPE_ORDER[b]) {
-				return 1;
-			}
-			return 0;
-		})[0];
-	}
-
-	static findBudgetNotification(
-		orderNumber: number, itemCode: string, budgetNotifications: BudgetNotification[] = this.budgetNotifications
-	): BudgetNotification {
-		return budgetNotifications.find(c => c.orderNumber === orderNumber && c.itemCode === itemCode);
+		return Utils.sort(types, (type) => Constants.BUDGET_TYPE_ORDER[type])[0];
 	}
 
 	static findBudgetNotifications(
@@ -142,20 +182,139 @@ export class InspectionService {
 		let price = 0;
 		orderInspections.forEach(orderInspection => {
 			orderInspection.order.budgets.forEach(budget => {
+				const acceptedBudget = InspectionService.checkAcceptedBudget(budget);
 				budget.lines.filter(l => l.price).forEach(line => {
-					price += line.units * line.price;
+					/* Sólo se suma el precio si el presupuesto ha sido aceptado */
+					if (acceptedBudget) {
+						price += line.units * line.price;
+					}
 				});
 			});
 		});
 		return price;
 	}
 
-	static findAllBudgetNotifications(orderInspections: OrderInspectionVehicle[] = this.orderInspections): BudgetNotification[] {
-		const allBudgetNotifications = [];
-		orderInspections.forEach(orderInspection => {
-			allBudgetNotifications.push(...InspectionService.findBudgetNotifications(orderInspection.order.number));
+	static findGroupedItems(
+		items: any[],
+		i: number = 0,
+		levelElements: ((item: any) => NameElement)[] = this.LEVEL_ELEMENTS
+	): ListElement[] {
+		if (i >= levelElements.length) {
+			return items;
+		}
+		const listElements = [];
+		items.forEach(item => {
+			const levelElem = levelElements[i](item);
+			if (levelElem) {
+				const existent: Category = listElements.find(elem =>
+					elem instanceof Category && (elem as Category).name === levelElem.name
+				);
+				if (existent) {
+					existent.items.push(item);
+				} else {
+					listElements.push(new Category(levelElem, [item]));
+				}
+			} else {
+				listElements.push(item);
+			}
 		});
-		return allBudgetNotifications;
+		i += 1;
+		const categoryElements = listElements.filter(item => item instanceof Category);
+		categoryElements.forEach(categoryElem => {
+			categoryElem.items = this.findGroupedItems(categoryElem.items, i);
+		});
+		return listElements;
+	}
+
+	static findIconColor(code: string, selectIconColor: { [key: string]: string } = this.SELECT_ICON_COLOR): string {
+		return selectIconColor[code];
+	}
+
+	static findImageUrl(image: string): string {
+		return `data:image/png;base64,${image}`;
+	}
+
+	static findBudget(itemCode: string, budgets: Budget[], itemArticleCodes: ItemArticleCode[] = this.itemArticleCodes): Budget {
+		return budgets.find(b =>
+			b.lines.find(l =>
+				itemArticleCodes.find(i => i.articleCode === l.articleCode) !== undefined
+			) !== undefined
+		);
+	}
+
+	static checkAcceptedBudget(budget: Budget): boolean {
+		return budget && budget.state === Constants.BUDGET_STATE.O;
+	}
+
+	static findAllBudgets(orderInspections: OrderInspectionVehicle[] = this.orderInspections): Budget[] {
+		return [].concat(...orderInspections.map(o => o.order.budgets));
+	}
+
+	static findSelectItems(savedInspections: SavedInspection[] = this.savedInspections): SelectItem[] {
+		const items = [];
+		savedInspections.forEach(savedInspection =>
+			items.push(...savedInspection.items.filter(i => i.item.type === Constants.ITEM_TYPE.SELECT).map(i => i.item))
+		);
+		return items;
+	}
+
+	static findSelectItemOptions(): SelectItemOption[] {
+		const options = [];
+		this.findSelectItems().forEach((item: SelectItem) => {
+			item.options.forEach((option: SelectItemOption) => {
+				const existent = options.find(o => o.code === option.code);
+				if (!existent) {
+					options.push(option);
+				}
+			});
+		});
+		return options;
+	}
+
+	static updateItem(
+		savedItem: SavedItem,
+		item: Item,
+		value: string,
+		savedInspection: SavedInspection,
+		employee: Employee = EmployeeService.employee
+	): Observable<ItemRelation> {
+		// const savedItem = savedInspection.items.find(i => i.item.name === item.name);
+
+		/* Antes de actualizar el valor, se debe comprobar si hay alguna relación que deshacer. Por ejemplo, al tener
+		 * 'Pastilla de freno' el valor 'No aplica', el espesor está oculto; sin embargo, en cuanto se actualiza el
+		 * valor de la primera, el segundo debe volver a aparecer (se está deshaciendo la relación) */
+		this.updateRelations(
+			savedItem, savedItem.findValue(), item.relations, this.ITEM_RELATION_RESTORE_ACTION, savedInspection
+		).subscribe();
+		savedItem.update(value, employee.code);
+
+		return this.updateRelations(savedItem, savedItem.findValue(), item.relations, this.ITEM_RELATION_ACTION, savedInspection).pipe(
+			finalize(() => {
+				LocalStorageService.setItem(Constants.LOCAL_STORAGE.SAVED_INSPECTION, savedInspection);
+			})
+		);
+	}
+
+	static updateRelations(
+		savedItem: SavedItem, value: string, relations: ItemRelation[], actions: any, savedInspection: SavedInspection
+	): Observable<ItemRelation> {
+		return from(relations).pipe(
+			tap(itemRelation => InspectionService.handleRelation(savedItem, value, itemRelation, actions, savedInspection))
+		);
+	}
+
+	static handleRelation(
+		savedItem: SavedItem,
+		value: string,
+		itemRelation: ItemRelation,
+		actions: any,
+		savedInspection: SavedInspection,
+		employee: Employee = EmployeeService.employee
+	): void {
+		if (value === itemRelation.matchText) {
+			const targetSavedItem = savedInspection.items.find(i => i.item.code === itemRelation.targetItem.code);
+			actions[itemRelation.action](targetSavedItem, savedItem.findValue(), employee.code);
+		}
 	}
 
 	findLanguage(): Observable<string> {
@@ -163,6 +322,7 @@ export class InspectionService {
 		return (language ? of(language) : this.http.get(Url.language(), { responseType: 'text' })).pipe(
 			catchError(() => of(Constants.DEFAULT_LANGUAGE)),
 			tap((lang: string) => {
+				InspectionService.countryHandler = InspectionService.COUNTRY_HANDLER_DECIDER[lang];
 				LocalStorageService.setItem(Constants.LOCAL_STORAGE.LANGUAGE, lang);
 				console.log('Language', lang);
 			})
@@ -176,16 +336,15 @@ export class InspectionService {
 				console.log('Opened orders', openedOrders);
 
 				if (openedOrders.length) {
-					const articles = this.findArticles(openedOrders);
 					const orderNumbers = openedOrders.map(o => o.number);
-					const budgetNotificationsUrl = `${Url.budgetNotification()}&orderNumbers=${orderNumbers.join('&orderNumbers=')}`;
+					const budgetNotificationsUrl = `${Url.budgetNotification()}?orderNumbers=${orderNumbers.join('&orderNumbers=')}`;
 					return forkJoin([
 						this.findItemBudgets(),
-						InspectionService.itemArticleCodes || articles.length ?
-							of(InspectionService.itemArticleCodes) : this.http.post(Url.articleItems(), articles),
+						this.findItemArticleCodes(),
 						this.http.post(Url.inspections(), orders),
 						this.http.post(Url.savedInspections(), orderNumbers),
-						this.http.get(budgetNotificationsUrl)
+						this.http.get(budgetNotificationsUrl),
+						this.findCentre()
 					]);
 				} else {
 					return of([]);
@@ -194,27 +353,45 @@ export class InspectionService {
 			tap(data => {
 				console.log('Received data', data);
 				if (data.length) {
-					InspectionService.itemBudgets = this.buildItemBudgets(data[0]);
-					InspectionService.itemArticleCodes = InspectionService.itemArticleCodes.length ?
-						InspectionService.itemArticleCodes : data[1].map(i => new ItemArticleCode(i));
-					InspectionService.savedInspections = data[3].map(d => new SavedInspection(d, InspectionService.itemBudgets));
-					InspectionService.budgetNotifications = data[4].map(b => new BudgetNotification(b));
-
-					const orderInspections = data[2].map(d => new OrderInspectionVehicle(d));
-					InspectionService.orderInspections = this.buildOrderInspections(orderInspections, InspectionService.savedInspections);
+					this.initData(data);
 				}
 				console.log('Item budgets', InspectionService.itemBudgets);
 				console.log('Item article codes', InspectionService.itemArticleCodes);
 				console.log('Order inspections', InspectionService.orderInspections);
 				console.log('Saved inspections', InspectionService.savedInspections);
 				console.log('Client budget notifications', InspectionService.budgetNotifications);
+				console.log('Centre', InspectionService.centre);
 			})
 		);
+	}
+
+	initData(data: any[]): void {
+		InspectionService.itemBudgets = this.buildItemBudgets(data[0]);
+		InspectionService.itemArticleCodes = InspectionService.itemArticleCodes.length ?
+			InspectionService.itemArticleCodes : data[1].map(i => new ItemArticleCode(i));
+		InspectionService.savedInspections = data[3].map(d => Builder.buildSavedInspection(d, InspectionService.itemBudgets));
+		InspectionService.budgetNotifications = data[4].map(b => new BudgetNotification(b));
+
+		const orderInspections = data[2].map(d => new OrderInspectionVehicle(d));
+		InspectionService.orderInspections = this.buildOrderInspections(orderInspections, InspectionService.savedInspections);
+
+		InspectionService.centre = new Centre(data[5]);
+		InspectionService.selectItemOptions = InspectionService.findSelectItemOptions();
+	}
+
+	findCentre(): Observable<any> {
+		const savedCentre = LocalStorageService.getItem(Constants.LOCAL_STORAGE.CENTRE);
+		return savedCentre ? of(savedCentre) : this.http.get(Url.centre());
 	}
 
 	findItemBudgets(): Observable<any> {
 		const savedItemBudgets = LocalStorageService.getItem(Constants.LOCAL_STORAGE.ITEM_BUDGETS);
 		return savedItemBudgets ? of(savedItemBudgets) : this.http.get(Url.itemBudgets());
+	}
+
+	findItemArticleCodes(): Observable<any> {
+		const savedItemArticleCodes = LocalStorageService.getItem(Constants.LOCAL_STORAGE.ITEM_ARTICLE_CODES);
+		return savedItemArticleCodes ? of(savedItemArticleCodes) : this.http.get(Url.articleItems());
 	}
 
 	buildItemBudgets(itemBudgets: any[]): ItemBudget[] {
@@ -230,19 +407,13 @@ export class InspectionService {
 	buildOrderInspections(orderInspections: OrderInspectionVehicle[], savedInspections: SavedInspection[]): OrderInspectionVehicle[] {
 		const allOrderInspections = [];
 		orderInspections.forEach(orderInspection => {
-			/* Cuenta como revisión si tiene una asociada, o si tiene una guardad previamente (caso de una OR sin revisión en la que se ha
+			/* Cuenta como revisión si tiene una asociada, o si tiene una guardada previamente (caso de una OR sin revisión en la que se ha
 			 * destacado algún aspecto incorrecto) */
 			if (orderInspection.inspection || savedInspections.find(s => s.orderNumber === orderInspection.order.number) !== undefined) {
 				allOrderInspections.push(orderInspection);
 			}
 		});
 		return allOrderInspections;
-	}
-
-	findArticles(orders: Order[]): number[] {
-		return [].concat(...orders.map(o => o.lines.map(l => l.articleCode))).filter((value, index, self) =>
-			self.indexOf(value) === index
-		);
 	}
 
 	findOrders(filters: OrdersFilter[]): Observable<any> {
@@ -263,9 +434,17 @@ export class InspectionService {
 		return orderInspection && orderInspection.order.number === orderNumber;
 	}
 
-	selectOrder(orderNumber: number): void {
+	selectOrder(orderNumber: number): boolean {
+		let existentSavedInspection = false;
 		InspectionService.selectedOrderInspection = InspectionService.findOrderInspection(orderNumber);
-		this.selectedOrderInspectionSubject.next(InspectionService.selectedOrderInspection);
+		InspectionService.selectedSavedInspection = InspectionService.findSavedInspection(orderNumber);
+		if (InspectionService.selectedSavedInspection) {
+			InspectionService.inspectionHandler = InspectionService.selectedSavedInspection.orderInspection ?
+				new OrderInspectionHandler() : new DetectedFaultsHandler();
+			this.selectedOrderInspectionSubject.next(InspectionService.selectedOrderInspection);
+			existentSavedInspection = true;
+		}
+		return existentSavedInspection;
 	}
 
 	createBudgetNotification(orderNumber: number, itemCodes: string[]): Observable<any> {
@@ -286,11 +465,16 @@ export class InspectionService {
 		);
 	}
 
-	updateAcceptedBudget(budgetNotification: BudgetNotification, accepted: boolean): Observable<any> {
-		this.budgetNotificationsSubject.next([budgetNotification]);
-		return this.http.patch(Url.budgetNotification(accepted), budgetNotification).pipe(
-			tap(() => this.budgetNotificationsSubject.next(InspectionService.budgetNotifications))
-		);
+	saveInspection(
+		savedInspection: SavedInspection = InspectionService.selectedSavedInspection,
+		handler: InspectionHandler = InspectionService.inspectionHandler,
+		employee: Employee = EmployeeService.employee
+	): Observable<any> {
+		const body = handler.findSavedInspection(savedInspection);
+		body.sellerCode = employee.code;
+		body.saved = dayjs();
+		console.log('Saving inspection', body);
+		return this.http.patch(Url.savedInspection(), body);
 	}
 
 }

@@ -14,6 +14,10 @@ export class Url {
 		return `${environment.serverUrl}/inspection/savedInspections`;
 	}
 
+	static savedInspection(): string {
+		return `${environment.serverUrl}/inspection/savedInspection`;
+	}
+
 	static language(): string {
 		return `${environment.serverUrl}/inspection/language`;
 	}
@@ -26,12 +30,16 @@ export class Url {
 		return `${environment.serverUrl}/inspection/itemBudgets`;
 	}
 
-	static budgetNotification(accepted: boolean = undefined): string {
-		return `${environment.serverUrl}/inspection/budgetNotification?accepted=${accepted}`;
+	static budgetNotification(): string {
+		return `${environment.serverUrl}/inspection/budgetNotification`;
 	}
 
 	static employees(): string {
 		return `${environment.serverUrl}/inspection/employees`;
+	}
+
+	static centre(): string {
+		return `${environment.serverUrl}/inspection/centre`;
 	}
 
 }
