@@ -4,9 +4,6 @@
 	width: 2.5rem
 	min-width: 2.5rem
 	height: 100%
-	//position: absolute
-	//top: 0
-	//right: 0
 	display: flex
 	flex-direction: column
 	background-color: $tools-bar-background
@@ -16,6 +13,7 @@
 	button
 		@include flex-column-center
 		color: $white
+		overflow: hidden
 
 		&.highlight mat-icon
 			color: $dark-highlight
@@ -30,6 +28,9 @@
 
 			mat-icon
 				transform: scale(1.2)
+
+		&.disabled
+			cursor: auto
 
 	.label
 		position: relative

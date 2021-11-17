@@ -11,13 +11,14 @@ export abstract class SavedItem {
 	employeeCode: string;
 	sellerCode: string;
 	image: Image;
+	imageId: number;
 
 	protected constructor(savedItem: SavedItem) {
 		this.item = savedItem.item;
 		this.employeeCode = savedItem.employeeCode;
 		if (savedItem) {
 			this.filled = savedItem.filled ? dayjs(savedItem.filled) : undefined;
-			this.image = savedItem.image ? new Image(savedItem.image.image, savedItem.image.landscape) : undefined;
+			this.imageId = savedItem.imageId;
 			this.hidden = savedItem.hidden;
 		}
 	}

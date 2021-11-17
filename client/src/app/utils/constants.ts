@@ -71,7 +71,9 @@ export class Constants {
 	static readonly SELECT_ITEM_OPTION_CODE: any = {
 		C: 'C',
 		NA: 'NA',
-		P: 'P'
+		P: 'P',
+		SN: 'SN',
+		PS: 'PS'
 	};
 
 	public static readonly PATH: any = {

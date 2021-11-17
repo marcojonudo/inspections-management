@@ -37,7 +37,7 @@
 							*ngFor="let option of findSelectItem(item.item).options | order; let i = index"
 							class="select-item-icon"
 							[ngClass]="{
-								'front': checkSelectedOption(item.findValue(), option.code),
+								'front': checkSelectedOption(item.findValue(), option.code, item, i),
 								'left': checkLeftOption(findSelectSavedItem(item), findSelectItem(item.item).options, i),
 								'right': checkRightOption(findSelectSavedItem(item), findSelectItem(item.item).options, i)
 							}"
@@ -62,7 +62,7 @@
 		*ngFor="let elem of imageListElements"
 		class="category"
 		[class.page-break]="elem.pageBreak">
-		<mat-card *ngIf="checkCategoryElement(elem.listElement); else elementTemplate">
+		<mat-card *ngIf="checkCategoryElement(elem.listElement); else elementTemplate" class="image-card">
 			<mat-card-header>
 				<mat-icon mat-card-avatar>navigate_next</mat-icon>
 				<mat-card-title translate>print.category.{{elem.listElement.code}}</mat-card-title>
@@ -79,7 +79,7 @@
 			</mat-card-content>
 		</mat-card>
 		<ng-template #elementTemplate>
-			<mat-card>
+			<mat-card class="image-card">
 				<mat-card-header>
 					<mat-icon mat-card-avatar>navigate_next</mat-icon>
 					<mat-card-title translate>inspection.item.{{elem.listElement.item.code}}</mat-card-title>

@@ -14,6 +14,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Constants } from '../../utils/constants';
 import { MatDialog } from '@angular/material/dialog';
 import { EmployeeDialogComponent } from '../employee-dialog/employee-dialog.component';
+import { ImageDialogComponent } from '../image-dialog/image-dialog.component';
 
 @Component({
 	selector: 'app-inspection-details',
@@ -23,7 +24,7 @@ import { EmployeeDialogComponent } from '../employee-dialog/employee-dialog.comp
 })
 export class InspectionDetailsComponent {
 
-	private COLUMNS: string[] = ['item', 'image', 'doneBudget', 'clientContact', 'acceptedBudget', 'inspectionButton'];
+	private COLUMNS: string[] = ['item', 'image', 'doneBudget', 'acceptedBudget', 'clientContact', 'inspectionButton'];
 
 	private COLUMNS_DATA: any = {
 		item: (i: ItemBudget) => i,
@@ -103,8 +104,8 @@ export class InspectionDetailsComponent {
 		return InspectionService.checkAcceptedBudget(budget);
 	}
 
-	openImage(a): void {
-		console.log(a);
+	openImage(imageId: number): void {
+		this.dialog.open(ImageDialogComponent, { data: { imageId } });
 	}
 
 	updateNotifiedClient(

@@ -110,7 +110,7 @@
 								.select-item-icon
 									position: absolute
 									backface-visibility: hidden
-									transition: transform $medium-transition, color $medium-transition
+									transition: transform $medium-transition
 									background-color: $white
 
 									&.front
@@ -143,10 +143,14 @@
 				width: 100%
 				display: flex
 				flex-direction: column
-				padding: $tiny-gap $small-gap
 
 				& > div
 					line-height: 1.5
+
+		.text-area-card, .image-card
+
+			.mat-card-content
+				padding: $tiny-gap $small-gap
 
 @media print
 
@@ -192,3 +196,6 @@
 
 		.text-area-card .mat-card-content
 			padding: $tiny-gap !important
+
+		.select-item-icon.right
+			transform: translateX(-100%) rotateY(90deg) !important

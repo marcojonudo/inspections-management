@@ -38,6 +38,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import localeEs from '@angular/common/locales/es';
 import { registerLocaleData } from '@angular/common';
 registerLocaleData(localeEs);
+import { ImageDialogComponent } from './components/image-dialog/image-dialog.component';
 
 @NgModule({
 	declarations: [
@@ -54,7 +55,8 @@ registerLocaleData(localeEs);
 		EmployeeDialogComponent,
 		InspectionSheetComponent,
 		InspectionHeaderComponent,
-		InspectionComponent
+		InspectionComponent,
+		ImageDialogComponent
 	],
 	imports: [
 		BrowserModule,

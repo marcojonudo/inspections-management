@@ -289,6 +289,10 @@ export class InspectionService {
 		return options;
 	}
 
+	static checkWrongSelectValue(value: string): boolean {
+		return value === Constants.SELECT_ITEM_OPTION_CODE.SN || value === Constants.SELECT_ITEM_OPTION_CODE.PS;
+	}
+
 	static updateItem(
 		savedItem: SavedItem,
 		item: Item,

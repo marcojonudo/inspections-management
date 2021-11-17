@@ -95,7 +95,7 @@ export class ToolsBarComponent {
 		this.inspectionService.saveInspection().pipe(
 			finalize(() => {
 				this.saving = false;
-				// this.cdRef.detectChanges();
+				this.cdRef.detectChanges();
 			})
 		).subscribe(
 			() => this.snackBarService.open(Constants.MESSAGE_CODE.SAVED_INSPECTION),

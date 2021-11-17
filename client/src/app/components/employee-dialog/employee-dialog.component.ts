@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { EmployeeService } from '../../services/employee.service';
 import { InspectionService } from '../../services/inspection.service';
-import { FormControl, Validators } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { Constants } from '../../utils/constants';
 import { TranslateService } from '@ngx-translate/core';

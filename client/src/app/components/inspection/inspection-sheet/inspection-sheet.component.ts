@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { ListElement } from '../../../objects/list-elements/list-element';
 import { SavedInspection } from '../../../objects/inspections/saved-inspection';
 import { InspectionHandler } from '../../../objects/inspection-handler/inspection-handler';
@@ -23,6 +23,9 @@ import { Category } from '../../../objects/list-elements/category';
 import { Builder } from '../../../utils/builder';
 import { Utils } from '../../../utils/utils';
 import { Item } from '../../../objects/inspections/items/item';
+import { Url } from '../../../utils/url';
+import { Image } from '../../../objects/inspections/image';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
 	selector: 'app-inspection-sheet',
@@ -33,10 +36,15 @@ export class InspectionSheetComponent {
 
 	private readonly ROW_ITEMS = 4;
 
+	images: Image[];
 	listElements: ListElement[];
 	imageListElements: any[];
 
-	constructor(private orderPipe: OrderPipe) {
+	constructor(
+		private orderPipe: OrderPipe,
+		private http: HttpClient,
+		private cdRef: ChangeDetectorRef
+	) {
 		const items = this.savedInspection.items
 			.filter(i => !i.item.header)
 			.filter(i => {
@@ -46,7 +54,22 @@ export class InspectionSheetComponent {
 		this.listElements = InspectionService.findGroupedItems(
 			items, 0, [(savedItem: SavedItem) => savedItem.item.category]
 		);
-		this.imageListElements = this.findImageElements();
+		this.images = [];
+		this.imageListElements = [];
+
+		const imageItems = this.savedInspection.items.filter(savedItem => savedItem.imageId);
+		const imageIds = imageItems.map(savedItem => savedItem.imageId);
+		if (imageIds) {
+			http.get(Url.images(), { params: { ids: `${imageIds.join(',')}` } }).subscribe((images: Image[]) => {
+				this.images = images;
+				imageItems.forEach(savedItem => {
+					savedItem.image = this.images.find(image => image.id === savedItem.imageId);
+				});
+				this.imageListElements = this.findImageElements(imageItems);
+				this.cdRef.detectChanges();
+				console.log('\n\n ------------------------------------- \n\n');
+			});
+		}
 	}
 
 	// region Getters / setters
@@ -73,15 +96,24 @@ export class InspectionSheetComponent {
 
 	// endregion
 
-	checkSelectedOption(value: string, optionCode: string): boolean {
+	checkSelectedOption(value: string, optionCode: string, item, i: number): boolean {
+		if (item.item.code === 'OI' && optionCode === 'C') {
+			console.log('front', item, value, optionCode, i, value === optionCode);
+		}
 		return value === optionCode;
 	}
 
 	checkLeftOption(savedItem: SelectSavedItem, options: SelectItemOption[], i: number): boolean {
+		// if (savedItem.item.code === 'OI') {
+		// 	console.log('left', savedItem, i < this.findOptionIndex(savedItem, options));
+		// }
 		return i < this.findOptionIndex(savedItem, options);
 	}
 
 	checkRightOption(savedItem: SelectSavedItem, options: SelectItemOption[], i: number): boolean {
+		if (savedItem.item.code === 'OI') {
+			console.log('right', savedItem, i, i > this.findOptionIndex(savedItem, options));
+		}
 		return i > this.findOptionIndex(savedItem, options);
 	}
 
@@ -94,6 +126,9 @@ export class InspectionSheetComponent {
 	}
 
 	findSelectItem(item: Item): SelectItem {
+		if (item.code === 'OI') {
+			console.log('item', item, (item as SelectItem).options);
+		}
 		return item as SelectItem;
 	}
 
@@ -107,10 +142,6 @@ export class InspectionSheetComponent {
 
 	findTextItemUnit(item: SavedItem): string {
 		return this.findTextSavedItem(item).text ? (item.item as TextItem).unit || '' : '';
-	}
-
-	findSelectIcon(item: SelectSavedItem): string {
-		return (item.item as SelectItem).options.find(option => option.code === item.value).printIcon;
 	}
 
 	findIconColor(code: string): string {
@@ -129,13 +160,9 @@ export class InspectionSheetComponent {
 		return InspectionService.findImageUrl(image);
 	}
 
-	findImageElements(): { listElement, pageBreak }[] {
+	findImageElements(savedItems: SavedItem[]): { listElement, pageBreak }[] {
 		const splittedImageListElements = [];
-		const imageListElements = InspectionService.findGroupedItems(
-			this.savedInspection.items.filter(i => i.image),
-			0,
-			[(savedItem: SavedItem) => savedItem.item.category]
-		);
+		const imageListElements = InspectionService.findGroupedItems(savedItems, 0, [(savedItem: SavedItem) => savedItem.item.category]);
 		let row = 0;
 		this.orderPipe.transform(imageListElements).forEach(listElement => {
 			if (this.checkCategoryElement(listElement)) {
@@ -166,7 +193,7 @@ export class InspectionSheetComponent {
 		if (savedItem.item.type !== Constants.ITEM_TYPE.SELECT) {
 			return false;
 		}
-		return (savedItem as SelectSavedItem).value !== Constants.SELECT_ITEM_OPTION_CODE.C;
+		return InspectionService.checkWrongSelectValue((savedItem as SelectSavedItem).value);
 	}
 
 	toggleSelectOption(savedItem: SelectSavedItem): void {

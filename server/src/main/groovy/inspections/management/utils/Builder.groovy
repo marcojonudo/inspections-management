@@ -1,7 +1,6 @@
 package inspections.management.utils
 
 import groovy.transform.CompileStatic
-import inspections.management.domains.Image
 import inspections.management.domains.InspectionVehicle
 import inspections.management.domains.ItemCategory
 import inspections.management.domains.items.Item
@@ -44,10 +43,10 @@ class Builder {
         savedItem.employeeCode = item.employeeCode
         savedItem.sellerCode = item.sellerCode
         savedItem.hidden = item.hidden
-        if (item.image) {
-            Map<String, Object> image = (Map<String, Object>) item.image
-            savedItem.image = new Image(((String) image.image).decodeBase64(), (boolean) image.landscape)
-        }
+//        if (item.image) {
+//            Map<String, Object> image = (Map<String, Object>) item.image
+//            savedItem.image = new Image(((String) image.image).decodeBase64(), (boolean) image.landscape)
+//        }
         savedItem.filled = (LocalDateTime) (item.filled ? LocalDateTime.parse(
             (String) item.filled, DateTimeFormatter.ofPattern(Constants.DateTimeFormat.yyyy_MM_dd_HH_mm_ss)
         ) : null)
