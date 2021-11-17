@@ -1,10 +1,7 @@
 package inspections.management.controllers
 
 import groovy.transform.CompileStatic
-import inspections.management.domains.BudgetNotification
-import inspections.management.domains.ItemArticleCode
-import inspections.management.domains.ItemBudget
-import inspections.management.domains.SavedInspection
+import inspections.management.domains.*
 import inspections.management.domains.fviberi.Centre
 import inspections.management.domains.fviberi.Order
 import inspections.management.domains.schedules.EmployeeData
@@ -36,7 +33,7 @@ class InspectionController {
 
     @Inject private InspectionService inspectionService
     @Inject private LanguageDataService languageDataService
-    @Inject private ItemArticleCodeDataService itemArticleCodeDataService
+    @Inject private ItemVehicleArticleCodeDataService itemVehicleArticleCodeDataService
     @Inject private ItemBudgetDataService itemBudgetDataService
     @Inject private BudgetNotificationDataService budgetNotificationDataService
     @Inject private EmployeeDataDataService employeeDataDataService
@@ -144,10 +141,10 @@ class InspectionController {
     @ApiResponse(
         responseCode = "200",
         description = "Lista de artículos e items",
-        content = @Content(array = @ArraySchema(schema = @Schema(implementation = ItemArticleCode)))
+        content = @Content(array = @ArraySchema(schema = @Schema(implementation = ItemVehicleArticleCode)))
     )
-    List<ItemArticleCode> findArticleItems() {
-        return itemArticleCodeDataService.findAll()
+    List<ItemVehicleArticleCode> findArticleItems() {
+        return itemVehicleArticleCodeDataService.findAll()
     }
 
     @Get("/itemBudgets")

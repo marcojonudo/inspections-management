@@ -35,6 +35,9 @@ import { InspectionSheetComponent } from './components/inspection/inspection-she
 import { InspectionHeaderComponent } from './components/inspection/inspection-header/inspection-header.component';
 import { InspectionComponent } from './components/inspection/inspection.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import localeEs from '@angular/common/locales/es';
+import { registerLocaleData } from '@angular/common';
+registerLocaleData(localeEs);
 
 @NgModule({
 	declarations: [

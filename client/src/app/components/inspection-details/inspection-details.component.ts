@@ -87,12 +87,16 @@ export class InspectionDetailsComponent {
 		return this.translate.instant(`inspection.item.${code}`);
 	}
 
-	findItemBudgetType(itemBudget: ItemBudget, budgets: Budget[] = this.orderInspection.order.budgets): string {
-		return InspectionService.findItemBudgetType(itemBudget, budgets);
+	findItemBudgetType(itemBudget: ItemBudget, orderInspection: OrderInspectionVehicle = this.orderInspection): string {
+		return InspectionService.findItemBudgetType(itemBudget, orderInspection.inspection.vehicle, orderInspection.order.budgets);
 	}
 
 	checkNotifiedClient(orderNumber: number = this.orderInspection.order.number): boolean {
 		return InspectionService.findBudgetNotifications(orderNumber).length > 0;
+	}
+
+	checkExistentBudget(itemBudget: ItemBudget, budget: Budget, orderInspection: OrderInspectionVehicle = this.orderInspection): boolean {
+		return  InspectionService.checkExistentBudget(itemBudget.itemCode, orderInspection.inspection.vehicle, [budget]);
 	}
 
 	checkAcceptedBudget(budget: Budget): boolean {

@@ -8,7 +8,7 @@
         <mat-card-content>
 			<div class="content-block">
 				<span translate>summary.urgentPendingBudgets</span>
-				<span class="color-urgent">{{findAllItemBudgetLength(urgentType)}}</span>
+				<span class="color-urgent">{{findPendingItemBudgetsLength(urgentType)}}</span>
 			</div>
         </mat-card-content>
     </mat-card>
@@ -16,7 +16,7 @@
         <mat-card-content>
 			<div class="content-block">
 				<span translate>summary.secondaryPendingBudgets</span>
-				<span class="color-secondary">{{findAllItemBudgetLength(secondaryType)}}</span>
+				<span class="color-secondary">{{findPendingItemBudgetsLength(secondaryType)}}</span>
 			</div>
         </mat-card-content>
     </mat-card>
@@ -32,7 +32,11 @@
         <mat-card-content>
 			<div class="content-block">
 				<span translate>summary.sells</span>
-				<span class="color-correct">{{findBudgetsPrice() | number}}€</span>
+				<span class="color-correct smaller-font">{{findBudgetsPrice() | currency:'EUR':'symbol':'1.0-0':'es'}}</span>
+			</div>
+			<div class="content-block">
+				<span translate>summary.acceptedSells</span>
+				<span class="color-correct smaller-font">{{findAcceptedBudgetsPrice() | currency: 'EUR':'symbol':'1.0-0':'es'}}</span>
 			</div>
         </mat-card-content>
     </mat-card>
@@ -51,8 +55,8 @@
     <mat-card>
         <mat-card-content>
 			<div class="content-block">
-				<span translate>summary.closedOrders</span>
-				<span class="color-urgent">{{findClosedOrders()}}</span>
+				<span translate>summary.notFinishedInspectionOrders</span>
+				<span class="color-urgent">{{findNotFinishedInspectionOrders()}}</span>
 			</div>
         </mat-card-content>
     </mat-card>

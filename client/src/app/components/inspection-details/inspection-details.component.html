@@ -43,7 +43,7 @@
 					<mat-icon
 						*ngIf="data"
 						class="color-correct"
-						[class.color-urgent]="!checkAcceptedBudget(element.budget)">
+						[ngClass]="'color-' + (checkAcceptedBudget(element.budget) ? (checkExistentBudget(element.item, element.budget) ? '' : 'secondary') : 'urgent')">
 						radio_button_checked
 					</mat-icon>
 				</td>

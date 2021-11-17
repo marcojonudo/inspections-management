@@ -6,7 +6,7 @@ import { LocalStorageService } from './local-storage.service';
 import { OrdersFilter } from '../objects/filters/orders-filter';
 import { TodayOrdersFilter } from '../objects/filters/today-orders-filter';
 import { Order } from '../objects/orders/order';
-import { ItemArticleCode } from '../objects/orders/item-article-code';
+import { ItemVehicleArticleCode } from '../objects/orders/item-vehicle-article-code';
 import { ItemBudget } from '../objects/item-budget';
 import { BudgetNotification } from '../objects/budget-notification';
 import { Budget } from '../objects/orders/budget';
@@ -44,7 +44,7 @@ export class InspectionService {
 	static orderInspections: OrderInspectionVehicle[];
 	static savedInspections: SavedInspection[];
 	static itemBudgets: ItemBudget[];
-	static itemArticleCodes: ItemArticleCode[];
+	static itemVehicleArticleCodes: ItemVehicleArticleCode[];
 	static budgetNotifications: BudgetNotification[];
 	static selectedOrderInspection: OrderInspectionVehicle;
 	static selectedSavedInspection: SavedInspection;
@@ -104,7 +104,7 @@ export class InspectionService {
 
 		InspectionService.orderInspections = [];
 		InspectionService.savedInspections = [];
-		InspectionService.itemArticleCodes = [];
+		InspectionService.itemVehicleArticleCodes = [];
 		InspectionService.budgetNotifications = [];
 	}
 
@@ -121,23 +121,28 @@ export class InspectionService {
 	}
 
 	static findOrderItemBudgetType(orderNumber: number): string {
-		const order = this.findOrderInspection(orderNumber).order;
+		const orderInspection = this.findOrderInspection(orderNumber);
 		const savedInspection = this.findSavedInspection(orderNumber);
-		const itemBudgetTypes = savedInspection.itemBudgets.map(itemBudget => this.findItemBudgetType(itemBudget, order.budgets));
+		const itemBudgetTypes = savedInspection.itemBudgets.map(itemBudget =>
+			this.findItemBudgetType(itemBudget, orderInspection.inspection.vehicle, orderInspection.order.budgets)
+		);
 		return this.findItemBudgetsMainType(itemBudgetTypes);
 	}
 
-	static findItemBudgetType(itemBudget: ItemBudget, budgets: Budget[]): string {
-		const existentBudget = InspectionService.checkExistentBudget(itemBudget.itemCode, budgets);
+	static findItemBudgetType(itemBudget: ItemBudget, vehicle: string, budgets: Budget[]): string {
+		const existentBudget = InspectionService.checkExistentBudget(itemBudget.itemCode, vehicle, budgets);
 		return existentBudget ? '' : itemBudget.budgetType;
 	}
 
 	static checkExistentBudget(
-		itemCode: string, budgets: Budget[], itemArticleCodes: ItemArticleCode[] = this.itemArticleCodes
+		itemCode: string,
+		vehicle: string,
+		budgets: Budget[],
+		itemVehicleArticleCodes: ItemVehicleArticleCode[] = this.itemVehicleArticleCodes
 	): boolean {
 		/* Se buscan los códigos de artículo que corresponden al item erróneo */
-		const articleCodes = itemArticleCodes.filter(itemArticleCode =>
-			itemArticleCode.itemCode === itemCode
+		const articleCodes = itemVehicleArticleCodes.filter(itemArticleCode =>
+			itemArticleCode.itemCode === itemCode && itemArticleCode.vehicle === vehicle
 		).map(itemArticleCode => itemArticleCode.articleCode);
 		/* Una vez obtenidos los artículos, se comprueba si alguno de los presupuestos asociados a la orden contiene alguno de
 		 * ellos. De ser así, se determinaría que existe presupuesto asociado a la revisión */
@@ -167,28 +172,45 @@ export class InspectionService {
 		return itemBudgets;
 	}
 
-	static findPendingClientContactOrders(orderInspections: OrderInspectionVehicle[] = this.orderInspections): number[] {
+	static findPendingItemBudgets(type: string = undefined, savedInspections: SavedInspection[] = this.savedInspections): ItemBudget[] {
+		const itemBudgets = [];
+		savedInspections.forEach(savedInspection => {
+			const orderInspection = this.findOrderInspection(savedInspection.orderNumber);
+
+			const foundItemBudgets = type ?
+				savedInspection.itemBudgets.filter(itemBudget => itemBudget.budgetType === type) : savedInspection.itemBudgets;
+			const pendingItemBudgets = foundItemBudgets.filter(itemBudget =>
+				!this.checkExistentBudget(itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets)
+			);
+			itemBudgets.push(...pendingItemBudgets);
+		});
+		return itemBudgets;
+	}
+
+	static findPendingClientContactOrders(savedInspections: SavedInspection[] = this.savedInspections): number[] {
 		const pendingContactOrders = [];
-		orderInspections.forEach(orderInspection => {
-			const pending = InspectionService.findBudgetNotifications(orderInspection.order.number).length === 0;
+		savedInspections.forEach(savedInspection => {
+			const pending = InspectionService.findBudgetNotifications(savedInspection.orderNumber).length === 0;
 			if (pending) {
-				pendingContactOrders.push(orderInspection.order.number);
+				pendingContactOrders.push(savedInspection.orderNumber);
 			}
 		});
 		return pendingContactOrders;
 	}
 
-	static findBudgetsPrice(orderInspections: OrderInspectionVehicle[] = this.orderInspections): number {
+	static findOrdersBudgets(orderInspections: OrderInspectionVehicle[] = this.orderInspections): Budget[] {
+		return [].concat(...orderInspections.map(o => o.order).map(o => o.budgets));
+	}
+
+	static findBudgetsPrice(budgets: Budget[]): number {
 		let price = 0;
-		orderInspections.forEach(orderInspection => {
-			orderInspection.order.budgets.forEach(budget => {
-				const acceptedBudget = InspectionService.checkAcceptedBudget(budget);
-				budget.lines.filter(l => l.price).forEach(line => {
-					/* Sólo se suma el precio si el presupuesto ha sido aceptado */
-					if (acceptedBudget) {
-						price += line.units * line.price;
-					}
-				});
+		budgets.forEach(budget => {
+			const acceptedBudget = InspectionService.checkAcceptedBudget(budget);
+			budget.lines.filter(l => l.price).forEach(line => {
+				/* Sólo se suma el precio si el presupuesto ha sido aceptado */
+				if (acceptedBudget) {
+					price += line.units * line.price;
+				}
 			});
 		});
 		return price;
@@ -234,7 +256,7 @@ export class InspectionService {
 		return `data:image/png;base64,${image}`;
 	}
 
-	static findBudget(itemCode: string, budgets: Budget[], itemArticleCodes: ItemArticleCode[] = this.itemArticleCodes): Budget {
+	static findBudget(itemCode: string, budgets: Budget[], itemArticleCodes: ItemVehicleArticleCode[] = this.itemVehicleArticleCodes): Budget {
 		return budgets.find(b =>
 			b.lines.find(l =>
 				itemArticleCodes.find(i => i.articleCode === l.articleCode) !== undefined
@@ -244,10 +266,6 @@ export class InspectionService {
 
 	static checkAcceptedBudget(budget: Budget): boolean {
 		return budget && budget.state === Constants.BUDGET_STATE.O;
-	}
-
-	static findAllBudgets(orderInspections: OrderInspectionVehicle[] = this.orderInspections): Budget[] {
-		return [].concat(...orderInspections.map(o => o.order.budgets));
 	}
 
 	static findSelectItems(savedInspections: SavedInspection[] = this.savedInspections): SelectItem[] {
@@ -340,7 +358,7 @@ export class InspectionService {
 					const budgetNotificationsUrl = `${Url.budgetNotification()}?orderNumbers=${orderNumbers.join('&orderNumbers=')}`;
 					return forkJoin([
 						this.findItemBudgets(),
-						this.findItemArticleCodes(),
+						this.findItemVehicleArticleCodes(),
 						this.http.post(Url.inspections(), orders),
 						this.http.post(Url.savedInspections(), orderNumbers),
 						this.http.get(budgetNotificationsUrl),
@@ -356,7 +374,7 @@ export class InspectionService {
 					this.initData(data);
 				}
 				console.log('Item budgets', InspectionService.itemBudgets);
-				console.log('Item article codes', InspectionService.itemArticleCodes);
+				console.log('Item vehicle article codes', InspectionService.itemVehicleArticleCodes);
 				console.log('Order inspections', InspectionService.orderInspections);
 				console.log('Saved inspections', InspectionService.savedInspections);
 				console.log('Client budget notifications', InspectionService.budgetNotifications);
@@ -367,8 +385,8 @@ export class InspectionService {
 
 	initData(data: any[]): void {
 		InspectionService.itemBudgets = this.buildItemBudgets(data[0]);
-		InspectionService.itemArticleCodes = InspectionService.itemArticleCodes.length ?
-			InspectionService.itemArticleCodes : data[1].map(i => new ItemArticleCode(i));
+		InspectionService.itemVehicleArticleCodes = InspectionService.itemVehicleArticleCodes.length ?
+			InspectionService.itemVehicleArticleCodes : data[1].map(i => new ItemVehicleArticleCode(i));
 		InspectionService.savedInspections = data[3].map(d => Builder.buildSavedInspection(d, InspectionService.itemBudgets));
 		InspectionService.budgetNotifications = data[4].map(b => new BudgetNotification(b));
 
@@ -389,8 +407,8 @@ export class InspectionService {
 		return savedItemBudgets ? of(savedItemBudgets) : this.http.get(Url.itemBudgets());
 	}
 
-	findItemArticleCodes(): Observable<any> {
-		const savedItemArticleCodes = LocalStorageService.getItem(Constants.LOCAL_STORAGE.ITEM_ARTICLE_CODES);
+	findItemVehicleArticleCodes(): Observable<any> {
+		const savedItemArticleCodes = LocalStorageService.getItem(Constants.LOCAL_STORAGE.ITEM_VEHICLE_ARTICLE_CODES);
 		return savedItemArticleCodes ? of(savedItemArticleCodes) : this.http.get(Url.articleItems());
 	}
 

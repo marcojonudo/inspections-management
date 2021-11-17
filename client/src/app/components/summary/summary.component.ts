@@ -56,12 +56,22 @@ export class SummaryComponent implements OnDestroy {
 		return InspectionService.findAllItemBudgets(budgetType).length;
 	}
 
+	findPendingItemBudgetsLength(budgetType: string = undefined): number {
+		return InspectionService.findPendingItemBudgets(budgetType).length;
+	}
+
 	findPendingClientContacts(): number {
 		return InspectionService.findPendingClientContactOrders().length;
 	}
 
 	findBudgetsPrice(): number {
-		return InspectionService.findBudgetsPrice();
+		const budgets = InspectionService.findOrdersBudgets();
+		return InspectionService.findBudgetsPrice(budgets);
+	}
+
+	findAcceptedBudgetsPrice(): number {
+		const budgets = InspectionService.findOrdersBudgets().filter(b => InspectionService.checkAcceptedBudget(b));
+		return InspectionService.findBudgetsPrice(budgets);
 	}
 
 	findDoneBudgets(): ItemBudget[] {
@@ -69,7 +79,7 @@ export class SummaryComponent implements OnDestroy {
 		InspectionService.orderInspections.forEach(orderInspection => {
 			const savedInspection = InspectionService.findSavedInspection(orderInspection.order.number);
 			const doneOrderBudgets = (savedInspection ? savedInspection.itemBudgets : []).filter(itemBudget =>
-				InspectionService.checkExistentBudget(itemBudget.itemCode, orderInspection.order.budgets)
+				InspectionService.checkExistentBudget(itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets)
 			);
 			doneBudgets.push(...doneOrderBudgets);
 		});
@@ -77,17 +87,18 @@ export class SummaryComponent implements OnDestroy {
 	}
 
 	findAllBudgets(): Budget[] {
-		return InspectionService.findAllBudgets();
+		return InspectionService.findOrdersBudgets();
 	}
 
 	findAcceptedBudgets(): Budget[] {
 		return this.findAllBudgets().filter(b => InspectionService.checkAcceptedBudget(b));
 	}
 
-	findClosedOrders(): number {
+	findNotFinishedInspectionOrders(): number {
 		return this.orderInspections.filter(orderInspection => {
 			const savedInspection = InspectionService.findSavedInspection(orderInspection.order.number);
-			return orderInspection.order.state === Constants.ORDER_STATE.F && savedInspection.state !== Constants.INSPECTION_STATE.FINISHED;
+			return (orderInspection.order.state === Constants.ORDER_STATE.F || orderInspection.order.state === Constants.ORDER_STATE.E) &&
+				savedInspection?.state !== Constants.INSPECTION_STATE.FINISHED;
 		}).length;
 	}
 
