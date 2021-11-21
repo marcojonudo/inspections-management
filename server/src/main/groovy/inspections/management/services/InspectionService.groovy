@@ -1,9 +1,11 @@
 package inspections.management.services
 
 import groovy.transform.CompileStatic
+import inspections.management.domains.InspectionType
 import inspections.management.domains.InspectionVehicle
 import inspections.management.domains.SavedInspection
 import inspections.management.domains.fviberi.Order
+import inspections.management.domains.fviberi.OrderLine
 import inspections.management.domains.items.Item
 import inspections.management.pogos.OrderInspection
 import inspections.management.pogos.logs.Log
@@ -19,8 +21,6 @@ import org.slf4j.LoggerFactory
 import javax.inject.Inject
 import javax.inject.Singleton
 import java.time.LocalDate
-import java.time.LocalTime
-import java.time.temporal.ChronoUnit
 
 @Singleton
 @CompileStatic
@@ -35,6 +35,12 @@ class InspectionService {
 	@Inject private SavedInspectionDataService savedInspectionDataService
 	@Inject private OrderDataService orderDataService
 
+	/**
+	 * Obtiene las órdenes según los parámetros recibidos
+	 * @param day Día
+	 * @param to Booleano que indica si el día se refiere al actual, o al 'to'
+	 * @return Lista de órdenes
+	 */
 	List<Order> findOrders(LocalDate day, boolean to) {
 		List<Order> orders
 		List<Integer> savedOrderNumbers
@@ -46,9 +52,15 @@ class InspectionService {
 			savedOrderNumbers = savedInspectionDataService.findOrderNumbers(day)
 		}
 
-		return handleNotInspectionOrders(orders, savedOrderNumbers)
+		return orders // handleNotInspectionOrders(orders, savedOrderNumbers)
 	}
 
+	/**
+	 * Se añade a las órdenes encontradas, aquellas que
+	 * @param orders
+	 * @param savedOrderNumbers
+	 * @return
+	 */
 	List<Order> handleNotInspectionOrders(List<Order> orders, List<Integer> savedOrderNumbers) {
 		/* Se buscan los números de orden guardados en revisiones, que no figuren en la lista de ordenes. Esto significa
 		 * que no tienen ningún código de artículo de revisión, pero se guardó alguna anomalía */
@@ -64,9 +76,16 @@ class InspectionService {
 		return orders + notInspectionOrders
 	}
 
+	/**
+	 * Busca las revisiones asociadas a las órdenes con código de revisión
+	 * @param orders Lista de ordenes
+	 * @return Lista de órdenes con su revisión
+	 */
 	List<OrderInspection> findOrderInspections(List<Order> orders) {
+		List<Integer> articleCodes = ((List<OrderLine>) orders.lines.flatten()).articleCode.unique()
+		List<InspectionVehicle> inspectionsVehicle = inspectionVehicleDataService.findAll(articleCodes)
 		return orders.collect {
-			InspectionVehicle inspectionVehicle = findInspection(it)
+			InspectionVehicle inspectionVehicle = findOrderInspection(it, inspectionsVehicle)
 			return new OrderInspection(it, inspectionVehicle)
 		}
 	}
@@ -76,13 +95,12 @@ class InspectionService {
 	 * @param order Orden
 	 * @return Revisión
 	 */
-	InspectionVehicle findInspection(Order order) {
-		LocalTime refTime = LocalTime.now()
-		List<InspectionVehicle> inspectionsVehicle = inspectionVehicleDataService.findAll(
-			order.lines*.articleCode.toList()
-		)
-		LOG.info("INSPECTIONS VEHICLE: ${ChronoUnit.MILLIS.between(refTime, LocalTime.now())}")
-		return buildGroupedInspection(inspectionsVehicle)
+	static InspectionVehicle findOrderInspection(Order order, List<InspectionVehicle> inspectionsVehicle) {
+		List<Integer> orderArticleCodes = order.lines*.articleCode as List<Integer>
+		List<InspectionVehicle> orderInspectionVehicle = inspectionsVehicle.findAll {
+			it.articleCodes.find { it.articleCode in orderArticleCodes }
+		}
+		return orderInspectionVehicle ? buildGroupedInspection(orderInspectionVehicle) : null
 	}
 
 	/**
@@ -91,14 +109,27 @@ class InspectionService {
 	 * @return Revisión con items agrupados
 	 */
 	static InspectionVehicle buildGroupedInspection(List<InspectionVehicle> inspectionsVehicle) {
-		InspectionVehicle inspectionVehicle = null
-		if (inspectionsVehicle) {
-			/* Se obtienen el código y nombre de la revisión con mayor número de items */
-			InspectionVehicle maxInspection = inspectionsVehicle.max { it.items.size() }
-			List<Item> items = ((List<Item>) inspectionsVehicle.items.flatten()).unique { it.code }
-			inspectionVehicle = Builder.buildInspectionVehicle(maxInspection, items)
+		/* Se obtienen el código y nombre de la revisión con mayor número de items */
+		InspectionVehicle maxInspection = inspectionsVehicle.max { it.items.size() }
+		List<Item> items = ((List<Item>) inspectionsVehicle.items.flatten()).unique { it.code }
+		return Builder.buildInspectionVehicle(maxInspection, items)
+	}
+
+	/**
+	 * Busca las revisiones asociadas a las órdenes con anomalías detectadas
+	 * @param orders Lista de ordenes
+	 * @return Lista de órdenes con su revisión
+	 */
+	List<OrderInspection> findDetectedAnomaliesInspections(List<Order> orders) {
+		InspectionVehicle securityInspectionVehicle = inspectionVehicleDataService.find(
+			InspectionType.Code.SE.toString(), InspectionVehicle.Vehicle.CAR.toString()
+		)
+		return orders.collect {
+			InspectionVehicle inspectionVehicle = Builder.buildInspectionVehicle(
+				securityInspectionVehicle, securityInspectionVehicle.items.toList(), false
+			)
+			return new OrderInspection(it, inspectionVehicle)
 		}
-		return inspectionVehicle
 	}
 
 	/**

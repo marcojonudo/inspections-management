@@ -22,8 +22,6 @@ import org.slf4j.LoggerFactory
 
 import javax.inject.Inject
 import java.time.LocalDate
-import java.time.LocalTime
-import java.time.temporal.ChronoUnit
 
 @Controller("/inspection")
 @CompileStatic
@@ -113,8 +111,13 @@ class InspectionController {
         description = "Lista de revisiones",
         content = @Content(array = @ArraySchema(schema = @Schema(implementation = OrderInspection)))
     )
-    List<OrderInspection> findInspections(@Body List<Order> orders) {
-        return inspectionService.findOrderInspections(orders)
+    List<OrderInspection> findInspections(@Body Map<String, List<Order>> orders) {
+        List<OrderInspection> orderInspections = inspectionService.findOrderInspections(orders.openedOrders)
+        List<OrderInspection> detectedAnomaliesOrderInspections = inspectionService.findDetectedAnomaliesInspections(
+            orders.detectedAnomaliesOrders
+        )
+        return orderInspections + detectedAnomaliesOrderInspections
+
     }
 
     @Post("/savedInspections")
@@ -128,10 +131,7 @@ class InspectionController {
         content = @Content(array = @ArraySchema(schema = @Schema(implementation = SavedInspection)))
     )
     List<SavedInspection> findSavedInspections(@Body List<Integer> orders) {
-        LocalTime refTime = LocalTime.now()
-        List<SavedInspection> a = savedInspectionDataService.findAll(orders)
-        LOG.info("SAVED -INSPECIONTS: ${ChronoUnit.MILLIS.between(refTime, LocalTime.now())}")
-        return a
+        return savedInspectionDataService.findAll(orders)
     }
 
     @Get("/articleItems")

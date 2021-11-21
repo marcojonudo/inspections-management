@@ -14,12 +14,14 @@ import java.time.format.DateTimeFormatter
 @CompileStatic
 class Builder {
 
-    static InspectionVehicle buildInspectionVehicle(InspectionVehicle inspectionVehicle, List<Item> items) {
+    static InspectionVehicle buildInspectionVehicle(
+        InspectionVehicle inspectionVehicle, List<Item> items, boolean orderInspection = true
+    ) {
         items.each {
             it.vehicleData = it.vehicleDataList.find { it.vehicle == inspectionVehicle.vehicle }
         }
         return new InspectionVehicle(
-            inspectionVehicle.inspectionType, inspectionVehicle.vehicle, items.toSet()
+            inspectionVehicle.inspectionType, inspectionVehicle.vehicle, items.toSet(), orderInspection
         )
     }
 

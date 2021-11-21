@@ -108,6 +108,37 @@ export class InspectionService {
 		InspectionService.budgetNotifications = [];
 	}
 
+	static initData(data: any[]): void {
+		InspectionService.itemBudgets = this.buildItemBudgets(data[0]);
+		InspectionService.itemVehicleArticleCodes = InspectionService.itemVehicleArticleCodes.length ?
+			InspectionService.itemVehicleArticleCodes : data[1].map(i => new ItemVehicleArticleCode(i));
+		InspectionService.savedInspections = data[2].map(d => Builder.buildSavedInspection(d, InspectionService.itemBudgets));
+		InspectionService.budgetNotifications = data[3].map(b => new BudgetNotification(b));
+		InspectionService.centre = new Centre(data[4]);
+		InspectionService.selectItemOptions = InspectionService.findSelectItemOptions();
+
+		console.log('Item budgets', InspectionService.itemBudgets);
+		console.log('Item vehicle article codes', InspectionService.itemVehicleArticleCodes);
+		console.log('Saved inspections', InspectionService.savedInspections);
+		console.log('Client budget notifications', InspectionService.budgetNotifications);
+		console.log('Centre', InspectionService.centre);
+	}
+
+	static initOrderInspections(orderInspections: any[]): void {
+		InspectionService.orderInspections = orderInspections.map(d => new OrderInspectionVehicle(d)).filter(o => o.inspection);
+		console.log('Order inspections', InspectionService.orderInspections);
+	}
+
+	static buildItemBudgets(itemBudgets: any[]): ItemBudget[] {
+		const savedItemBudgets = LocalStorageService.getItem(Constants.LOCAL_STORAGE.ITEM_BUDGETS);
+		if (savedItemBudgets) {
+			return savedItemBudgets;
+		}
+		const builtItemBudgets = itemBudgets.map(i => new ItemBudget(i));
+		LocalStorageService.setItem(Constants.LOCAL_STORAGE.ITEM_BUDGETS, builtItemBudgets);
+		return builtItemBudgets;
+	}
+
 	static findOrderInspection(
 		orderNumber: number, orderInspections: OrderInspectionVehicle[] = this.orderInspections
 	): OrderInspectionVehicle {
@@ -205,12 +236,8 @@ export class InspectionService {
 	static findBudgetsPrice(budgets: Budget[]): number {
 		let price = 0;
 		budgets.forEach(budget => {
-			const acceptedBudget = InspectionService.checkAcceptedBudget(budget);
 			budget.lines.filter(l => l.price).forEach(line => {
-				/* Sólo se suma el precio si el presupuesto ha sido aceptado */
-				if (acceptedBudget) {
-					price += line.units * line.price;
-				}
+				price += line.units * line.price;
 			});
 		});
 		return price;
@@ -300,8 +327,6 @@ export class InspectionService {
 		savedInspection: SavedInspection,
 		employee: Employee = EmployeeService.employee
 	): Observable<ItemRelation> {
-		// const savedItem = savedInspection.items.find(i => i.item.name === item.name);
-
 		/* Antes de actualizar el valor, se debe comprobar si hay alguna relación que deshacer. Por ejemplo, al tener
 		 * 'Pastilla de freno' el valor 'No aplica', el espesor está oculto; sin embargo, en cuanto se actualiza el
 		 * valor de la primera, el segundo debe volver a aparecer (se está deshaciendo la relación) */
@@ -352,9 +377,10 @@ export class InspectionService {
 	}
 
 	loadMainInfo(filters: OrdersFilter[] = this.filters): Observable<any> {
+		let openedOrders = [];
 		return this.findOrders(filters).pipe(
 			mergeMap(orders => {
-				const openedOrders = orders.filter(o => o.state !== Constants.ORDER_STATE.F);
+				openedOrders = orders.filter(o => o.state !== Constants.ORDER_STATE.F);
 				console.log('Opened orders', openedOrders);
 
 				if (openedOrders.length) {
@@ -363,7 +389,6 @@ export class InspectionService {
 					return forkJoin([
 						this.findItemBudgets(),
 						this.findItemVehicleArticleCodes(),
-						this.http.post(Url.inspections(), orders),
 						this.http.post(Url.savedInspections(), orderNumbers),
 						this.http.get(budgetNotificationsUrl),
 						this.findCentre()
@@ -372,33 +397,26 @@ export class InspectionService {
 					return of([]);
 				}
 			}),
-			tap(data => {
+			mergeMap(data => {
 				console.log('Received data', data);
 				if (data.length) {
-					this.initData(data);
+					InspectionService.initData(data);
+					/* Una vez obtenidas las revisiones guardadas, se puede comprobar qué números de orden tienen asociada una revisión de
+					 * anomalías detectadas */
+					const detectedAnomaliesOrders = InspectionService.savedInspections.filter(i => !i.orderInspection).map(i =>
+						openedOrders.find(o => o.number === i.orderNumber)
+					);
+					const body = { openedOrders, detectedAnomaliesOrders };
+					return this.http.post(Url.inspections(), body);
 				}
-				console.log('Item budgets', InspectionService.itemBudgets);
-				console.log('Item vehicle article codes', InspectionService.itemVehicleArticleCodes);
-				console.log('Order inspections', InspectionService.orderInspections);
-				console.log('Saved inspections', InspectionService.savedInspections);
-				console.log('Client budget notifications', InspectionService.budgetNotifications);
-				console.log('Centre', InspectionService.centre);
+				return of([]);
+			}),
+			tap(orderInspections => {
+				if (orderInspections.length) {
+					InspectionService.initOrderInspections(orderInspections);
+				}
 			})
 		);
-	}
-
-	initData(data: any[]): void {
-		InspectionService.itemBudgets = this.buildItemBudgets(data[0]);
-		InspectionService.itemVehicleArticleCodes = InspectionService.itemVehicleArticleCodes.length ?
-			InspectionService.itemVehicleArticleCodes : data[1].map(i => new ItemVehicleArticleCode(i));
-		InspectionService.savedInspections = data[3].map(d => Builder.buildSavedInspection(d, InspectionService.itemBudgets));
-		InspectionService.budgetNotifications = data[4].map(b => new BudgetNotification(b));
-
-		const orderInspections = data[2].map(d => new OrderInspectionVehicle(d));
-		InspectionService.orderInspections = this.buildOrderInspections(orderInspections, InspectionService.savedInspections);
-
-		InspectionService.centre = new Centre(data[5]);
-		InspectionService.selectItemOptions = InspectionService.findSelectItemOptions();
 	}
 
 	findCentre(): Observable<any> {
@@ -414,28 +432,6 @@ export class InspectionService {
 	findItemVehicleArticleCodes(): Observable<any> {
 		const savedItemArticleCodes = LocalStorageService.getItem(Constants.LOCAL_STORAGE.ITEM_VEHICLE_ARTICLE_CODES);
 		return savedItemArticleCodes ? of(savedItemArticleCodes) : this.http.get(Url.articleItems());
-	}
-
-	buildItemBudgets(itemBudgets: any[]): ItemBudget[] {
-		const savedItemBudgets = LocalStorageService.getItem(Constants.LOCAL_STORAGE.ITEM_BUDGETS);
-		if (savedItemBudgets) {
-			return savedItemBudgets;
-		}
-		const builtItemBudgets = itemBudgets.map(i => new ItemBudget(i));
-		LocalStorageService.setItem(Constants.LOCAL_STORAGE.ITEM_BUDGETS, builtItemBudgets);
-		return builtItemBudgets;
-	}
-
-	buildOrderInspections(orderInspections: OrderInspectionVehicle[], savedInspections: SavedInspection[]): OrderInspectionVehicle[] {
-		const allOrderInspections = [];
-		orderInspections.forEach(orderInspection => {
-			/* Cuenta como revisión si tiene una asociada, o si tiene una guardada previamente (caso de una OR sin revisión en la que se ha
-			 * destacado algún aspecto incorrecto) */
-			if (orderInspection.inspection || savedInspections.find(s => s.orderNumber === orderInspection.order.number) !== undefined) {
-				allOrderInspections.push(orderInspection);
-			}
-		});
-		return allOrderInspections;
 	}
 
 	findOrders(filters: OrdersFilter[]): Observable<any> {
