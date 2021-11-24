@@ -83,6 +83,13 @@ export class ToolsBarComponent {
 	}
 
 	print(): void {
+		this.inspectionService.saveInspection().subscribe(
+			() => this.snackBarService.open(Constants.MESSAGE_CODE.SAVED_INSPECTION),
+			(error) => {
+				console.error(error);
+				this.snackBarService.open(Constants.MESSAGE_CODE.ERROR_SAVING_INSPECTION, Constants.SNACK_BAR.TYPE.ERROR);
+			}
+		);
 		this.printService.openPrintDialog();
 	}
 

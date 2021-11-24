@@ -67,7 +67,6 @@ export class InspectionSheetComponent {
 				});
 				this.imageListElements = this.findImageElements(imageItems);
 				this.cdRef.detectChanges();
-				console.log('\n\n ------------------------------------- \n\n');
 			});
 		}
 	}
@@ -97,23 +96,14 @@ export class InspectionSheetComponent {
 	// endregion
 
 	checkSelectedOption(value: string, optionCode: string, item, i: number): boolean {
-		if (item.item.code === 'OI' && optionCode === 'C') {
-			console.log('front', item, value, optionCode, i, value === optionCode);
-		}
 		return value === optionCode;
 	}
 
 	checkLeftOption(savedItem: SelectSavedItem, options: SelectItemOption[], i: number): boolean {
-		// if (savedItem.item.code === 'OI') {
-		// 	console.log('left', savedItem, i < this.findOptionIndex(savedItem, options));
-		// }
 		return i < this.findOptionIndex(savedItem, options);
 	}
 
 	checkRightOption(savedItem: SelectSavedItem, options: SelectItemOption[], i: number): boolean {
-		if (savedItem.item.code === 'OI') {
-			console.log('right', savedItem, i, i > this.findOptionIndex(savedItem, options));
-		}
 		return i > this.findOptionIndex(savedItem, options);
 	}
 
@@ -126,9 +116,6 @@ export class InspectionSheetComponent {
 	}
 
 	findSelectItem(item: Item): SelectItem {
-		if (item.code === 'OI') {
-			console.log('item', item, (item as SelectItem).options);
-		}
 		return item as SelectItem;
 	}
 
@@ -207,6 +194,11 @@ export class InspectionSheetComponent {
 	findOptionIndex(savedItem: SelectSavedItem, options: SelectItemOption[]): number {
 		const selectedValue = savedItem.value;
 		return options.findIndex(o => o.code === selectedValue);
+	}
+
+	updateText(savedItem: TextSavedItem): void {
+		InspectionService.updateItem(savedItem, savedItem.item, savedItem.text, this.savedInspection).subscribe();
+		console.log(savedItem.text);
 	}
 
 	checkCategoryBreak(elem: ListElement): boolean {
