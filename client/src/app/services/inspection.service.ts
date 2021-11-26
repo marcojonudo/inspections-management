@@ -156,7 +156,7 @@ export class InspectionService {
 		const savedInspection = this.findSavedInspection(orderNumber);
 		const itemBudgetTypes = savedInspection.itemBudgets.map(itemBudget =>
 			this.findItemBudgetType(itemBudget, orderInspection.inspection.vehicle, orderInspection.order.budgets)
-		);
+		).filter(type => type !== '');
 		return this.findItemBudgetsMainType(itemBudgetTypes);
 	}
 
