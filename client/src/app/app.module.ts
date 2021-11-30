@@ -35,6 +35,10 @@ import { InspectionSheetComponent } from './components/inspection/inspection-she
 import { InspectionHeaderComponent } from './components/inspection/inspection-header/inspection-header.component';
 import { InspectionComponent } from './components/inspection/inspection.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import localeEs from '@angular/common/locales/es';
+import { registerLocaleData } from '@angular/common';
+registerLocaleData(localeEs);
+import { ImageDialogComponent } from './components/image-dialog/image-dialog.component';
 
 @NgModule({
 	declarations: [
@@ -51,7 +55,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 		EmployeeDialogComponent,
 		InspectionSheetComponent,
 		InspectionHeaderComponent,
-		InspectionComponent
+		InspectionComponent,
+		ImageDialogComponent
 	],
 	imports: [
 		BrowserModule,

@@ -5,9 +5,10 @@ import grails.gorm.annotation.Entity
 import org.grails.datastore.gorm.GormEntity
 
 @Entity
-class ItemArticleCode implements GormEntity<ItemArticleCode> {
+class ItemVehicleArticleCode implements GormEntity<ItemVehicleArticleCode> {
 
 	String itemCode
+	String vehicle
 	int articleCode
 
 }

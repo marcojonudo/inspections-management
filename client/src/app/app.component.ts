@@ -35,23 +35,10 @@ export class AppComponent {
 			EmployeeService.setEmployees(data[1]);
 		});
 
-
-		// this.inspectionService.loadMainInfo().subscribe(() => {
-		// 	console.log('----------- LOADED');
-		// 	// this.loadingService.stop();
-		// 	this.loading = false;
-		// 	this.cdRef.detectChanges();
-		// });
-
 		this.loadingService.subscribe(loading => {
 			this.loading = loading;
 			this.cdRef.detectChanges();
 		});
 	}
-
-	// prepareRoute(outlet: RouterOutlet): void {
-	// 	console.log(outlet, outlet && outlet.activatedRouteData && outlet.activatedRouteData.animation);
-	// 	return outlet && outlet.activatedRouteData && outlet.activatedRouteData.animation;
-	// }
 
 }

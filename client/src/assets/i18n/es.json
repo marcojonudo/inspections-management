@@ -7,9 +7,10 @@
 		"secondaryPendingBudgets": "Presupuestos pendientes secundarios",
 		"pendingClientContacts": "Contactos clientes pendientes",
 		"sells": "Ventas añadidas",
+		"acceptedSells": "Ventas aceptadas",
 		"budgets": "Presupuestos realizados",
 		"acceptPercentage": "% aceptación",
-		"closedOrders": "ORs cerradas sin finalizar revisión",
+		"notFinishedInspectionOrders": "ORs sin finalizar revisión",
 		"completedInspections": "Revisiones realizadas",
 		"detectedProblems": "% anomalías detectadas",
 		"orderNumber": "Nº OR",
@@ -338,8 +339,7 @@
 			"clientContact": "Contacto cliente",
 			"doneBudget": "Pto. realizado",
 			"acceptedBudget": "Pto. aceptado",
-			"item": "Item",
-			"image": ""
+			"item": "Item"
 		}
 	},
 	"print": {
