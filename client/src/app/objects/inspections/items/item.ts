@@ -13,6 +13,7 @@ export class Item {
 	category: ItemCategory;
 	header: string;
 	relations: ItemRelation[];
+	required: boolean;
 
 	constructor(item: any) {
 		this.type = item.type;
@@ -22,6 +23,7 @@ export class Item {
 		this.printOrder = item.printOrder;
 		this.category = item.category ? new ItemCategory(item.category) : undefined;
 		this.header = item.header;
+		this.required = item.required;
 	}
 
 }

@@ -40,15 +40,12 @@ class Builder {
         savedItem.item = new Item(
             type: Item.Type.valueOf((String) ((Map<String, Object>) item.item).type),
             code: (String) ((Map<String, Object>) item.item).code,
-            category: category ? new ItemCategory(code: (String) category.code, name: (String) category.name) : null
+            category: category ? new ItemCategory(code: (String) category.code, name: (String) category.name) : null,
+            required: (boolean) ((Map<String, Object>) item.item).required,
         )
         savedItem.employeeCode = item.employeeCode
         savedItem.sellerCode = item.sellerCode
         savedItem.hidden = item.hidden
-//        if (item.image) {
-//            Map<String, Object> image = (Map<String, Object>) item.image
-//            savedItem.image = new Image(((String) image.image).decodeBase64(), (boolean) image.landscape)
-//        }
         savedItem.filled = (LocalDateTime) (item.filled ? LocalDateTime.parse(
             (String) item.filled, DateTimeFormatter.ofPattern(Constants.DateTimeFormat.yyyy_MM_dd_HH_mm_ss)
         ) : null)
