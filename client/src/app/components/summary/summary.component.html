@@ -44,11 +44,11 @@
         <mat-card-content>
 			<div class="content-block">
 				<span translate>summary.budgets</span>
-				<span class="smaller-font">{{findDoneBudgets().length}}/{{findAllItemBudgetLength()}}</span>
+				<span class="smaller-font">{{findDoneItemBudgets().length}}/{{findAllItemBudgetLength()}}</span>
 			</div>
 			<div class="content-block">
 				<span translate>summary.acceptPercentage</span>
-				<span class="color-correct smaller-font">{{(findAcceptedBudgets().length / findAllBudgets().length) | percent}}</span>
+				<span class="color-correct smaller-font">{{(findAcceptedItemBudgets().length / findAllItemBudgetLength()) | percent}}</span>
 			</div>
         </mat-card-content>
     </mat-card>

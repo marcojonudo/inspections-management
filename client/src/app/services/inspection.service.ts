@@ -154,27 +154,44 @@ export class InspectionService {
 	static findOrderItemBudgetType(orderNumber: number): string {
 		const orderInspection = this.findOrderInspection(orderNumber);
 		const savedInspection = this.findSavedInspection(orderNumber);
-		const itemBudgetTypes = savedInspection.itemBudgets.map(itemBudget =>
+		const itemBudgetTypes = savedInspection ? savedInspection.itemBudgets.map(itemBudget =>
 			this.findItemBudgetType(itemBudget, orderInspection.inspection.vehicle, orderInspection.order.budgets)
-		).filter(type => type !== '');
+		).filter(type => type !== '') : [];
 		return this.findItemBudgetsMainType(itemBudgetTypes);
 	}
 
 	static findItemBudgetType(itemBudget: ItemBudget, vehicle: string, budgets: Budget[]): string {
-		const existentBudget = InspectionService.checkExistentBudget(itemBudget.itemCode, vehicle, budgets);
+		const existentBudget = InspectionService.findExistentBudget(itemBudget.itemCode, vehicle, budgets) !== undefined;
 		return existentBudget ? '' : itemBudget.budgetType;
 	}
 
-	static checkExistentBudget(
+	static findItemArticles(
 		itemCode: string,
 		vehicle: string,
-		budgets: Budget[],
 		itemVehicleArticleCodes: ItemVehicleArticleCode[] = this.itemVehicleArticleCodes
-	): boolean {
-		/* Se buscan los códigos de artículo que corresponden al item erróneo */
-		const articleCodes = itemVehicleArticleCodes.filter(itemArticleCode =>
+	): number[] {
+		return itemVehicleArticleCodes.filter(itemArticleCode =>
 			itemArticleCode.itemCode === itemCode && itemArticleCode.vehicle === vehicle
 		).map(itemArticleCode => itemArticleCode.articleCode);
+	}
+
+	static findArticlesBudget(articles: number[], budgets: Budget[]): Budget {
+		return budgets.find(budget =>
+			budget.lines.map(l => l.articleCode).find(articleCode => articles.find(code => code === articleCode))
+		);
+	}
+
+	static findExistentBudget(itemCode: string, vehicle: string, budgets: Budget[]): Budget {
+		/* Se buscan los códigos de artículo que corresponden al item erróneo */
+		const articleCodes = this.findItemArticles(itemCode, vehicle);
+		/* Una vez obtenidos los artículos, se comprueba si alguno de los presupuestos asociados a la orden contiene alguno de
+		 * ellos. De ser así, se determinaría que existe presupuesto asociado a la revisión */
+		return this.findArticlesBudget(articleCodes, budgets);
+	}
+
+	static checkAcceptedBudget2(itemCode: string, vehicle: string, budgets: Budget[]): boolean {
+		/* Se buscan los códigos de artículo que corresponden al item erróneo */
+		const articleCodes = this.findItemArticles(itemCode, vehicle);
 		/* Una vez obtenidos los artículos, se comprueba si alguno de los presupuestos asociados a la orden contiene alguno de
 		 * ellos. De ser así, se determinaría que existe presupuesto asociado a la revisión */
 		return budgets.find(budget =>
@@ -211,7 +228,9 @@ export class InspectionService {
 			const foundItemBudgets = type ?
 				savedInspection.itemBudgets.filter(itemBudget => itemBudget.budgetType === type) : savedInspection.itemBudgets;
 			const pendingItemBudgets = foundItemBudgets.filter(itemBudget =>
-				!this.checkExistentBudget(itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets)
+				this.findExistentBudget(
+					itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
+				) === undefined
 			);
 			itemBudgets.push(...pendingItemBudgets);
 		});
@@ -229,7 +248,8 @@ export class InspectionService {
 		return pendingContactOrders;
 	}
 
-	static findOrdersBudgets(orderInspections: OrderInspectionVehicle[] = this.orderInspections): Budget[] {
+	static findOrdersBudgets(savedInspections: SavedInspection[] = this.savedInspections): Budget[] {
+		const orderInspections = savedInspections.map(i => InspectionService.findOrderInspection(i.orderNumber));
 		return [].concat(...orderInspections.map(o => o.order).map(o => o.budgets));
 	}
 

@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs';
 import { Constants } from '../../utils/constants';
 import { ItemBudget } from '../../objects/item-budget';
 import { Budget } from '../../objects/orders/budget';
+import { SavedInspection } from '../../objects/inspections/saved-inspection';
 
 @Component({
 	selector: 'app-summary',
@@ -69,29 +70,52 @@ export class SummaryComponent implements OnDestroy {
 		return InspectionService.findBudgetsPrice(budgets);
 	}
 
-	findAcceptedBudgetsPrice(): number {
-		const budgets = InspectionService.findOrdersBudgets().filter(b => InspectionService.checkAcceptedBudget(b));
-		return InspectionService.findBudgetsPrice(budgets);
+	findAcceptedBudgetsPrice(savedInspections: SavedInspection[] = InspectionService.savedInspections): number {
+		const acceptedBudgets = [];
+		savedInspections.forEach(savedInspection => {
+			const orderInspection = InspectionService.findOrderInspection(savedInspection.orderNumber);
+			savedInspection.itemBudgets.forEach(itemBudget => {
+				const budget = InspectionService.findExistentBudget(
+					itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
+				);
+				if (budget && InspectionService.checkAcceptedBudget(budget)) {
+					const alreadyAddedBudget = acceptedBudgets.indexOf(budget) !== -1;
+					if (!alreadyAddedBudget) {
+						acceptedBudgets.push(budget);
+					}
+				}
+			});
+		});
+		return InspectionService.findBudgetsPrice(acceptedBudgets);
 	}
 
-	findDoneBudgets(): ItemBudget[] {
+	findDoneItemBudgets(savedInspections: SavedInspection[] = InspectionService.savedInspections): ItemBudget[] {
 		const doneBudgets = [];
-		InspectionService.orderInspections.forEach(orderInspection => {
-			const savedInspection = InspectionService.findSavedInspection(orderInspection.order.number);
-			const doneOrderBudgets = (savedInspection ? savedInspection.itemBudgets : []).filter(itemBudget =>
-				InspectionService.checkExistentBudget(itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets)
+		savedInspections.forEach(savedInspection => {
+			const orderInspection = InspectionService.findOrderInspection(savedInspection.orderNumber);
+			const doneOrderBudgets = savedInspection.itemBudgets.filter(itemBudget =>
+				InspectionService.findExistentBudget(
+					itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
+				) !== undefined
 			);
 			doneBudgets.push(...doneOrderBudgets);
 		});
 		return doneBudgets;
 	}
 
-	findAllBudgets(): Budget[] {
-		return InspectionService.findOrdersBudgets();
-	}
-
-	findAcceptedBudgets(): Budget[] {
-		return this.findAllBudgets().filter(b => InspectionService.checkAcceptedBudget(b));
+	findAcceptedItemBudgets(savedInspections: SavedInspection[] = InspectionService.savedInspections): ItemBudget[] {
+		const doneBudgets = [];
+		savedInspections.forEach(savedInspection => {
+			const orderInspection = InspectionService.findOrderInspection(savedInspection.orderNumber);
+			const doneOrderBudgets = savedInspection.itemBudgets.filter(itemBudget => {
+				const budget = InspectionService.findExistentBudget(
+					itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
+				);
+				return budget && InspectionService.checkAcceptedBudget(budget);
+			});
+			doneBudgets.push(...doneOrderBudgets);
+		});
+		return doneBudgets;
 	}
 
 	findNotFinishedInspectionOrders(): number {

@@ -97,7 +97,7 @@ export class InspectionDetailsComponent {
 	}
 
 	checkExistentBudget(itemBudget: ItemBudget, budget: Budget, orderInspection: OrderInspectionVehicle = this.orderInspection): boolean {
-		return  InspectionService.checkExistentBudget(itemBudget.itemCode, orderInspection.inspection.vehicle, [budget]);
+		return InspectionService.findExistentBudget(itemBudget.itemCode, orderInspection.inspection.vehicle, [budget]) !== undefined;
 	}
 
 	checkAcceptedBudget(budget: Budget): boolean {
