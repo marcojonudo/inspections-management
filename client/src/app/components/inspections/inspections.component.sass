@@ -25,9 +25,12 @@
 			&:last-of-type
 				padding-right: $small-gap
 
-		tr
+		tr:not(.header-row)
 			cursor: pointer
 			transition: background-color $fast-transition
 
+			&:hover
+				background-color: $light-grey
+
 		.highlight
-			background-color: $grey
+			background-color: $grey !important
