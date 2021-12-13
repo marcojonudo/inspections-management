@@ -70,7 +70,9 @@ export class InspectionDetailsComponent {
 			savedInspection.itemBudgets.forEach(itemBudget => {
 				const row = {};
 				const savedItem = savedInspection.items.find(i => i.item.code === itemBudget.itemCode);
-				const budget = InspectionService.findBudget(itemBudget.itemCode, orderInspection.order.budgets);
+				const budget = InspectionService.findBudget(
+					itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
+				);
 				allColumns.forEach(key => {
 					row[key] = columnsData[key](itemBudget, savedItem, budget);
 				});

@@ -189,16 +189,6 @@ export class InspectionService {
 		return this.findArticlesBudget(articleCodes, budgets);
 	}
 
-	static checkAcceptedBudget2(itemCode: string, vehicle: string, budgets: Budget[]): boolean {
-		/* Se buscan los códigos de artículo que corresponden al item erróneo */
-		const articleCodes = this.findItemArticles(itemCode, vehicle);
-		/* Una vez obtenidos los artículos, se comprueba si alguno de los presupuestos asociados a la orden contiene alguno de
-		 * ellos. De ser así, se determinaría que existe presupuesto asociado a la revisión */
-		return budgets.find(budget =>
-			budget.lines.map(l => l.articleCode).find(articleCode => articleCodes.find(code => code === articleCode))
-		) !== undefined;
-	}
-
 	static findItemBudgetsMainType(types: string[]): string {
 		return Utils.sort(types, (type) => Constants.BUDGET_TYPE_ORDER[type])[0];
 	}
@@ -303,7 +293,13 @@ export class InspectionService {
 		return `data:image/png;base64,${image}`;
 	}
 
-	static findBudget(itemCode: string, budgets: Budget[], itemArticleCodes: ItemVehicleArticleCode[] = this.itemVehicleArticleCodes): Budget {
+	static findBudget(
+		itemCode: string,
+		vehicle: string,
+		budgets: Budget[],
+		itemVehicleArticleCodes: ItemVehicleArticleCode[] = this.itemVehicleArticleCodes
+	): Budget {
+		const itemArticleCodes = itemVehicleArticleCodes.filter(i => i.vehicle === vehicle && i.itemCode === itemCode);
 		return budgets.find(b =>
 			b.lines.find(l =>
 				itemArticleCodes.find(i => i.articleCode === l.articleCode) !== undefined
