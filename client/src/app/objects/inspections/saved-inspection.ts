@@ -3,6 +3,7 @@ import { ItemBudget } from '../item-budget';
 import { Constants } from '../../utils/constants';
 import { Builder } from '../../utils/builder';
 import { Dayjs } from 'dayjs';
+import { InspectionService } from '../../services/inspection.service';
 
 export class SavedInspection {
 
@@ -28,7 +29,7 @@ export class SavedInspection {
 			const item = this.items.find(savedItem =>
 				savedItem.item.type === Constants.ITEM_TYPE.SELECT && savedItem.item.code === itemBudget.itemCode
 			);
-			return item && item.filled && item.findValue() !== Constants.SELECT_ITEM_OPTION_CODE.C;
+			return item && item.filled && InspectionService.checkWrongSelectValue(item.findValue());
 		});
 		this.orderInspection = savedInspection.orderInspection;
 	}

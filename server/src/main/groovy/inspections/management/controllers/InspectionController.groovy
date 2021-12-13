@@ -1,10 +1,7 @@
 package inspections.management.controllers
 
 import groovy.transform.CompileStatic
-import inspections.management.domains.BudgetNotification
-import inspections.management.domains.ItemArticleCode
-import inspections.management.domains.ItemBudget
-import inspections.management.domains.SavedInspection
+import inspections.management.domains.*
 import inspections.management.domains.fviberi.Centre
 import inspections.management.domains.fviberi.Order
 import inspections.management.domains.schedules.EmployeeData
@@ -25,8 +22,6 @@ import org.slf4j.LoggerFactory
 
 import javax.inject.Inject
 import java.time.LocalDate
-import java.time.LocalTime
-import java.time.temporal.ChronoUnit
 
 @Controller("/inspection")
 @CompileStatic
@@ -36,12 +31,13 @@ class InspectionController {
 
     @Inject private InspectionService inspectionService
     @Inject private LanguageDataService languageDataService
-    @Inject private ItemArticleCodeDataService itemArticleCodeDataService
+    @Inject private ItemVehicleArticleCodeDataService itemVehicleArticleCodeDataService
     @Inject private ItemBudgetDataService itemBudgetDataService
     @Inject private BudgetNotificationDataService budgetNotificationDataService
     @Inject private EmployeeDataDataService employeeDataDataService
     @Inject private SavedInspectionDataService savedInspectionDataService
     @Inject private CentreDataService centreDataService
+    @Inject private ImageDataService imageDataService
 
     @Get("/centre")
     @Operation(
@@ -115,8 +111,13 @@ class InspectionController {
         description = "Lista de revisiones",
         content = @Content(array = @ArraySchema(schema = @Schema(implementation = OrderInspection)))
     )
-    List<OrderInspection> findInspections(@Body List<Order> orders) {
-        return inspectionService.findOrderInspections(orders)
+    List<OrderInspection> findInspections(@Body Map<String, List<Order>> orders) {
+        List<OrderInspection> orderInspections = inspectionService.findOrderInspections(orders.openedOrders)
+        List<OrderInspection> detectedAnomaliesOrderInspections = inspectionService.findDetectedAnomaliesInspections(
+            orders.detectedAnomaliesOrders
+        )
+        return orderInspections + detectedAnomaliesOrderInspections
+
     }
 
     @Post("/savedInspections")
@@ -130,10 +131,7 @@ class InspectionController {
         content = @Content(array = @ArraySchema(schema = @Schema(implementation = SavedInspection)))
     )
     List<SavedInspection> findSavedInspections(@Body List<Integer> orders) {
-        LocalTime refTime = LocalTime.now()
-        List<SavedInspection> a = savedInspectionDataService.findAll(orders)
-        LOG.info("SAVED -INSPECIONTS: ${ChronoUnit.MILLIS.between(refTime, LocalTime.now())}")
-        return a
+        return savedInspectionDataService.findAll(orders)
     }
 
     @Get("/articleItems")
@@ -144,10 +142,10 @@ class InspectionController {
     @ApiResponse(
         responseCode = "200",
         description = "Lista de artículos e items",
-        content = @Content(array = @ArraySchema(schema = @Schema(implementation = ItemArticleCode)))
+        content = @Content(array = @ArraySchema(schema = @Schema(implementation = ItemVehicleArticleCode)))
     )
-    List<ItemArticleCode> findArticleItems() {
-        return itemArticleCodeDataService.findAll()
+    List<ItemVehicleArticleCode> findArticleItems() {
+        return itemVehicleArticleCodeDataService.findAll()
     }
 
     @Get("/itemBudgets")
@@ -176,6 +174,34 @@ class InspectionController {
     )
     HttpResponse<List<BudgetNotification>> findBudgetNotifications(@QueryValue List<Integer> orderNumbers) {
         return HttpResponse.ok(budgetNotificationDataService.findAll(orderNumbers))
+    }
+
+    @Get("/image")
+    @Operation(
+        summary = "Obtiene una imágen",
+        description = "Obtiene una imágen"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Imagen obtenida correctamente",
+        content = @Content(schema = @Schema(implementation = Image))
+    )
+    Image findImage(@QueryValue int id) {
+        return imageDataService.get(id)
+    }
+
+    @Get("/images")
+    @Operation(
+        summary = "Obtiene una lista de imágenes",
+        description = "Obtiene una lista de imágenes"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Imagen obtenida correctamente",
+        content = @Content(array = @ArraySchema(schema = @Schema(implementation = Image)))
+    )
+    List<Image> findImages(@QueryValue List<Long> ids) {
+        return imageDataService.getAll(ids)
     }
 
     @Post("/budgetNotification")

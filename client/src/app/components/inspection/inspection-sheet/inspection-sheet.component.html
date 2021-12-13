@@ -19,7 +19,19 @@
 					<mat-card-title translate>inspection.item.{{elem.item.code}}</mat-card-title>
 				</mat-card-header>
 				<mat-card-content>
-					<div *ngFor="let line of findTextAreaLines(findTextSavedItem(elem))" class="highlight">{{line}}</div>
+					<div class="text-area-card-content">
+						<div *ngFor="let line of findTextAreaLines(findTextSavedItem(elem))" class="highlight">{{line}}</div>
+					</div>
+					<mat-form-field>
+						<textarea
+							matInput
+							cdkTextareaAutosize
+							cdkAutosizeMinRows="1"
+							cdkAutosizeMaxRows="5"
+							[(ngModel)]="findTextSavedItem(elem).text"
+							(change)="updateText(elem)">
+						</textarea>
+					</mat-form-field>
 				</mat-card-content>
 			</mat-card>
 		</ng-template>
@@ -37,7 +49,7 @@
 							*ngFor="let option of findSelectItem(item.item).options | order; let i = index"
 							class="select-item-icon"
 							[ngClass]="{
-								'front': checkSelectedOption(item.findValue(), option.code),
+								'front': checkSelectedOption(item.findValue(), option.code, item, i),
 								'left': checkLeftOption(findSelectSavedItem(item), findSelectItem(item.item).options, i),
 								'right': checkRightOption(findSelectSavedItem(item), findSelectItem(item.item).options, i)
 							}"
@@ -47,12 +59,22 @@
 					</div>
 				</div>
 				<ng-template #textItemText>
-					<div>
+					<div class="text-item">
 						<div translate class="item-text">inspection.item.{{item.item.code}}</div>
+						<mat-form-field>
+							<input
+								matInput
+								[(ngModel)]="findTextSavedItem(item).text"
+								(change)="updateText(findTextSavedItem(item))"
+								autocomplete="off">
+							<span matSuffix>{{findTextItemUnit(item)}}</span>
+						</mat-form-field>
+						<div class="item-data">
 							<span class="item-text-value" [class.unit]="findTextItemUnit(item)">
 								{{findTextSavedItem(item).text ? findTextSavedItem(item).text : '-'}}
 							</span>
 							<span class="item-unit">{{findTextItemUnit(item)}}</span>
+						</div>
 					</div>
 				</ng-template>
 			</div>
@@ -62,7 +84,7 @@
 		*ngFor="let elem of imageListElements"
 		class="category"
 		[class.page-break]="elem.pageBreak">
-		<mat-card *ngIf="checkCategoryElement(elem.listElement); else elementTemplate">
+		<mat-card *ngIf="checkCategoryElement(elem.listElement); else elementTemplate" class="image-card">
 			<mat-card-header>
 				<mat-icon mat-card-avatar>navigate_next</mat-icon>
 				<mat-card-title translate>print.category.{{elem.listElement.code}}</mat-card-title>
@@ -79,7 +101,7 @@
 			</mat-card-content>
 		</mat-card>
 		<ng-template #elementTemplate>
-			<mat-card>
+			<mat-card class="image-card">
 				<mat-card-header>
 					<mat-icon mat-card-avatar>navigate_next</mat-icon>
 					<mat-card-title translate>inspection.item.{{elem.listElement.item.code}}</mat-card-title>

@@ -14,6 +14,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Constants } from '../../utils/constants';
 import { MatDialog } from '@angular/material/dialog';
 import { EmployeeDialogComponent } from '../employee-dialog/employee-dialog.component';
+import { ImageDialogComponent } from '../image-dialog/image-dialog.component';
 
 @Component({
 	selector: 'app-inspection-details',
@@ -23,7 +24,7 @@ import { EmployeeDialogComponent } from '../employee-dialog/employee-dialog.comp
 })
 export class InspectionDetailsComponent {
 
-	private COLUMNS: string[] = ['item', 'image', 'doneBudget', 'clientContact', 'acceptedBudget', 'inspectionButton'];
+	private COLUMNS: string[] = ['item', 'image', 'doneBudget', 'acceptedBudget', 'clientContact', 'inspectionButton'];
 
 	private COLUMNS_DATA: any = {
 		item: (i: ItemBudget) => i,
@@ -87,20 +88,24 @@ export class InspectionDetailsComponent {
 		return this.translate.instant(`inspection.item.${code}`);
 	}
 
-	findItemBudgetType(itemBudget: ItemBudget, budgets: Budget[] = this.orderInspection.order.budgets): string {
-		return InspectionService.findItemBudgetType(itemBudget, budgets);
+	findItemBudgetType(itemBudget: ItemBudget, orderInspection: OrderInspectionVehicle = this.orderInspection): string {
+		return InspectionService.findItemBudgetType(itemBudget, orderInspection.inspection.vehicle, orderInspection.order.budgets);
 	}
 
 	checkNotifiedClient(orderNumber: number = this.orderInspection.order.number): boolean {
 		return InspectionService.findBudgetNotifications(orderNumber).length > 0;
 	}
 
+	checkExistentBudget(itemBudget: ItemBudget, budget: Budget, orderInspection: OrderInspectionVehicle = this.orderInspection): boolean {
+		return InspectionService.findExistentBudget(itemBudget.itemCode, orderInspection.inspection.vehicle, [budget]) !== undefined;
+	}
+
 	checkAcceptedBudget(budget: Budget): boolean {
 		return InspectionService.checkAcceptedBudget(budget);
 	}
 
-	openImage(a): void {
-		console.log(a);
+	openImage(imageId: number): void {
+		this.dialog.open(ImageDialogComponent, { data: { imageId } });
 	}
 
 	updateNotifiedClient(

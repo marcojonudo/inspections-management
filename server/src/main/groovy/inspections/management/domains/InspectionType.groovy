@@ -14,4 +14,10 @@ class InspectionType implements GormEntity<InspectionType> {
 		name maxSize: 45
 	}
 
+	enum Code {
+
+		SE
+
+	}
+
 }

@@ -9,7 +9,7 @@
 				</td>
 			</ng-container>
 			<ng-container matColumnDef="image">
-				<th mat-header-cell *matHeaderCellDef class="image-column">{{findColumnName(columnsToDisplay[1])}}</th>
+				<th mat-header-cell *matHeaderCellDef class="image-column"></th>
 				<td mat-cell *matCellDef="let element" class="image-column">
 					<button *ngIf="element.image" mat-icon-button (click)="openImage(element.image)">
 						<mat-icon>image</mat-icon>
@@ -26,27 +26,28 @@
 					</mat-icon>
 				</td>
 			</ng-container>
-			<ng-container matColumnDef="clientContact">
+			<ng-container matColumnDef="acceptedBudget">
 				<th mat-header-cell *matHeaderCellDef>{{findColumnName(columnsToDisplay[3])}}</th>
 				<td mat-cell *matCellDef="let element">
+					<mat-icon
+						*ngIf="data"
+						class="color-correct"
+						[ngClass]="'color-' + (checkAcceptedBudget(element.budget) ? (checkExistentBudget(element.item, element.budget) ? '' : 'secondary') : 'urgent')">
+						radio_button_checked
+					</mat-icon>
+				</td>
+			</ng-container>
+			<ng-container matColumnDef="clientContact">
+				<th mat-header-cell *matHeaderCellDef>
+					{{findColumnName(columnsToDisplay[4])}}
 					<mat-slide-toggle
 						*ngIf="data"
 						color="primary"
 						[checked]="checkNotifiedClient()"
 						(change)="updateNotifiedClient($event.checked)">
 					</mat-slide-toggle>
-				</td>
-			</ng-container>
-			<ng-container matColumnDef="acceptedBudget">
-				<th mat-header-cell *matHeaderCellDef>{{findColumnName(columnsToDisplay[4])}}</th>
-				<td mat-cell *matCellDef="let element">
-					<mat-icon
-						*ngIf="data"
-						class="color-correct"
-						[class.color-urgent]="!checkAcceptedBudget(element.budget)">
-						radio_button_checked
-					</mat-icon>
-				</td>
+				</th>
+				<td mat-cell *matCellDef="let element"></td>
 			</ng-container>
 			<ng-container matColumnDef="inspectionButton">
 				<th mat-header-cell *matHeaderCellDef>

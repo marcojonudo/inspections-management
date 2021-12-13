@@ -63,7 +63,22 @@ export class InspectionsComponent implements OnDestroy {
 		private snackBarService: SnackBarService
 	) {
 		this.columnsToDisplay = this.COLUMNS;
-		this.data = this.buildData(InspectionService.orderInspections);
+		const orderInspections = InspectionService.orderInspections.sort((a, b) => {
+			const aType = this.findOrderItemBudgetType(a.order.number);
+			const bType = this.findOrderItemBudgetType(b.order.number);
+			if (aType && bType) {
+				if (aType === Constants.BUDGET_TYPE.URGENT) { return -1; }
+				else if (bType === Constants.BUDGET_TYPE.URGENT) { return 1; }
+				else { return a.order < b.order ? -1 : (a.order > b.order ? 1 : 0); }
+			} else if (aType) {
+				return -1;
+			} else if (bType) {
+				return 1;
+			} else {
+				return a.order < b.order ? -1 : (a.order > b.order ? 1 : 0);
+			}
+		});
+		this.data = this.buildData(orderInspections);
 		this.budgetNotificationsSubscription = this.inspectionService.budgetNotifications$.subscribe(() => {
 			/* La lista budgetNotifications ya se ha actualizado en el servicio. Aquí se consume el Observable para poder ejecutar un
 			 * ciclo de CD, y refrescar el contenido cuando se actualiza la notificación de cliente */

@@ -25,7 +25,7 @@ export class SelectSavedItem extends SavedItem {
 
 	reset(employeeCode: string): void {
 		this.value = Constants.SELECT_ITEM_OPTION_CODE.P;
-		this.image = undefined;
+		this.imageId = undefined;
 		this.updateCommonFields(employeeCode);
 	}
 

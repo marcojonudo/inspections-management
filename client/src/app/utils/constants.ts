@@ -9,7 +9,7 @@ export class Constants {
 		EMPLOYEES: 'employees',
 		EMPLOYEE: 'employee',
 		ITEM_BUDGETS: 'itemBudgets',
-		ITEM_ARTICLE_CODES: 'itemArticleCodes',
+		ITEM_VEHICLE_ARTICLE_CODES: 'itemVehicleArticleCodes',
 		CENTRE: 'centre'
 	};
 
@@ -54,7 +54,8 @@ export class Constants {
 	static readonly ORDER_STATE: any = {
 		V: 'V',
 		F: 'F',
-		X: 'X'
+		X: 'X',
+		E: 'E'
 	};
 
 	static readonly INSPECTION_STATE: any = {
@@ -70,7 +71,9 @@ export class Constants {
 	static readonly SELECT_ITEM_OPTION_CODE: any = {
 		C: 'C',
 		NA: 'NA',
-		P: 'P'
+		P: 'P',
+		SN: 'SN',
+		PS: 'PS'
 	};
 
 	public static readonly PATH: any = {

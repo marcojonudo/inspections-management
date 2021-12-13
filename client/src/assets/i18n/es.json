@@ -3,13 +3,14 @@
 		"title": "Situación revisiones taller"
 	},
 	"summary": {
-		"urgentPendingBudgets": "Presupuestos pendientes urgentes",
-		"secondaryPendingBudgets": "Presupuestos pendientes secundarios",
+		"urgentPendingBudgets": "Items urgentes pendientes de presupuestar",
+		"secondaryPendingBudgets": "Items secundarios pendientes de presupuestar",
 		"pendingClientContacts": "Contactos clientes pendientes",
 		"sells": "Ventas añadidas",
-		"budgets": "Presupuestos realizados",
+		"acceptedSells": "Ventas aceptadas",
+		"budgets": "Items presupuestados",
 		"acceptPercentage": "% aceptación",
-		"closedOrders": "ORs cerradas sin finalizar revisión",
+		"notFinishedInspectionOrders": "ORs sin finalizar revisión",
 		"completedInspections": "Revisiones realizadas",
 		"detectedProblems": "% anomalías detectadas",
 		"orderNumber": "Nº OR",
@@ -338,8 +339,7 @@
 			"clientContact": "Contacto cliente",
 			"doneBudget": "Pto. realizado",
 			"acceptedBudget": "Pto. aceptado",
-			"item": "Item",
-			"image": ""
+			"item": "Item"
 		}
 	},
 	"print": {
