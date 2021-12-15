@@ -33,7 +33,7 @@ export interface Column {
 export class InspectionsComponent implements OnDestroy {
 
 	private COLUMNS: string[] = [
-		'order', 'brand', 'model', 'inspectionType', 'inspectionState', 'mechanic', 'budgets', 'clientContact', 'acceptedBudget'
+		'order', 'brand', 'model', 'inspectionType', 'inspectionState', 'mechanic', 'budgets', 'clientContact'
 	];
 
 	private COLUMNS_DATA: any = {
@@ -133,12 +133,6 @@ export class InspectionsComponent implements OnDestroy {
 
 	checkNotifiedClient(orderNumber: number): boolean {
 		return InspectionService.findBudgetNotifications(orderNumber).length > 0;
-	}
-
-	checkAcceptedBudgets(orderNumber: number): boolean {
-		const orderInspection = InspectionService.findOrderInspection(orderNumber);
-		return orderInspection.order.budgets.length &&
-			orderInspection.order.budgets.find(b => !InspectionService.checkAcceptedBudget(b)) === undefined;
 	}
 
 	checkSelectedOrder(orderNumber: number): boolean {

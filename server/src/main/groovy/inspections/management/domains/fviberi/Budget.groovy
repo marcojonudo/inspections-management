@@ -10,6 +10,7 @@ class Budget implements GormEntity<Budget> {
 
 	int number
 	String state
+	String sellerCode
 
 	static hasMany = [lines: BudgetLine]
 
@@ -19,6 +20,7 @@ class Budget implements GormEntity<Budget> {
 
 		number column: 'nupresup'
 		state column: 'clsituac'
+		sellerCode column: 'covended'
 		lines fetch: 'join'
 
 		id generator: 'assigned', name: 'number'

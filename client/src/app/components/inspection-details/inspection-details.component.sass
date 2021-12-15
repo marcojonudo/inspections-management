@@ -15,11 +15,11 @@
 				position: absolute
 				right: 0
 
-	th button
-		@include flex-center
+		button
+			@include flex-center
 
-		mat-icon
-			font-size: $big-font
+			mat-icon
+				font-size: 2.25em
 
 	td
 		position: relative
@@ -28,3 +28,24 @@
 		button
 			position: absolute
 			right: 0
+
+	.item-column
+		@include flex-2
+		min-width: 125px
+
+	.image-column, .inspection-button-column
+		width: 40px
+		max-width: 40px
+
+	.client-contact-header
+
+		& > span
+			cursor: pointer
+			transition: transform $fast-transition
+			border-radius: $border-radius
+
+			&.disabled
+				pointer-events: none
+
+			&.notified
+				box-shadow: 0 3px 3px -2px rgba(19, 149, 0, 0.2), 0 3px 4px 0 rgba(19, 149, 0, 0.14), 0 1px 8px 0 rgba(19, 149, 0, 0.12)

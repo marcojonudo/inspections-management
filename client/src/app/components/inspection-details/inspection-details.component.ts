@@ -24,7 +24,7 @@ import { ImageDialogComponent } from '../image-dialog/image-dialog.component';
 })
 export class InspectionDetailsComponent {
 
-	private COLUMNS: string[] = ['item', 'image', 'doneBudget', 'acceptedBudget', 'clientContact', 'inspectionButton'];
+	private COLUMNS: string[] = ['item', 'image', 'seller', 'doneBudget', 'acceptedBudget', 'clientContact', 'inspectionButton'];
 
 	private COLUMNS_DATA: any = {
 		item: (i: ItemBudget) => i,
@@ -94,8 +94,12 @@ export class InspectionDetailsComponent {
 		return InspectionService.findItemBudgetType(itemBudget, orderInspection.inspection.vehicle, orderInspection.order.budgets);
 	}
 
-	checkNotifiedClient(orderNumber: number = this.orderInspection.order.number): boolean {
-		return InspectionService.findBudgetNotifications(orderNumber).length > 0;
+	findEmployee(code: string): Employee {
+		return EmployeeService.findEmployee(code);
+	}
+
+	checkNotifiedClient(orderInspection: OrderInspectionVehicle = this.orderInspection): boolean {
+		return orderInspection ? InspectionService.findBudgetNotifications(orderInspection.order.number).length > 0 : false;
 	}
 
 	checkExistentBudget(itemBudget: ItemBudget, budget: Budget, orderInspection: OrderInspectionVehicle = this.orderInspection): boolean {
