@@ -3,13 +3,15 @@
 	<div class="table-container mat-elevation-z8">
 		<table mat-table [dataSource]="data">
 			<ng-container matColumnDef="item">
-				<th mat-header-cell *matHeaderCellDef>{{findColumnName(columnsToDisplay[0])}}</th>
-				<td mat-cell *matCellDef="let element">
+				<th mat-header-cell *matHeaderCellDef class="item-column">{{findColumnName(columnsToDisplay[0])}}</th>
+				<td mat-cell *matCellDef="let element" class="item-column">
 					{{data ? findItemName(element.item.itemCode) : '-'}}
 				</td>
 			</ng-container>
 			<ng-container matColumnDef="image">
-				<th mat-header-cell *matHeaderCellDef class="image-column"></th>
+				<th mat-header-cell *matHeaderCellDef class="image-column">
+					<mat-icon>image</mat-icon>
+				</th>
 				<td mat-cell *matCellDef="let element" class="image-column">
 					<button *ngIf="element.image" mat-icon-button (click)="openImage(element.image)">
 						<mat-icon>image</mat-icon>
@@ -33,8 +35,8 @@
 				</td>
 			</ng-container>
 			<ng-container matColumnDef="acceptedBudget">
-				<th mat-header-cell *matHeaderCellDef>{{findColumnName(columnsToDisplay[3])}}</th>
-				<td mat-cell *matCellDef="let element">
+				<th mat-header-cell *matHeaderCellDef class="indicator-column">{{findColumnName(columnsToDisplay[4])}}</th>
+				<td mat-cell *matCellDef="let element" class="indicator-column">
 					<mat-icon
 						*ngIf="data"
 						class="color-correct"
@@ -44,24 +46,28 @@
 				</td>
 			</ng-container>
 			<ng-container matColumnDef="clientContact">
-				<th mat-header-cell *matHeaderCellDef>
-					{{findColumnName(columnsToDisplay[4])}}
-					<mat-slide-toggle
-						*ngIf="data"
-						color="primary"
-						[checked]="checkNotifiedClient()"
-						(change)="updateNotifiedClient($event.checked)">
-					</mat-slide-toggle>
+				<th mat-header-cell *matHeaderCellDef class="indicator-column client-contact-header">
+					<span
+						[ngClass]="{
+							'mat-elevation-z3': !checkNotifiedClient(),
+							'notified': checkNotifiedClient(),
+							'disabled': !data
+						}"
+						[style.transform]="'translateY(-' + (checkNotifiedClient() ? 0 : 2) + 'px)'"
+						(click)="updateNotifiedClient(!checkNotifiedClient())"
+						matRipple>
+						{{findColumnName(columnsToDisplay[5])}}
+					</span>
 				</th>
-				<td mat-cell *matCellDef="let element"></td>
+				<td mat-cell *matCellDef="let element" class="indicator-column"></td>
 			</ng-container>
 			<ng-container matColumnDef="inspectionButton">
-				<th mat-header-cell *matHeaderCellDef>
+				<th mat-header-cell *matHeaderCellDef class="inspection-button-column">
 					<button mat-icon-button [disabled]="!savedInspection" (click)="openInspection()">
 						<mat-icon [inline]="true">visibility</mat-icon>
 					</button>
 				</th>
-				<td mat-cell *matCellDef></td>
+				<td mat-cell *matCellDef class="inspection-button-column"></td>
 			</ng-container>
 
 			<tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>

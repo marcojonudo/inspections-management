@@ -143,7 +143,7 @@ export class SummaryComponent implements OnDestroy {
 		});
 		const totalItems = [].concat(...savedInspections.map(s => s.items.filter(i => i.item.type === Constants.ITEM_TYPE.SELECT)));
 		const wrongItems = totalItems.filter(i => i.filled && InspectionService.checkWrongSelectValue(i.findValue()));
-		return wrongItems.length / totalItems.length;
+		return totalItems.length ? wrongItems.length / totalItems.length : 0;
 	}
 
 }

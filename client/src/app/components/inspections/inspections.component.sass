@@ -9,22 +9,6 @@
 		td
 			text-align: center
 
-			&.mat-cell
-
-				&:first-of-type
-					padding-left: $small-gap
-
-				&:last-of-type
-					padding-right: $small-gap
-
-		th.mat-header-cell
-
-			&:first-of-type
-				padding-left: $small-gap
-
-			&:last-of-type
-				padding-right: $small-gap
-
 		tr:not(.header-row)
 			cursor: pointer
 			transition: background-color $fast-transition
@@ -34,3 +18,18 @@
 
 		.highlight
 			background-color: $grey !important
+
+		.order-column
+			min-width: 40px
+			max-width: 40px
+
+		.small-screen
+			display: none
+
+@media (max-width: $medium-threshold)
+
+	.small-screen
+		display: block !important
+
+	.big-screen
+		display: none !important

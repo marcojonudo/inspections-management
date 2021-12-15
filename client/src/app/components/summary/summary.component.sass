@@ -6,6 +6,7 @@
 
 	header
 		padding: $small-gap
+		font-size: 1.3em
 
 		#header-wrapper
 			position: relative
@@ -22,30 +23,28 @@
 					width: 5rem
 					display: flex
 
-			& > span
-				font-weight: bold
-				font-size: 1.3em
-
 	#cards-summary
 		@include flex-1
 		display: flex
+		min-height: 0
 
 		& > mat-card
 			@include flex-1
 			@include flex-column
+			min-width: 140px
 			text-align: center
-			padding: $small-gap 0
+			padding: $tiny-gap 0
 			margin: 0 $small-gap
 			box-sizing: border-box
 			border: 1px solid $border
 			border-bottom: 8px solid $sand
 			border-radius: 0
 
-			mat-card-title
-				font-size: 1.3em
-
-				&.mat-card-title
-					margin-bottom: 0 !important
+			//mat-card-title
+			//	font-size: 1.3em
+			//
+			//	&.mat-card-title
+					//margin-bottom: 0 !important
 
 			mat-card-content
 				@include flex-1
@@ -56,17 +55,47 @@
 					@include flex-column
 
 					& > span
-						@include flex-1
 
 						&:first-child
+							@include flex-1
 							font-size: 1.2em
 
 						&:last-child
+							@include flex-2
 							@include flex-center
-							font-size: 5.5em
+							font-size: 5em
 							font-weight: bold
 
 						&.smaller-font
 							font-size: 3em
 
+@media (max-width: $max-threshold)
 
+	mat-card-content
+
+		.content-block
+
+			& > span
+
+				&:first-child
+					font-size: 1em !important
+
+				&:last-child
+					font-size: 4em !important
+
+				&.smaller-font
+					font-size: 2em !important
+
+@media (max-width: $medium-threshold)
+
+	mat-card-content
+
+		.content-block
+
+			& > span
+
+				&:first-child
+					font-size: .85em !important
+					//overflow: hidden
+					//white-space: nowrap
+					//text-overflow: ellipsis

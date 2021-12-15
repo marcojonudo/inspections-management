@@ -3,8 +3,8 @@
 	<div class="table-container mat-elevation-z8">
 		<table mat-table *ngIf="data" [dataSource]="data">
 			<ng-container matColumnDef="order">
-				<th mat-header-cell *matHeaderCellDef>{{findColumnName(columnsToDisplay[0])}}</th>
-				<td mat-cell *matCellDef="let element">{{element.order}}</td>
+				<th mat-header-cell *matHeaderCellDef class="order-column">{{findColumnName(columnsToDisplay[0])}}</th>
+				<td mat-cell *matCellDef="let element" class="order-column">{{element.order}}</td>
 			</ng-container>
 			<ng-container matColumnDef="brand">
 				<th mat-header-cell *matHeaderCellDef>{{findColumnName(columnsToDisplay[1])}}</th>
@@ -27,8 +27,15 @@
 				<td mat-cell *matCellDef="let element">{{element.mechanic ? findMechanic(element.mechanic)?.name : '-'}}</td>
 			</ng-container>
 			<ng-container matColumnDef="budgets">
-				<th mat-header-cell *matHeaderCellDef>{{findColumnName(columnsToDisplay[6])}}</th>
-				<td mat-cell *matCellDef="let element">
+				<th mat-header-cell *matHeaderCellDef class="indicator-column">
+					<span class="big-screen">
+						{{findColumnName(columnsToDisplay[6])}}
+					</span>
+					<span class="small-screen">
+						{{findColumnName('briefBudgets')}}
+					</span>
+				</th>
+				<td mat-cell *matCellDef="let element" class="indicator-column">
 					<mat-icon
 						*ngIf="checkRecommendedBudget(element.budgets)"
 						class="color-correct color-{{findOrderItemBudgetType(element.orderNumber) | lowercase}}">
@@ -37,8 +44,8 @@
 				</td>
 			</ng-container>
 			<ng-container matColumnDef="clientContact">
-				<th mat-header-cell *matHeaderCellDef>{{findColumnName(columnsToDisplay[7])}}</th>
-				<td mat-cell *matCellDef="let element">
+				<th mat-header-cell *matHeaderCellDef class="indicator-column">{{findColumnName(columnsToDisplay[7])}}</th>
+				<td mat-cell *matCellDef="let element" class="indicator-column">
 					<mat-icon
 						*ngIf="checkRecommendedBudget(element.budgets)"
 						class="color-{{checkNotifiedClient(element.orderNumber) ? 'correct' : 'warning'}}">

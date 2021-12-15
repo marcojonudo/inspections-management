@@ -32,6 +32,8 @@ export interface Column {
 })
 export class InspectionsComponent implements OnDestroy {
 
+	private readonly INSPECTION_NAME = 'Revisión';
+
 	private COLUMNS: string[] = [
 		'order', 'brand', 'model', 'inspectionType', 'inspectionState', 'mechanic', 'budgets', 'clientContact'
 	];
@@ -116,7 +118,9 @@ export class InspectionsComponent implements OnDestroy {
 	}
 
 	findInspectionTypeName(code: string): string {
-		return this.translate.instant(`inspection.type.${code}`);
+		const inspectionType = this.translate.instant(`inspection.type.${code}`);
+		/* Si el tipo es distinto a 'Anomalías detectadas', se elimina la palabra 'Revisión' por ser redundante */
+		return inspectionType.startsWith(this.INSPECTION_NAME) ? inspectionType.substring(this.INSPECTION_NAME.length + 1) : inspectionType;
 	}
 
 	findInspectionStateName(state: string): string {
