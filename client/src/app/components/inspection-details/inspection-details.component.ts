@@ -90,10 +90,6 @@ export class InspectionDetailsComponent {
 		return this.translate.instant(`inspection.item.${code}`);
 	}
 
-	findItemBudgetType(itemBudget: ItemBudget, orderInspection: OrderInspectionVehicle = this.orderInspection): string {
-		return InspectionService.findItemBudgetType(itemBudget, orderInspection.inspection.vehicle, orderInspection.order.budgets);
-	}
-
 	findEmployee(code: string): Employee {
 		return EmployeeService.findEmployee(code);
 	}
@@ -102,8 +98,10 @@ export class InspectionDetailsComponent {
 		return orderInspection ? InspectionService.findBudgetNotifications(orderInspection.order.number).length > 0 : false;
 	}
 
-	checkExistentBudget(itemBudget: ItemBudget, budget: Budget, orderInspection: OrderInspectionVehicle = this.orderInspection): boolean {
-		return InspectionService.findExistentBudget(itemBudget.itemCode, orderInspection.inspection.vehicle, [budget]) !== undefined;
+	checkExistentBudget(itemBudget: ItemBudget, orderInspection: OrderInspectionVehicle = this.orderInspection): boolean {
+		return InspectionService.findExistentBudget(
+			itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
+		) !== undefined;
 	}
 
 	checkAcceptedBudget(budget: Budget): boolean {

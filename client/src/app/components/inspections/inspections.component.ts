@@ -66,19 +66,22 @@ export class InspectionsComponent implements OnDestroy {
 	) {
 		this.columnsToDisplay = this.COLUMNS;
 		const orderInspections = InspectionService.orderInspections.sort((a, b) => {
-			const aType = this.findOrderItemBudgetType(a.order.number);
-			const bType = this.findOrderItemBudgetType(b.order.number);
-			if (aType && bType) {
-				if (aType === Constants.BUDGET_TYPE.URGENT) { return -1; }
-				else if (bType === Constants.BUDGET_TYPE.URGENT) { return 1; }
-				else { return a.order < b.order ? -1 : (a.order > b.order ? 1 : 0); }
-			} else if (aType) {
-				return -1;
-			} else if (bType) {
-				return 1;
-			} else {
-				return a.order < b.order ? -1 : (a.order > b.order ? 1 : 0);
+			let aType = this.findOrderItemBudgetType(a.order.number, false);
+			let bType = this.findOrderItemBudgetType(b.order.number, false);
+			if (!aType && !bType) {
+				aType = this.findOrderItemBudgetType(a.order.number, true);
+				bType = this.findOrderItemBudgetType(b.order.number, true);
+				if (!aType && !bType) {
+					const aCodeNumber = this.findCodeNumber(a.order.code);
+					const bCodeNumber = this.findCodeNumber(b.order.code);
+					return aCodeNumber < bCodeNumber ? -1 : (aCodeNumber > bCodeNumber ? 1 : 0);
+				}
 			}
+			const aOrder = this.findOrder(aType);
+			const bOrder = this.findOrder(bType);
+			if (aOrder < bOrder) { return -1; }
+			else if (aOrder > bOrder) { return 1; }
+			else { return 0; }
 		});
 		this.data = this.buildData(orderInspections);
 		this.budgetNotificationsSubscription = this.inspectionService.budgetNotifications$.subscribe(() => {
@@ -90,6 +93,14 @@ export class InspectionsComponent implements OnDestroy {
 
 	ngOnDestroy(): void {
 		this.budgetNotificationsSubscription.unsubscribe();
+	}
+
+	findOrder(budgetType: string): number {
+		return Constants.BUDGET_TYPE_ORDER[budgetType] !== undefined ? Constants.BUDGET_TYPE_ORDER[budgetType] : 10;
+	}
+
+	findCodeNumber(orderCode: string): number {
+		return parseInt(orderCode.startsWith('C') ? orderCode.substring(1) : orderCode, 10);
 	}
 
 	buildData(orderInspections: OrderInspectionVehicle[], columnsData: any = this.COLUMNS_DATA): Column[] {
@@ -131,8 +142,8 @@ export class InspectionsComponent implements OnDestroy {
 		return itemBudgets.length > 0;
 	}
 
-	findOrderItemBudgetType(orderNumber: number): string {
-		return InspectionService.findOrderItemBudgetType(orderNumber);
+	findOrderItemBudgetType(orderNumber: number, accepted: boolean = undefined): string {
+		return InspectionService.findOrderItemBudgetType(orderNumber, accepted);
 	}
 
 	checkNotifiedClient(orderNumber: number): boolean {

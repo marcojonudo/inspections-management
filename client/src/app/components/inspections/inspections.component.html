@@ -38,7 +38,7 @@
 				<td mat-cell *matCellDef="let element" class="indicator-column">
 					<mat-icon
 						*ngIf="checkRecommendedBudget(element.budgets)"
-						class="color-correct color-{{findOrderItemBudgetType(element.orderNumber) | lowercase}}">
+						class="color-correct color-{{findOrderItemBudgetType(element.orderNumber, false) | lowercase}}">
 						radio_button_checked
 					</mat-icon>
 				</td>

@@ -40,12 +40,13 @@
 	.client-contact-header
 
 		& > span
+			border: 1px solid $grey
 			cursor: pointer
-			transition: transform $fast-transition
+			transition: background-color $fast-transition
 			border-radius: $border-radius
+
+			&:hover, &.notified
+				background-color: $grey
 
 			&.disabled
 				pointer-events: none
-
-			&.notified
-				box-shadow: 0 3px 3px -2px rgba(19, 149, 0, 0.2), 0 3px 4px 0 rgba(19, 149, 0, 0.14), 0 1px 8px 0 rgba(19, 149, 0, 0.12)

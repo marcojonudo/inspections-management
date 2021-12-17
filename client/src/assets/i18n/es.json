@@ -35,7 +35,7 @@
 		"state": {
 			"PENDING": "Pendiente",
 			"STARTED": "En curso",
-			"FINISHED": "Cerrada"
+			"FINISHED": "Realizada"
 		},
 		"item": {
 			"C": "Comentarios",
