@@ -13,6 +13,7 @@ export class Order {
 	client: Client;
 	sellerCode: string;
 	mechanicCode: string;
+	keys: boolean;
 	lines: OrderLine[];
 	budgets: Budget[];
 
@@ -24,6 +25,7 @@ export class Order {
 		this.client = new Client(order.client);
 		this.sellerCode = order.sellerCode;
 		this.mechanicCode = order.mechanicCode;
+		this.keys = order.keys;
 		this.lines = order.lines ? order.lines.map(line => new OrderLine(this.number, line)) : [];
 		this.budgets = order.budgets.map(budget => new Budget(budget));
 	}

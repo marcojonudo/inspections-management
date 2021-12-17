@@ -60,6 +60,8 @@ abstract class OrderDataService {
 			OrderTime orderTime = ordersTime.find { it.orderNumber == order.number }
 			order.code = orderTime.code
 			order.mechanicCode = orderTime.mechanicCode
+			order.keys = order.isAppointment() ? orderTime.day != null : true
+
 			List<Integer> orderBudgetNumbers = (List<Integer>) order.relatedBudgets.sort { it.number }.takeRight(
 				order.relatedBudgets.size() - 1
 			).number

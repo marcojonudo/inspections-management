@@ -23,6 +23,7 @@ class Order implements GormEntity<Order> {
 	Client client
 	String sellerCode
 	String mechanicCode
+	boolean keys
 
 	@JsonInclude
 	Set<RelatedBudget> relatedBudgets
@@ -49,6 +50,10 @@ class Order implements GormEntity<Order> {
 		version false
 	}
 
-	static transients = ['code', 'mechanicCode', 'budgets', 'vehicle']
+	static transients = ['code', 'mechanicCode', 'budgets', 'vehicle', 'keys']
+
+	boolean isAppointment() {
+		return code.startsWith(Constants.APPOINTMENT_IDENTIFIER)
+	}
 
 }

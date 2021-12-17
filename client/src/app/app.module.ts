@@ -36,9 +36,9 @@ import { InspectionHeaderComponent } from './components/inspection/inspection-he
 import { InspectionComponent } from './components/inspection/inspection.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import localeEs from '@angular/common/locales/es';
+import { ImageDialogComponent } from './components/image-dialog/image-dialog.component';
 import { registerLocaleData } from '@angular/common';
 registerLocaleData(localeEs);
-import { ImageDialogComponent } from './components/image-dialog/image-dialog.component';
 
 @NgModule({
 	declarations: [

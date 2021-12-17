@@ -21,7 +21,7 @@
 			<ng-container matColumnDef="seller">
 				<th mat-header-cell *matHeaderCellDef>{{findColumnName(columnsToDisplay[2])}}</th>
 				<td mat-cell *matCellDef="let element">
-					{{element.budget?.seller ? findEmployee(element.budget.seller)?.name : '-'}}
+					{{element.budget?.sellerCode ? findEmployee(element.budget.sellerCode)?.name : '-'}}
 				</td>
 			</ng-container>
 			<ng-container matColumnDef="doneBudget">

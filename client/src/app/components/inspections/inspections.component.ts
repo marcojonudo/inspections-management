@@ -65,7 +65,7 @@ export class InspectionsComponent implements OnDestroy {
 		private snackBarService: SnackBarService
 	) {
 		this.columnsToDisplay = this.COLUMNS;
-		const orderInspections = InspectionService.orderInspections.sort((a, b) => {
+		const orderInspections = this.filterInspections(InspectionService.orderInspections).sort((a, b) => {
 			let aType = this.findOrderItemBudgetType(a.order.number, false);
 			let bType = this.findOrderItemBudgetType(b.order.number, false);
 			if (!aType && !bType) {
@@ -101,6 +101,10 @@ export class InspectionsComponent implements OnDestroy {
 
 	findCodeNumber(orderCode: string): number {
 		return parseInt(orderCode.startsWith('C') ? orderCode.substring(1) : orderCode, 10);
+	}
+
+	filterInspections(orderInspections: OrderInspectionVehicle[]): OrderInspectionVehicle[] {
+		return orderInspections.filter(o => o.order.keys && o.order.state !== Constants.ORDER_STATE.V);
 	}
 
 	buildData(orderInspections: OrderInspectionVehicle[], columnsData: any = this.COLUMNS_DATA): Column[] {
