@@ -41,8 +41,15 @@ class InspectionService {
 	 * @param to Booleano que indica si el día se refiere al actual, o al 'to'
 	 * @return Lista de órdenes
 	 */
-	List<Order> findOrders(LocalDate day, boolean to) {
-		return to ? orderDataService.findAll(day, day.minusDays(DAYS_OFFSET)) : orderDataService.findAll(day)
+	List<Order> findOrders(LocalDate day, Boolean to = null) {
+		List<Order> orders
+		if (to == false) {
+			orders = orderDataService.findAll(day)
+		} else {
+			LocalDate toDay = to ? day : day.plusDays(1)
+			orders = orderDataService.findAll(day.minusDays(DAYS_OFFSET), toDay)
+		}
+		return orders
 	}
 
 	/**

@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { InspectionService } from '../../services/inspection.service';
 import { Subscription } from 'rxjs';
-import { Column } from '../inspections/inspections.component';
 import { ItemBudget } from '../../objects/item-budget';
 import { TranslateService } from '@ngx-translate/core';
 import { Budget } from '../../objects/orders/budget';
@@ -9,12 +8,20 @@ import { Employee } from '../../objects/employee';
 import { EmployeeService } from '../../services/employee.service';
 import { OrderInspectionVehicle } from '../../objects/order-inspection-vehicle';
 import { SavedInspection } from '../../objects/inspections/saved-inspection';
-import { SavedItem } from '../../objects/inspections/saved-items/saved-item';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Constants } from '../../utils/constants';
 import { MatDialog } from '@angular/material/dialog';
 import { EmployeeDialogComponent } from '../employee-dialog/employee-dialog.component';
 import { ImageDialogComponent } from '../image-dialog/image-dialog.component';
+import { Image } from '../../objects/inspections/image';
+import { RealTimeService } from '../../services/real-time.service';
+import { RealTimeOrder } from '../../objects/real-time/update/orders/real-time-order';
+
+export interface InspectionDetailsColumn {
+	item: ItemBudget;
+	image: Image;
+	budget: Budget;
+}
 
 @Component({
 	selector: 'app-inspection-details',
@@ -26,22 +33,18 @@ export class InspectionDetailsComponent {
 
 	private COLUMNS: string[] = ['item', 'image', 'seller', 'doneBudget', 'acceptedBudget', 'clientContact', 'inspectionButton'];
 
-	private COLUMNS_DATA: any = {
-		item: (i: ItemBudget) => i,
-		image: (i: ItemBudget, savedItem: SavedItem) => savedItem.image,
-		budget: (i: ItemBudget, savedItem: SavedItem, budget: Budget) => budget
-	};
-
 	private selectedOrderSubscription: Subscription;
+	private realTimeOrdersSubscription: Subscription;
 
 	columnsToDisplay: string[];
 	orderInspection: OrderInspectionVehicle;
 	savedInspection: SavedInspection;
 	mechanics: Employee[];
-	data: any;
+	data: InspectionDetailsColumn[];
 
 	constructor(
 		private inspectionService: InspectionService,
+		private realTimeService: RealTimeService,
 		private translate: TranslateService,
 		private cdRef: ChangeDetectorRef,
 		private router: Router,
@@ -62,21 +65,27 @@ export class InspectionDetailsComponent {
 			).map(employeeCode => EmployeeService.findEmployee(employeeCode)) : [];
 			this.cdRef.detectChanges();
 		});
+
+		this.realTimeOrdersSubscription = this.realTimeService.realTimeOrders$.subscribe(realTimeOrders => {
+			if (realTimeOrders.length && this.orderInspection) {
+				const selectedOrderUpdate = realTimeOrders.find(update => update.order.number === this.orderInspection.order.number);
+				if (selectedOrderUpdate) {
+					this.cdRef.detectChanges();
+				}
+				this.cdRef.detectChanges();
+			}
+		});
 	}
 
-	buildData(orderInspection: OrderInspectionVehicle, savedInspection: SavedInspection, columnsData: any = this.COLUMNS_DATA): Column[] {
+	buildData(
+		orderInspection: OrderInspectionVehicle,
+		savedInspection: SavedInspection,
+		columnsData: any = Constants.INSPECTION_DETAILS_COLUMN_DATA
+	): InspectionDetailsColumn[] {
 		const data = [];
-		const allColumns = Object.keys(columnsData);
 		if (savedInspection) {
 			savedInspection.itemBudgets.forEach(itemBudget => {
-				const row = {};
-				const savedItem = savedInspection.items.find(i => i.item.code === itemBudget.itemCode);
-				const budget = InspectionService.findBudget(
-					itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
-				);
-				allColumns.forEach(key => {
-					row[key] = columnsData[key](itemBudget, savedItem, budget);
-				});
+				const row = InspectionService.buildInspectionDetailsRow(orderInspection, savedInspection.items, itemBudget, columnsData);
 				data.push(row);
 			});
 		}

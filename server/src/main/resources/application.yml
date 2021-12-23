@@ -43,6 +43,9 @@ endpoints:
         enabled: true
         sensitive: false
 
+cron:
+    sync-orders: '0 0 0 1 1 ?'
+
 host:
     ip: ${HOST_IP:localhost}
     local-mysql-port: ${MYSQL_PORT:3306}

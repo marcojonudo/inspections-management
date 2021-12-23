@@ -35,6 +35,8 @@ import { OrderInspectionHandler } from '../objects/inspection-handler/order-insp
 import { DetectedFaultsHandler } from '../objects/inspection-handler/detected-faults-handler';
 import { InspectionHandler } from '../objects/inspection-handler/inspection-handler';
 import * as dayjs from 'dayjs';
+import { InspectionsColumn } from '../components/inspections/inspections.component';
+import { InspectionDetailsColumn } from '../components/inspection-details/inspection-details.component';
 import { TextSavedItemField } from '../objects/inspections/saved-items/text-saved-item-field';
 
 @Injectable({
@@ -218,7 +220,6 @@ export class InspectionService {
 		savedInspections.forEach(savedInspection => {
 			const orderInspection = this.findOrderInspection(savedInspection.orderNumber);
 
-			// console.log('order inspection', savedInspection.orderNumber, orderInspection);
 			const foundItemBudgets = type ?
 				savedInspection.itemBudgets.filter(itemBudget => itemBudget.budgetType === type) : savedInspection.itemBudgets;
 			const pendingItemBudgets = foundItemBudgets.filter(itemBudget =>
@@ -338,6 +339,53 @@ export class InspectionService {
 
 	static checkWrongSelectValue(value: string): boolean {
 		return value === Constants.SELECT_ITEM_OPTION_CODE.SN || value === Constants.SELECT_ITEM_OPTION_CODE.PS;
+	}
+
+	static buildInspectionsRow(order: Order, columnsData: any): InspectionsColumn {
+		const inspection = InspectionService.findOrderInspection(order.number);
+		let row = undefined;
+		if (inspection) {
+			const allColumns = Object.keys(columnsData);
+			const savedInspection = InspectionService.findSavedInspection(order.number);
+			row = {};
+			allColumns.forEach(key => {
+				const handler = columnsData[key];
+				if (handler) {
+					row[key] = handler(order, inspection, savedInspection);
+				}
+			});
+		}
+		return row;
+	}
+
+	static buildInspectionDetailsRow(
+		orderInspection: OrderInspectionVehicle, savedItems: SavedItem[], itemBudget: ItemBudget, columnsData: any
+	): InspectionDetailsColumn {
+		let row = undefined;
+		const allColumns = Object.keys(columnsData);
+		const savedItem = savedItems.find(i => i.item.code === itemBudget.itemCode);
+		const budget = InspectionService.findBudget(
+			itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
+		);
+		row = {};
+		allColumns.forEach(key => {
+			row[key] = columnsData[key](itemBudget, savedItem, budget);
+		});
+		return row;
+	}
+
+	static findMechanicCode(order: Order, savedInspection: SavedInspection): string {
+		let mechanicCode;
+		if (savedInspection) {
+			mechanicCode = savedInspection.employeeCode || this.findItemsMechanicCode(savedInspection.items);
+		}
+		return mechanicCode ? mechanicCode : order.mechanicCode;
+	}
+
+	static findItemsMechanicCode(items: SavedItem[]): string {
+		const maxFilled = Math.max(...items.map(i => i.filled.valueOf()));
+		const maxFilledItem = items.find(i => i.filled.valueOf() === maxFilled);
+		return maxFilledItem.employeeCode;
 	}
 
 	static updateSelectItem(

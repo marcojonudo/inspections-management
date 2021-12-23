@@ -2,6 +2,10 @@ import { environment } from '../../environments/environment';
 
 export class Url {
 
+	static publisher(): string {
+		return `${environment.serverUrl}/inspection/publisher`;
+	}
+
 	static orders(): string {
 		return `${environment.serverUrl}/inspection/orders`;
 	}

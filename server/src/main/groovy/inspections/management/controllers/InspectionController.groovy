@@ -6,12 +6,16 @@ import inspections.management.domains.fviberi.Centre
 import inspections.management.domains.fviberi.Order
 import inspections.management.domains.schedules.EmployeeData
 import inspections.management.pogos.OrderInspection
+import inspections.management.pogos.RealTimePublisher
+import inspections.management.pogos.realTime.RealTimeInfo
 import inspections.management.services.InspectionService
 import inspections.management.services.data.*
 import inspections.management.utils.Constants
 import io.micronaut.core.convert.format.Format
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.*
+import io.micronaut.http.sse.Event
+import io.reactivex.subjects.PublishSubject
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
@@ -20,6 +24,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import javax.annotation.Nullable
 import javax.inject.Inject
 import java.time.LocalDate
 
@@ -38,6 +43,11 @@ class InspectionController {
     @Inject private SavedInspectionDataService savedInspectionDataService
     @Inject private CentreDataService centreDataService
     @Inject private ImageDataService imageDataService
+
+    @Get("/publisher")
+    PublishSubject<Event<RealTimeInfo>> getCardsPublisher() {
+        return RealTimePublisher.find()
+    }
 
     @Get("/centre")
     @Operation(
@@ -96,7 +106,7 @@ class InspectionController {
     )
     List<Order> findOrders(
         @QueryValue @Format(Constants.DateFormat.yyyy_MM_dd) LocalDate day,
-        @QueryValue boolean to
+        @QueryValue @Nullable Boolean to
     ) {
         return inspectionService.findOrders(day, to)
     }
@@ -258,6 +268,5 @@ class InspectionController {
         )
         return newSavedInspection ? HttpResponse.ok(savedInspection) : HttpResponse.serverError(newSavedInspection)
     }
-
 
 }

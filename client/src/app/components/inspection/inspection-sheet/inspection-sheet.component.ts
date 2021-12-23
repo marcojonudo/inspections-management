@@ -221,11 +221,9 @@ export class InspectionSheetComponent {
 
 	updateText(savedItem: TextSavedItem): void {
 		InspectionService.updateTextItem(savedItem, savedItem.item, savedItem.fields, this.savedInspection);
-		console.log(savedItem);
 	}
 
 	updateSeparatorValue(savedItem: SavedItem, fields: TextSavedItemField[]): void {
-		console.log('updated fields', fields);
 		InspectionService.updateTextItem(savedItem, savedItem.item, fields, this.savedInspection);
 	}
 
