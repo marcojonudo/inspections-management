@@ -50,6 +50,7 @@ export class InspectionDetailsComponent {
 	) {
 		this.columnsToDisplay = this.COLUMNS;
 		this.mechanics = [];
+		this.data = [];
 		this.selectedOrderSubscription = this.inspectionService.selectedOrderInspection$.subscribe(orderInspection => {
 			this.orderInspection = orderInspection;
 			this.savedInspection = InspectionService.findSavedInspection(this.orderInspection.order.number);
