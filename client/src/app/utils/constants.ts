@@ -64,6 +64,12 @@ export class Constants {
 		FINISHED: 'FINISHED'
 	};
 
+	static readonly INSPECTION_STATE_ORDER: any = {
+		PENDING: 0,
+		STARTED: 1,
+		FINISHED: 2
+	};
+
 	static readonly ITEM_TYPE: any = {
 		SELECT: 'SELECT'
 	};

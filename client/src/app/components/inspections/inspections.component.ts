@@ -72,16 +72,26 @@ export class InspectionsComponent implements OnDestroy {
 				aType = this.findOrderItemBudgetType(a.order.number, true);
 				bType = this.findOrderItemBudgetType(b.order.number, true);
 				if (!aType && !bType) {
-					const aCodeNumber = this.findCodeNumber(a.order.code);
-					const bCodeNumber = this.findCodeNumber(b.order.code);
-					return aCodeNumber < bCodeNumber ? -1 : (aCodeNumber > bCodeNumber ? 1 : 0);
+					const aState = InspectionService.findSavedInspection(a.order.number)?.state;
+					const bState = InspectionService.findSavedInspection(b.order.number)?.state;
+					if (aState && bState) {
+						const aStateOrder = this.findOrder(aState, Constants.INSPECTION_STATE_ORDER);
+						const bStateOrder = this.findOrder(bState, Constants.INSPECTION_STATE_ORDER);
+						return aStateOrder < bStateOrder ? -1 : (aStateOrder > bStateOrder ? 1 : 0);
+					} else if (aState) {
+						return -1;
+					} else if (bState) {
+						return 1;
+					} else {
+						const aCodeNumber = this.findCodeNumber(a.order.code);
+						const bCodeNumber = this.findCodeNumber(b.order.code);
+						return aCodeNumber < bCodeNumber ? -1 : (aCodeNumber > bCodeNumber ? 1 : 0);
+					}
 				}
 			}
-			const aOrder = this.findOrder(aType);
-			const bOrder = this.findOrder(bType);
-			if (aOrder < bOrder) { return -1; }
-			else if (aOrder > bOrder) { return 1; }
-			else { return 0; }
+			const aOrder = this.findOrder(aType, Constants.BUDGET_TYPE_ORDER);
+			const bOrder = this.findOrder(bType, Constants.BUDGET_TYPE_ORDER);
+			return aOrder < bOrder ? -1 : (aOrder > bOrder ? 1 : 0);
 		});
 		this.data = this.buildData(orderInspections);
 		this.budgetNotificationsSubscription = this.inspectionService.budgetNotifications$.subscribe(() => {
@@ -95,8 +105,8 @@ export class InspectionsComponent implements OnDestroy {
 		this.budgetNotificationsSubscription.unsubscribe();
 	}
 
-	findOrder(budgetType: string): number {
-		return Constants.BUDGET_TYPE_ORDER[budgetType] !== undefined ? Constants.BUDGET_TYPE_ORDER[budgetType] : 10;
+	findOrder(type: string, orderMap: any): number {
+		return orderMap[type] !== undefined ? orderMap[type] : 10;
 	}
 
 	findCodeNumber(orderCode: string): number {
