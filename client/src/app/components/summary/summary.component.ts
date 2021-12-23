@@ -7,7 +7,6 @@ import { OrderInspectionVehicle } from '../../objects/order-inspection-vehicle';
 import { Subscription } from 'rxjs';
 import { Constants } from '../../utils/constants';
 import { ItemBudget } from '../../objects/item-budget';
-import { Budget } from '../../objects/orders/budget';
 import { SavedInspection } from '../../objects/inspections/saved-inspection';
 
 @Component({
@@ -116,6 +115,10 @@ export class SummaryComponent implements OnDestroy {
 			doneBudgets.push(...doneOrderBudgets);
 		});
 		return doneBudgets;
+	}
+
+	findAcceptedPercentage(): number {
+		return this.findDoneItemBudgets().length ? this.findAcceptedItemBudgets().length / this.findDoneItemBudgets().length : 0;
 	}
 
 	findNotFinishedInspectionOrders(): number {
