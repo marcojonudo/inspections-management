@@ -29,13 +29,14 @@
 			"PITV": "Revisión pre-ITV",
 			"GCS": "Revisión garantía coche seguro",
 			"PC": "Revisión prueba en carretera",
+			"PE": "Revisión patinete eléctrico",
 			"ST": "Revisión servicio tranquilidad",
 			"AD": "Anomalías detectadas"
 		},
 		"state": {
 			"PENDING": "Pendiente",
 			"STARTED": "En curso",
-			"FINISHED": "Cerrada"
+			"FINISHED": "Realizada"
 		},
 		"item": {
 			"C": "Comentarios",
@@ -336,7 +337,9 @@
 			"inspectionState": "Estado",
 			"mechanic": "Mecánico",
 			"budgets": "Presupuestos",
+			"briefBudgets": "Ptos.",
 			"clientContact": "Contacto cliente",
+			"seller": "Vendedor",
 			"doneBudget": "Pto. realizado",
 			"acceptedBudget": "Pto. aceptado",
 			"item": "Item"

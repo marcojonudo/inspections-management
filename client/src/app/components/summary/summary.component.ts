@@ -7,7 +7,6 @@ import { OrderInspectionVehicle } from '../../objects/order-inspection-vehicle';
 import { Subscription } from 'rxjs';
 import { Constants } from '../../utils/constants';
 import { ItemBudget } from '../../objects/item-budget';
-import { Budget } from '../../objects/orders/budget';
 import { SavedInspection } from '../../objects/inspections/saved-inspection';
 
 @Component({
@@ -118,6 +117,10 @@ export class SummaryComponent implements OnDestroy {
 		return doneBudgets;
 	}
 
+	findAcceptedPercentage(): number {
+		return this.findDoneItemBudgets().length ? this.findAcceptedItemBudgets().length / this.findDoneItemBudgets().length : 0;
+	}
+
 	findNotFinishedInspectionOrders(): number {
 		return this.orderInspections.filter(orderInspection => {
 			const savedInspection = InspectionService.findSavedInspection(orderInspection.order.number);
@@ -143,7 +146,7 @@ export class SummaryComponent implements OnDestroy {
 		});
 		const totalItems = [].concat(...savedInspections.map(s => s.items.filter(i => i.item.type === Constants.ITEM_TYPE.SELECT)));
 		const wrongItems = totalItems.filter(i => i.filled && InspectionService.checkWrongSelectValue(i.findValue()));
-		return wrongItems.length / totalItems.length;
+		return totalItems.length ? wrongItems.length / totalItems.length : 0;
 	}
 
 }

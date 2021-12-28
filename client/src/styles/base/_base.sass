@@ -57,6 +57,15 @@ html, body
 				top: 0
 				z-index: 2
 
+			th, td
+				padding: 0 $tiny-gap !important
+				box-sizing: border-box
+
+				&.mat-header-cell, &.mat-cell
+
+					&:first-of-type, &:last-of-type
+						padding: 0
+
 			tr
 				display: flex
 
@@ -81,12 +90,6 @@ html, body
 .color-correct
 	color: $light-green
 
-.image-column
-	max-width: 40px
-
-.mat-column-inspectionButton
-	max-width: $big-gap
-
 .mat-card-header-text
 	display: flex
 	align-items: center
@@ -98,6 +101,9 @@ html, body
 .mat-progress-spinner circle
 	stroke: $dark-highlight
 
+.indicator-column
+	min-width: 80px
+
 @media print
 
 	.no-print
@@ -105,3 +111,8 @@ html, body
 
 	@page
 		margin: 0 $medium-gap
+
+@media (max-width: $big-threshold)
+
+	td
+		font-size: .9em !important

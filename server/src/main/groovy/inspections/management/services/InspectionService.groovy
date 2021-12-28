@@ -42,17 +42,7 @@ class InspectionService {
 	 * @return Lista de órdenes
 	 */
 	List<Order> findOrders(LocalDate day, boolean to) {
-		List<Order> orders
-		List<Integer> savedOrderNumbers
-		if (to) {
-			orders = orderDataService.findAll(day, day.minusDays(DAYS_OFFSET))
-			savedOrderNumbers = savedInspectionDataService.findOrderNumbers(day, day.minusDays(DAYS_OFFSET))
-		} else {
-			orders = orderDataService.findAll(day)
-			savedOrderNumbers = savedInspectionDataService.findOrderNumbers(day)
-		}
-
-		return orders // handleNotInspectionOrders(orders, savedOrderNumbers)
+		return to ? orderDataService.findAll(day, day.minusDays(DAYS_OFFSET)) : orderDataService.findAll(day)
 	}
 
 	/**

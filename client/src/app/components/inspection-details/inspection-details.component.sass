@@ -15,11 +15,11 @@
 				position: absolute
 				right: 0
 
-	th button
-		@include flex-center
+		button
+			@include flex-center
 
-		mat-icon
-			font-size: $big-font
+			mat-icon
+				font-size: 2.25em
 
 	td
 		position: relative
@@ -28,3 +28,34 @@
 		button
 			position: absolute
 			right: 0
+
+	.item-column
+		@include flex-2
+		min-width: 125px
+
+	.image-column, .inspection-button-column
+		width: 40px
+		max-width: 40px
+
+	.client-contact-header
+
+		& > span
+			border: 1px solid $grey
+			cursor: pointer
+			transition: background-color $fast-transition
+			border-radius: $border-radius
+
+			&:hover, &.notified
+				background-color: $grey
+
+			&.disabled
+				pointer-events: none
+
+	#correct-inspection
+		height: 100%
+		@include flex-center
+		text-align: center
+		background-color: $light-grey
+		color: rgba(0, 0, 0, .54)
+		font-size: $medium-font
+		font-weight: 500

@@ -151,18 +151,20 @@ export class InspectionService {
 		return savedInspections.find(savedInspection => savedInspection.orderNumber === orderNumber);
 	}
 
-	static findOrderItemBudgetType(orderNumber: number): string {
+	static findOrderItemBudgetType(orderNumber: number, accepted: boolean = undefined): string {
 		const orderInspection = this.findOrderInspection(orderNumber);
 		const savedInspection = this.findSavedInspection(orderNumber);
-		const itemBudgetTypes = savedInspection ? savedInspection.itemBudgets.map(itemBudget =>
-			this.findItemBudgetType(itemBudget, orderInspection.inspection.vehicle, orderInspection.order.budgets)
-		).filter(type => type !== '') : [];
-		return this.findItemBudgetsMainType(itemBudgetTypes);
-	}
-
-	static findItemBudgetType(itemBudget: ItemBudget, vehicle: string, budgets: Budget[]): string {
-		const existentBudget = InspectionService.findExistentBudget(itemBudget.itemCode, vehicle, budgets) !== undefined;
-		return existentBudget ? '' : itemBudget.budgetType;
+		let itemBudgets = [];
+		if (savedInspection) {
+			itemBudgets = accepted !== undefined ? savedInspection.itemBudgets.filter(i => {
+				const existentBudget = InspectionService.findExistentBudget(
+					i.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
+				) !== undefined;
+				return accepted ? existentBudget : !existentBudget;
+			}) : savedInspection.itemBudgets;
+		}
+		const types = itemBudgets.filter(i => i.budgetType !== '').map(i => i.budgetType);
+		return this.findItemBudgetsMainType(types);
 	}
 
 	static findItemArticles(
@@ -215,6 +217,7 @@ export class InspectionService {
 		savedInspections.forEach(savedInspection => {
 			const orderInspection = this.findOrderInspection(savedInspection.orderNumber);
 
+			// console.log('order inspection', savedInspection.orderNumber, orderInspection);
 			const foundItemBudgets = type ?
 				savedInspection.itemBudgets.filter(itemBudget => itemBudget.budgetType === type) : savedInspection.itemBudgets;
 			const pendingItemBudgets = foundItemBudgets.filter(itemBudget =>

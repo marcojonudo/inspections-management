@@ -24,7 +24,7 @@ import { ImageDialogComponent } from '../image-dialog/image-dialog.component';
 })
 export class InspectionDetailsComponent {
 
-	private COLUMNS: string[] = ['item', 'image', 'doneBudget', 'acceptedBudget', 'clientContact', 'inspectionButton'];
+	private COLUMNS: string[] = ['item', 'image', 'seller', 'doneBudget', 'acceptedBudget', 'clientContact', 'inspectionButton'];
 
 	private COLUMNS_DATA: any = {
 		item: (i: ItemBudget) => i,
@@ -50,6 +50,7 @@ export class InspectionDetailsComponent {
 	) {
 		this.columnsToDisplay = this.COLUMNS;
 		this.mechanics = [];
+		this.data = [];
 		this.selectedOrderSubscription = this.inspectionService.selectedOrderInspection$.subscribe(orderInspection => {
 			this.orderInspection = orderInspection;
 			this.savedInspection = InspectionService.findSavedInspection(this.orderInspection.order.number);
@@ -90,16 +91,18 @@ export class InspectionDetailsComponent {
 		return this.translate.instant(`inspection.item.${code}`);
 	}
 
-	findItemBudgetType(itemBudget: ItemBudget, orderInspection: OrderInspectionVehicle = this.orderInspection): string {
-		return InspectionService.findItemBudgetType(itemBudget, orderInspection.inspection.vehicle, orderInspection.order.budgets);
+	findEmployee(code: string): Employee {
+		return EmployeeService.findEmployee(code);
 	}
 
-	checkNotifiedClient(orderNumber: number = this.orderInspection.order.number): boolean {
-		return InspectionService.findBudgetNotifications(orderNumber).length > 0;
+	checkNotifiedClient(orderInspection: OrderInspectionVehicle = this.orderInspection): boolean {
+		return orderInspection ? InspectionService.findBudgetNotifications(orderInspection.order.number).length > 0 : false;
 	}
 
-	checkExistentBudget(itemBudget: ItemBudget, budget: Budget, orderInspection: OrderInspectionVehicle = this.orderInspection): boolean {
-		return InspectionService.findExistentBudget(itemBudget.itemCode, orderInspection.inspection.vehicle, [budget]) !== undefined;
+	checkExistentBudget(itemBudget: ItemBudget, orderInspection: OrderInspectionVehicle = this.orderInspection): boolean {
+		return InspectionService.findExistentBudget(
+			itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
+		) !== undefined;
 	}
 
 	checkAcceptedBudget(budget: Budget): boolean {

@@ -32,8 +32,10 @@ export interface Column {
 })
 export class InspectionsComponent implements OnDestroy {
 
+	private readonly INSPECTION_NAME = 'Revisión';
+
 	private COLUMNS: string[] = [
-		'order', 'brand', 'model', 'inspectionType', 'inspectionState', 'mechanic', 'budgets', 'clientContact', 'acceptedBudget'
+		'order', 'brand', 'model', 'inspectionType', 'inspectionState', 'mechanic', 'budgets', 'clientContact'
 	];
 
 	private COLUMNS_DATA: any = {
@@ -63,20 +65,33 @@ export class InspectionsComponent implements OnDestroy {
 		private snackBarService: SnackBarService
 	) {
 		this.columnsToDisplay = this.COLUMNS;
-		const orderInspections = InspectionService.orderInspections.sort((a, b) => {
-			const aType = this.findOrderItemBudgetType(a.order.number);
-			const bType = this.findOrderItemBudgetType(b.order.number);
-			if (aType && bType) {
-				if (aType === Constants.BUDGET_TYPE.URGENT) { return -1; }
-				else if (bType === Constants.BUDGET_TYPE.URGENT) { return 1; }
-				else { return a.order < b.order ? -1 : (a.order > b.order ? 1 : 0); }
-			} else if (aType) {
-				return -1;
-			} else if (bType) {
-				return 1;
-			} else {
-				return a.order < b.order ? -1 : (a.order > b.order ? 1 : 0);
+		const orderInspections = this.filterInspections(InspectionService.orderInspections).sort((a, b) => {
+			let aType = this.findOrderItemBudgetType(a.order.number, false);
+			let bType = this.findOrderItemBudgetType(b.order.number, false);
+			if (!aType && !bType) {
+				aType = this.findOrderItemBudgetType(a.order.number, true);
+				bType = this.findOrderItemBudgetType(b.order.number, true);
+				if (!aType && !bType) {
+					const aState = InspectionService.findSavedInspection(a.order.number)?.state;
+					const bState = InspectionService.findSavedInspection(b.order.number)?.state;
+					if (aState && bState) {
+						const aStateOrder = this.findOrder(aState, Constants.INSPECTION_STATE_ORDER);
+						const bStateOrder = this.findOrder(bState, Constants.INSPECTION_STATE_ORDER);
+						return aStateOrder < bStateOrder ? -1 : (aStateOrder > bStateOrder ? 1 : 0);
+					} else if (aState) {
+						return -1;
+					} else if (bState) {
+						return 1;
+					} else {
+						const aCodeNumber = this.findCodeNumber(a.order.code);
+						const bCodeNumber = this.findCodeNumber(b.order.code);
+						return aCodeNumber < bCodeNumber ? -1 : (aCodeNumber > bCodeNumber ? 1 : 0);
+					}
+				}
 			}
+			const aOrder = this.findOrder(aType, Constants.BUDGET_TYPE_ORDER);
+			const bOrder = this.findOrder(bType, Constants.BUDGET_TYPE_ORDER);
+			return aOrder < bOrder ? -1 : (aOrder > bOrder ? 1 : 0);
 		});
 		this.data = this.buildData(orderInspections);
 		this.budgetNotificationsSubscription = this.inspectionService.budgetNotifications$.subscribe(() => {
@@ -88,6 +103,18 @@ export class InspectionsComponent implements OnDestroy {
 
 	ngOnDestroy(): void {
 		this.budgetNotificationsSubscription.unsubscribe();
+	}
+
+	findOrder(type: string, orderMap: any): number {
+		return orderMap[type] !== undefined ? orderMap[type] : 10;
+	}
+
+	findCodeNumber(orderCode: string): number {
+		return parseInt(orderCode.startsWith('C') ? orderCode.substring(1) : orderCode, 10);
+	}
+
+	filterInspections(orderInspections: OrderInspectionVehicle[]): OrderInspectionVehicle[] {
+		return orderInspections.filter(o => o.order.keys && o.order.state !== Constants.ORDER_STATE.V);
 	}
 
 	buildData(orderInspections: OrderInspectionVehicle[], columnsData: any = this.COLUMNS_DATA): Column[] {
@@ -116,7 +143,9 @@ export class InspectionsComponent implements OnDestroy {
 	}
 
 	findInspectionTypeName(code: string): string {
-		return this.translate.instant(`inspection.type.${code}`);
+		const inspectionType = this.translate.instant(`inspection.type.${code}`);
+		/* Si el tipo es distinto a 'Anomalías detectadas', se elimina la palabra 'Revisión' por ser redundante */
+		return inspectionType.startsWith(this.INSPECTION_NAME) ? inspectionType.substring(this.INSPECTION_NAME.length + 1) : inspectionType;
 	}
 
 	findInspectionStateName(state: string): string {
@@ -127,18 +156,12 @@ export class InspectionsComponent implements OnDestroy {
 		return itemBudgets.length > 0;
 	}
 
-	findOrderItemBudgetType(orderNumber: number): string {
-		return InspectionService.findOrderItemBudgetType(orderNumber);
+	findOrderItemBudgetType(orderNumber: number, accepted: boolean = undefined): string {
+		return InspectionService.findOrderItemBudgetType(orderNumber, accepted);
 	}
 
 	checkNotifiedClient(orderNumber: number): boolean {
 		return InspectionService.findBudgetNotifications(orderNumber).length > 0;
-	}
-
-	checkAcceptedBudgets(orderNumber: number): boolean {
-		const orderInspection = InspectionService.findOrderInspection(orderNumber);
-		return orderInspection.order.budgets.length &&
-			orderInspection.order.budgets.find(b => !InspectionService.checkAcceptedBudget(b)) === undefined;
 	}
 
 	checkSelectedOrder(orderNumber: number): boolean {
