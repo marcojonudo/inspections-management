@@ -11,12 +11,14 @@ class TextItemField implements GormEntity<TextItemField> {
     TextItem textItem
 
     String placeholder
+    String separator
     String prefix
     Integer maxLength
     int order
 
     static constraints = {
         placeholder nullable: true
+        separator nullable: true
         prefix nullable: true
         maxLength nullable: true
     }

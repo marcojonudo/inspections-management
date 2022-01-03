@@ -4,9 +4,7 @@ import groovy.transform.CompileStatic
 import inspections.management.domains.InspectionVehicle
 import inspections.management.domains.ItemCategory
 import inspections.management.domains.items.Item
-import inspections.management.domains.savedItems.SavedItem
-import inspections.management.domains.savedItems.SelectSavedItem
-import inspections.management.domains.savedItems.TextSavedItem
+import inspections.management.domains.savedItems.*
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -26,8 +24,16 @@ class Builder {
     }
 
     static TextSavedItem buildTextSavedItem(Map<String, Object> item) {
-        TextSavedItem savedItem = new TextSavedItem(text: (String) item.text)
+        TextSavedItem savedItem = new TextSavedItem()
+        savedItem.fields = ((List<Map<String, Object>>) item.fields).collect {
+            new TextSavedItemField(textSavedItem: savedItem, order: (int) it.order, text: (String) it.text)
+        }.toSet()
         return (TextSavedItem) fillSavedItem(savedItem, item)
+    }
+
+    static TextAreaSavedItem buildTextAreaSavedItem(Map<String, Object> item) {
+        TextAreaSavedItem savedItem = new TextAreaSavedItem(text: (String) item.text)
+        return (TextAreaSavedItem) fillSavedItem(savedItem, item)
     }
 
     static SelectSavedItem buildSelectSavedItem(Map<String, Object> item) {

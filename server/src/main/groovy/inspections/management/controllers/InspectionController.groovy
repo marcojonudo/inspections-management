@@ -252,10 +252,11 @@ class InspectionController {
         content = @Content(schema = @Schema(implementation = BudgetNotification))
     )
     @ApiResponse(responseCode = "500", description = "Error actualizando la revisión")
-    SavedInspection updateInspection(@Body SavedInspection savedInspection) {
-        return inspectionService.saveInspection(
+    HttpResponse<SavedInspection> updateInspection(@Body SavedInspection savedInspection) {
+         SavedInspection newSavedInspection = inspectionService.saveInspection(
             savedInspection, savedInspection.orderNumber, savedInspection.sellerCode
         )
+        return newSavedInspection ? HttpResponse.ok(savedInspection) : HttpResponse.serverError(newSavedInspection)
     }
 
 

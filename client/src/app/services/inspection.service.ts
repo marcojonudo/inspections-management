@@ -35,6 +35,7 @@ import { OrderInspectionHandler } from '../objects/inspection-handler/order-insp
 import { DetectedFaultsHandler } from '../objects/inspection-handler/detected-faults-handler';
 import { InspectionHandler } from '../objects/inspection-handler/inspection-handler';
 import * as dayjs from 'dayjs';
+import { TextSavedItemField } from '../objects/inspections/saved-items/text-saved-item-field';
 
 @Injectable({
 	providedIn: 'root'
@@ -339,7 +340,7 @@ export class InspectionService {
 		return value === Constants.SELECT_ITEM_OPTION_CODE.SN || value === Constants.SELECT_ITEM_OPTION_CODE.PS;
 	}
 
-	static updateItem(
+	static updateSelectItem(
 		savedItem: SavedItem,
 		item: Item,
 		value: string,
@@ -381,6 +382,17 @@ export class InspectionService {
 			const targetSavedItem = savedInspection.items.find(i => i.item.code === itemRelation.targetItem.code);
 			actions[itemRelation.action](targetSavedItem, savedItem.findValue(), employee.code);
 		}
+	}
+
+	static updateTextItem(
+		savedItem: SavedItem,
+		item: Item,
+		fields: TextSavedItemField[],
+		savedInspection: SavedInspection,
+		employee: Employee = EmployeeService.employee
+	): void {
+		savedItem.update(fields, employee.code);
+		LocalStorageService.setItem(Constants.LOCAL_STORAGE.SAVED_INSPECTION, savedInspection);
 	}
 
 	findLanguage(): Observable<string> {

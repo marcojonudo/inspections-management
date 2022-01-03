@@ -20,7 +20,7 @@
 				</mat-card-header>
 				<mat-card-content>
 					<div class="text-area-card-content">
-						<div *ngFor="let line of findTextAreaLines(findTextSavedItem(elem))" class="highlight">{{line}}</div>
+						<div *ngFor="let line of findTextAreaLines(findTextAreaSavedItem(elem))" class="highlight">{{line}}</div>
 					</div>
 					<mat-form-field>
 						<textarea
@@ -28,7 +28,7 @@
 							cdkTextareaAutosize
 							cdkAutosizeMinRows="1"
 							cdkAutosizeMaxRows="5"
-							[(ngModel)]="findTextSavedItem(elem).text"
+							[(ngModel)]="findTextAreaSavedItem(elem).text"
 							(change)="updateText(elem)">
 						</textarea>
 					</mat-form-field>
@@ -59,19 +59,33 @@
 					</div>
 				</div>
 				<ng-template #textItemText>
-					<div class="text-item">
+					<div class="text-item" [class.text-item-fields]="findTextSavedItem(item).fields.length > 2">
 						<div translate class="item-text">inspection.item.{{item.item.code}}</div>
 						<mat-form-field>
+							<span *ngIf="checkIndividualTextField(findTextItem(item))" matPrefix>
+								{{findTextItemField(item).prefix}}
+							</span>
 							<input
 								matInput
-								[(ngModel)]="findTextSavedItem(item).text"
+								*ngIf="checkIndividualTextField(findTextItem(item)); else separatorInput"
+								type="tel"
+								[maxLength]="findTextItemFieldMaxLength(item)"
+								[placeholder]="findTextItemField(item).placeholder"
+								[(ngModel)]="findTextSavedItemField(item).text"
 								(change)="updateText(findTextSavedItem(item))"
 								autocomplete="off">
+							<ng-template #separatorInput>
+								<app-separator-input
+									[fields]="findTextItem(item).fields"
+									[model]="findTextSavedItem(item).fields"
+									(valueEmitter)="updateSeparatorValue(item, $event)">
+								</app-separator-input>
+							</ng-template>
 							<span matSuffix>{{findTextItemUnit(item)}}</span>
 						</mat-form-field>
 						<div class="item-data">
 							<span class="item-text-value" [class.unit]="findTextItemUnit(item)">
-								{{findTextSavedItem(item).text ? findTextSavedItem(item).text : '-'}}
+								{{findTextSavedItem(item).isFilled() ? findTextSavedItem(item).findValue() : '-'}}
 							</span>
 							<span class="item-unit">{{findTextItemUnit(item)}}</span>
 						</div>

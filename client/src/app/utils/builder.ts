@@ -10,13 +10,14 @@ import { ListElement } from '../objects/list-elements/list-element';
 import { Car } from '../objects/orders/vehicles/car';
 import { Vehicle } from '../objects/orders/vehicles/vehicle';
 import { Scooter } from '../objects/orders/vehicles/scooter';
+import { TextAreaSavedItem } from '../objects/inspections/saved-items/text-area-saved-item';
 
 export class Builder {
 
 	static savedItemBuilder: { [key: string]: ((savedItem: any) => SavedItem) } = {
 		TEXT: (savedItem: TextSavedItem) => new TextSavedItem(savedItem),
 		SELECT: (savedItem: SelectSavedItem) => new SelectSavedItem(savedItem),
-		TEXT_AREA: (savedItem: TextSavedItem) => new TextSavedItem(savedItem)
+		TEXT_AREA: (savedItem: TextAreaSavedItem) => new TextAreaSavedItem(savedItem)
 	};
 
 	static vehicleBuilder: { [key: string]: ((vehicle: any) => Vehicle) } = {

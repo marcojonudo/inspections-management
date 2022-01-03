@@ -7,7 +7,6 @@ import org.grails.datastore.gorm.GormEntity
 @Entity
 class TextItem extends Item implements GormEntity<TextItem> {
 
-    String separator
     String unit
 
     @JsonInclude
@@ -16,7 +15,6 @@ class TextItem extends Item implements GormEntity<TextItem> {
     static hasMany = [fields: TextItemField]
 
     static constraints = {
-        separator nullable: true
         unit nullable: true
     }
 

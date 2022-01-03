@@ -129,13 +129,13 @@ export class InspectionDetailsComponent {
 	}
 
 	openInspection(): void {
-		const dialogRef = this.dialog.open(EmployeeDialogComponent);
-		dialogRef.afterClosed().subscribe((employeeCode: string) => {
-			if (employeeCode) {
-				EmployeeService.setEmployee(employeeCode);
+		// const dialogRef = this.dialog.open(EmployeeDialogComponent);
+		// dialogRef.afterClosed().subscribe((employeeCode: string) => {
+		// 	if (employeeCode) {
+				EmployeeService.setEmployee('1000241');
 				this.router.navigate([`${Constants.PATH.HOME}${Constants.PATH.INSPECTION}`]);
-			}
-		});
+			// }
+		// });
 	}
 
 }

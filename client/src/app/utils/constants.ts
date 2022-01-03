@@ -3,6 +3,7 @@ export class Constants {
 	static readonly DEFAULT_LANGUAGE: string = 'es';
 	static readonly DETECTED_ANOMALIES_CODE = 'AD';
 	static readonly EMPLOYEE_CODE_MAX_LENGTH: number = 7;
+	static readonly TEXT_ITEM_MAX_LENGTH = 10;
 
 	static readonly LOCAL_STORAGE: any = {
 		LANGUAGE: 'language',

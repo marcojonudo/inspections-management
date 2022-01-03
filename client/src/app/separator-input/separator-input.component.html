@@ -1,0 +1,19 @@
+<div
+	role="group"
+	class="separator-input-container"
+	[formGroup]="formGroup"
+	(focusin)="onFocusIn()"
+	(focusout)="onFocusOut($event)">
+	<div *ngFor="let field of fields | order; let i = index; let last = last" class="separator-field-wrapper">
+		<span *ngIf="field.prefix" matPrefix class="separator-input-spacer">{{field.prefix}}</span>
+		<input
+			type="tel"
+			class="separator-input-element"
+			formControlName="field-{{i}}"
+			[maxLength]="findMaxLength(field)"
+			(input)="handleInput(i)"
+			(keyup.backspace)="handleAutoFocusPrev(i)"
+			#fieldInput>
+		<span *ngIf="!last" class="separator-input-spacer">{{field.separator}}</span>
+	</div>
+</div>

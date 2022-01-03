@@ -27,7 +27,7 @@ export abstract class SavedItem {
 
 	abstract isFilled(): boolean;
 
-	abstract update(value: string, employeeCode: string): void;
+	abstract update(value: any, employeeCode: string): void;
 
 	abstract reset(employeeCode: string): void;
 

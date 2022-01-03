@@ -1,7 +1,9 @@
 export class TextItemField {
 
 	placeholder: string;
+	separator: string;
 	prefix: string;
+	suffix: string;
 	maxLength: number;
 	order: number;
 
