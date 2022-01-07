@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
 import { InspectionService } from '../../services/inspection.service';
 import { Subscription } from 'rxjs';
 import { ItemBudget } from '../../objects/item-budget';
@@ -29,12 +29,12 @@ export interface InspectionDetailsColumn {
 	styleUrls: ['./inspection-details.component.sass'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class InspectionDetailsComponent {
+export class InspectionDetailsComponent implements OnDestroy {
 
 	private COLUMNS: string[] = ['item', 'image', 'seller', 'doneBudget', 'acceptedBudget', 'clientContact', 'inspectionButton'];
 
 	private selectedOrderSubscription: Subscription;
-	private realTimeOrdersSubscription: Subscription;
+	private realTimeActionsSubscription: Subscription;
 
 	columnsToDisplay: string[];
 	orderInspection: OrderInspectionVehicle;
@@ -66,15 +66,23 @@ export class InspectionDetailsComponent {
 			this.cdRef.detectChanges();
 		});
 
-		this.realTimeOrdersSubscription = this.realTimeService.realTimeOrders$.subscribe(realTimeOrders => {
-			if (realTimeOrders.length && this.orderInspection) {
-				const selectedOrderUpdate = realTimeOrders.find(update => update.order.number === this.orderInspection.order.number);
+		this.realTimeActionsSubscription = this.realTimeService.realTimeActions$.subscribe(realTimeActions => {
+			if (realTimeActions.length && this.orderInspection) {
+				const selectedOrderUpdate = realTimeActions.find(update => update.findOrderNumber() === this.orderInspection.order.number);
 				if (selectedOrderUpdate) {
+					const newRows = selectedOrderUpdate.updateDetailsLayout(this.data);
+					if (newRows.length) {
+						this.data = newRows;
+					}
 					this.cdRef.detectChanges();
 				}
-				this.cdRef.detectChanges();
 			}
 		});
+	}
+
+	ngOnDestroy(): void {
+		this.selectedOrderSubscription.unsubscribe();
+		this.realTimeActionsSubscription.unsubscribe();
 	}
 
 	buildData(
@@ -85,7 +93,7 @@ export class InspectionDetailsComponent {
 		const data = [];
 		if (savedInspection) {
 			savedInspection.itemBudgets.forEach(itemBudget => {
-				const row = InspectionService.buildInspectionDetailsRow(orderInspection, savedInspection.items, itemBudget, columnsData);
+				const row = InspectionService.buildInspectionDetailsRow(itemBudget, orderInspection, savedInspection.items, columnsData);
 				data.push(row);
 			});
 		}
@@ -138,13 +146,13 @@ export class InspectionDetailsComponent {
 	}
 
 	openInspection(): void {
-		// const dialogRef = this.dialog.open(EmployeeDialogComponent);
-		// dialogRef.afterClosed().subscribe((employeeCode: string) => {
-		// 	if (employeeCode) {
-				EmployeeService.setEmployee('1000241');
+		const dialogRef = this.dialog.open(EmployeeDialogComponent);
+		dialogRef.afterClosed().subscribe((employeeCode: string) => {
+			if (employeeCode) {
+				EmployeeService.setEmployee(employeeCode);
 				this.router.navigate([`${Constants.PATH.HOME}${Constants.PATH.INSPECTION}`]);
-			// }
-		// });
+			}
+		});
 	}
 
 }

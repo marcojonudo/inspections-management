@@ -7,6 +7,7 @@ import { Budget } from '../../../orders/budget';
 import { RealTimeBudgetCreate } from '../budgets/real-time-budget-create';
 import { RealTimeBudgetDelete } from '../budgets/real-time-budget-delete';
 import { RealTimeBudgetUpdate } from '../budgets/real-time-budget-update';
+import { InspectionDetailsColumn } from '../../../../components/inspection-details/inspection-details.component';
 
 export class RealTimeOrderUpdate extends RealTimeOrder {
 
@@ -23,8 +24,8 @@ export class RealTimeOrderUpdate extends RealTimeOrder {
 		(order: Order) => order.vehicle.brand
 	];
 
-	constructor(orders: Order[], syncedOrders: Order[], order: Order, syncedOrder: Order) {
-		super(Constants.REAL_TIME_ORDER_TYPE.UPDATE, orders, syncedOrders, order, syncedOrder);
+	constructor(orders: Order[], order: Order, syncedOrder: Order) {
+		super(Constants.REAL_TIME_UPDATE_TYPE.UPDATE, orders, undefined, order, syncedOrder);
 	}
 
 	check(): boolean {
@@ -83,10 +84,14 @@ export class RealTimeOrderUpdate extends RealTimeOrder {
 		this.realTimeBudgets.forEach(realTimeBudget => realTimeBudget.update());
 	}
 
-	updateInspectionsLayout(column: InspectionsColumn): void {
-		console.log('upading', this.order);
+	updateInspectionsLayout(column: InspectionsColumn): InspectionsColumn[] {
 		column.brand = this.order.vehicle.brand;
 		column.model = this.order.vehicle.model;
+		return [];
+	}
+
+	updateDetailsLayout(columns: InspectionDetailsColumn[]): InspectionDetailsColumn[] {
+		return [];
 	}
 
 }

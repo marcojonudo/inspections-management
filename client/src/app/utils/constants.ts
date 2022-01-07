@@ -121,22 +121,10 @@ export class Constants {
 		SCOOTER: 'SCOOTER'
 	};
 
-	static readonly REAL_TIME_ORDER_TYPE: any = {
+	static readonly REAL_TIME_UPDATE_TYPE: any = {
 		CREATE: 'CREATE',
 		DELETE: 'DELETE',
-		ORDER: 'ORDER'
-	};
-
-	static readonly REAL_TIME_BUDGET_TYPE: any = {
-		CREATE: 'CREATE',
-		DELETE: 'DELETE',
-		ORDER: 'ORDER'
-	};
-
-	static readonly REAL_TIME_BUDGET_LINE_TYPE: any = {
-		CREATE: 'CREATE',
-		DELETE: 'DELETE',
-		ORDER: 'ORDER'
+		UPDATE: 'UPDATE'
 	};
 
 	static readonly INSPECTIONS_COLUMN_DATA: any = {

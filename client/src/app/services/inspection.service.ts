@@ -142,6 +142,15 @@ export class InspectionService {
 		return builtItemBudgets;
 	}
 
+	static filterItemBudgets(savedItems: SavedItem[], itemBudgets: ItemBudget[] = this.itemBudgets): ItemBudget[] {
+		return itemBudgets.filter(itemBudget => {
+			const item = savedItems.find(savedItem =>
+				savedItem.item.type === Constants.ITEM_TYPE.SELECT && savedItem.item.code === itemBudget.itemCode
+			);
+			return item && item.filled && InspectionService.checkWrongSelectValue(item.findValue());
+		});
+	}
+
 	static findOrderInspection(
 		orderNumber: number, orderInspections: OrderInspectionVehicle[] = this.orderInspections
 	): OrderInspectionVehicle {
@@ -358,8 +367,57 @@ export class InspectionService {
 		return row;
 	}
 
+	static sortInspectionsRows(rows: InspectionsColumn[]): InspectionsColumn[] {
+		return rows.sort((a, b) => {
+			let aType = this.findOrderItemBudgetType(a.orderNumber, false);
+			let bType = this.findOrderItemBudgetType(b.orderNumber, false);
+			if (!aType && !bType) {
+				aType = this.findOrderItemBudgetType(a.orderNumber, true);
+				bType = this.findOrderItemBudgetType(b.orderNumber, true);
+				if (!aType && !bType) {
+					const aState = InspectionService.findSavedInspection(a.orderNumber)?.state;
+					const bState = InspectionService.findSavedInspection(b.orderNumber)?.state;
+					if (aState && bState) {
+						const aStateOrder = this.findInspectionsRowOrder(aState, Constants.INSPECTION_STATE_ORDER);
+						const bStateOrder = this.findInspectionsRowOrder(bState, Constants.INSPECTION_STATE_ORDER);
+						return aStateOrder < bStateOrder ? -1 : (aStateOrder > bStateOrder ? 1 : 0);
+					} else if (aState) {
+						return -1;
+					} else if (bState) {
+						return 1;
+					} else {
+						return this.compareCodeNumbers(a, b);
+					}
+				}
+			}
+			const aOrder = this.findInspectionsRowOrder(aType, Constants.BUDGET_TYPE_ORDER);
+			const bOrder = this.findInspectionsRowOrder(bType, Constants.BUDGET_TYPE_ORDER);
+			if (aOrder === bOrder) {
+				return this.compareCodeNumbers(a, b);
+			}
+			return aOrder < bOrder ? -1 : (aOrder > bOrder ? 1 : 0);
+		});
+	}
+
+	static compareCodeNumbers(a: InspectionsColumn, b: InspectionsColumn): number {
+		const aCodeNumber = this.findCodeNumber(a.order);
+		const bCodeNumber = this.findCodeNumber(b.order);
+		return aCodeNumber < bCodeNumber ? -1 : (aCodeNumber > bCodeNumber ? 1 : 0);
+	}
+
+	static findInspectionsRowOrder(type: string, orderMap: any): number {
+		return orderMap[type] !== undefined ? orderMap[type] : 10;
+	}
+
+	static findCodeNumber(orderCode: string): number {
+		return parseInt(orderCode.startsWith('C') ? orderCode.substring(1) : orderCode, 10);
+	}
+
 	static buildInspectionDetailsRow(
-		orderInspection: OrderInspectionVehicle, savedItems: SavedItem[], itemBudget: ItemBudget, columnsData: any
+		itemBudget: ItemBudget,
+		orderInspection: OrderInspectionVehicle = this.selectedOrderInspection,
+		savedItems: SavedItem[] = this.selectedSavedInspection.items,
+		columnsData: any = Constants.INSPECTION_DETAILS_COLUMN_DATA
 	): InspectionDetailsColumn {
 		let row = undefined;
 		const allColumns = Object.keys(columnsData);

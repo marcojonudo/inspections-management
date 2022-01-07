@@ -5,7 +5,7 @@ import { Budget } from '../../../orders/budget';
 export class RealTimeBudgetCreate extends RealTimeBudget {
 
 	constructor(budgets: Budget[], syncedBudgets: Budget[], budget: Budget, syncedBudget: Budget) {
-		super(Constants.REAL_TIME_BUDGET_TYPE.CREATE, budgets, syncedBudgets, budget, syncedBudget);
+		super(Constants.REAL_TIME_UPDATE_TYPE.CREATE, budgets, syncedBudgets, budget, syncedBudget);
 	}
 
 	check(): boolean {

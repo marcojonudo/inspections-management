@@ -1,10 +1,12 @@
 package inspections.management.domains.savedItems
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import grails.gorm.annotation.Entity
 import org.grails.datastore.gorm.GormEntity
 
 @Entity
+@JsonIgnoreProperties(ignoreUnknown = true)
 class TextSavedItemField implements GormEntity<TextSavedItemField> {
 
 	@JsonIgnore

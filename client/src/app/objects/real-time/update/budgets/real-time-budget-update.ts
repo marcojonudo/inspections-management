@@ -17,7 +17,7 @@ export class RealTimeBudgetUpdate extends RealTimeBudget {
 	];
 
 	constructor(budgets: Budget[], syncedBudgets: Budget[], budget: Budget, syncedBudget: Budget) {
-		super(Constants.REAL_TIME_BUDGET_TYPE.UPDATE, budgets, syncedBudgets, budget, syncedBudget);
+		super(Constants.REAL_TIME_UPDATE_TYPE.UPDATE, budgets, syncedBudgets, budget, syncedBudget);
 	}
 
 	check(): boolean {

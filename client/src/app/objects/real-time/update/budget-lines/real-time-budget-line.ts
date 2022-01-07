@@ -20,8 +20,6 @@ export abstract class RealTimeBudgetLine {
 
 	abstract update(): void;
 
-	// abstract updateInspectionsLayout(column: InspectionsColumn): void;
-
 	findIndex(lines: BudgetLine[], line: BudgetLine): number {
 		return lines.findIndex(l => l.articleCode === line.articleCode && l.line === line.line);
 	}

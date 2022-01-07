@@ -4,8 +4,8 @@ import { BudgetLine } from '../../../orders/budget-line';
 
 export class RealTimeBudgetLineDelete extends RealTimeBudgetLine {
 
-	constructor(lines: BudgetLine[], syncedLines: BudgetLine[], line: BudgetLine, syncedLine: BudgetLine = undefined) {
-		super(Constants.REAL_TIME_BUDGET_LINE_TYPE.DELETE, lines, syncedLines, line, syncedLine);
+	constructor(lines: BudgetLine[], syncedLines: BudgetLine[], line: BudgetLine) {
+		super(Constants.REAL_TIME_UPDATE_TYPE.DELETE, lines, syncedLines, line, undefined);
 	}
 
 	check(): boolean {

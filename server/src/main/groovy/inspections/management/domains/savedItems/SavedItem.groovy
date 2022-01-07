@@ -3,8 +3,9 @@ package inspections.management.domains.savedItems
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import grails.gorm.annotation.Entity
-import inspections.management.deserializers.SavedItemDeserializer
+import inspections.management.deserializers.ItemDeserializer
 import inspections.management.domains.SavedInspection
 import inspections.management.domains.items.Item
 import inspections.management.utils.Constants
@@ -13,12 +14,12 @@ import org.grails.datastore.gorm.GormEntity
 import java.time.LocalDateTime
 
 @Entity
-@JsonDeserialize(using = SavedItemDeserializer)
 abstract class SavedItem implements GormEntity<SavedItem> {
 
 	@JsonIgnore
 	SavedInspection savedInspection
 
+	@JsonDeserialize(using = ItemDeserializer)
 	Item item
 	String employeeCode
 	String sellerCode
@@ -27,6 +28,7 @@ abstract class SavedItem implements GormEntity<SavedItem> {
 	boolean restrictive
 
 	@JsonFormat(pattern = Constants.DateTimeFormat.yyyy_MM_dd_HH_mm_ss, timezone = Constants.SPAIN_TIMEZONE)
+	@JsonDeserialize(using = LocalDateTimeDeserializer)
 	LocalDateTime filled
 
 	static belongsTo = SavedInspection
@@ -40,7 +42,6 @@ abstract class SavedItem implements GormEntity<SavedItem> {
 	static mapping = {
 		tablePerHierarchy false
 		item fetch: 'join'
-//		image fetch: 'join'
 	}
 
 	abstract boolean equals(SavedItem savedItem)

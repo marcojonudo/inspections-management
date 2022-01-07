@@ -31,14 +31,16 @@ export abstract class SavedItem {
 
 	abstract reset(employeeCode: string): void;
 
+	abstract isUpdated(syncedSavedItem: SavedItem): boolean;
+
+	protected updateCommonFields(employeeCode: string): void {
+		this.sellerCode = employeeCode;
+		this.filled = dayjs();
+	}
+
 	updateHidden(employeeCode: string, hidden: boolean): void {
 		this.hidden = hidden;
 		this.reset(employeeCode);
-	}
-
-	updateCommonFields(employeeCode: string): void {
-		this.sellerCode = employeeCode;
-		this.filled = dayjs();
 	}
 
 }

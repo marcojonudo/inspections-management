@@ -38,4 +38,8 @@ export class TextSavedItem extends SavedItem {
 		this.updateCommonFields(employeeCode);
 	}
 
+	isUpdated(syncedSavedItem: TextSavedItem): boolean {
+		return this.findValue() !== syncedSavedItem.findValue();
+	}
+
 }

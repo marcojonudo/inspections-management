@@ -11,7 +11,8 @@ class RealTimeInfo {
 
 	enum Type {
 
-        ORDER_INSPECTIONS
+        ORDER_INSPECTIONS,
+        SAVED_INSPECTION
 
 	}
 

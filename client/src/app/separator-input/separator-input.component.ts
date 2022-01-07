@@ -82,7 +82,6 @@ export class SeparatorInputComponent
 	id = `separator-input-element-${SeparatorInputComponent.nextId++}`;
 
 	onChange = (_: any) => {
-		console.log('ON CHANGE');
 		this.valueEmitter.emit(this.value);
 	}
 	onTouched = () => {};

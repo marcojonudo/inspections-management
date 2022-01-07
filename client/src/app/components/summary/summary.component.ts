@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs';
 import { Constants } from '../../utils/constants';
 import { ItemBudget } from '../../objects/item-budget';
 import { SavedInspection } from '../../objects/inspections/saved-inspection';
+import { RealTimeService } from '../../services/real-time.service';
 
 @Component({
 	selector: 'app-summary',
@@ -18,13 +19,18 @@ import { SavedInspection } from '../../objects/inspections/saved-inspection';
 export class SummaryComponent implements OnDestroy {
 
 	private budgetNotificationsSubscription: Subscription;
+	private realTimeActionsSubscription: Subscription;
 
 	filters: OrdersFilter[];
 	todayFilter: OrdersFilter[];
 	pendingFilter: OrdersFilter[];
 	allFilters: OrdersFilter[];
 
-	constructor(private inspectionService: InspectionService, private cdRef: ChangeDetectorRef) {
+	constructor(
+		private inspectionService: InspectionService,
+		private realTimeService: RealTimeService,
+		private cdRef: ChangeDetectorRef
+	) {
 		this.todayFilter = [new TodayOrdersFilter()];
 		this.pendingFilter = [new PendingOrdersFilter()];
 		this.allFilters = this.todayFilter.concat(this.pendingFilter);
@@ -34,10 +40,15 @@ export class SummaryComponent implements OnDestroy {
 		this.budgetNotificationsSubscription = this.inspectionService.budgetNotifications$.subscribe(() => {
 			this.cdRef.detectChanges();
 		});
+
+		this.realTimeActionsSubscription = this.realTimeService.realTimeActions$.subscribe(() => {
+			this.cdRef.detectChanges();
+		});
 	}
 
 	ngOnDestroy(): void {
 		this.budgetNotificationsSubscription.unsubscribe();
+		this.realTimeActionsSubscription.unsubscribe();
 	}
 
 	get urgentType(): string {

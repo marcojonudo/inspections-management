@@ -20,8 +20,6 @@ export abstract class RealTimeBudget {
 
 	abstract update(): void;
 
-	// abstract updateInspectionsLayout(column: InspectionsColumn): void;
-
 	findIndex(budgets: Budget[], budget: Budget): number {
 		return budgets.findIndex(b => b.number === budget.number);
 	}

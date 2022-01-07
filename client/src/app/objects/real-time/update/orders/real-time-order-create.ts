@@ -3,11 +3,12 @@ import { RealTimeOrder } from './real-time-order';
 import { Order } from '../../../orders/order';
 import { InspectionsColumn } from '../../../../components/inspections/inspections.component';
 import { InspectionService } from '../../../../services/inspection.service';
+import { InspectionDetailsColumn } from '../../../../components/inspection-details/inspection-details.component';
 
 export class RealTimeOrderCreate extends RealTimeOrder {
 
-	constructor(orders: Order[], syncedOrders: Order[], order: Order, syncedOrder: Order) {
-		super(Constants.REAL_TIME_ORDER_TYPE.CREATE, orders, syncedOrders, order, syncedOrder);
+	constructor(orders: Order[], syncedOrder: Order) {
+		super(Constants.REAL_TIME_UPDATE_TYPE.CREATE, orders, [], undefined, syncedOrder);
 	}
 
 	check(): boolean {
@@ -18,9 +19,14 @@ export class RealTimeOrderCreate extends RealTimeOrder {
 		this.orders.push(this.syncedOrder);
 	}
 
-	updateInspectionsLayout(column: InspectionsColumn, columns: InspectionsColumn[]): void {
-		const newColumn = InspectionService.buildInspectionsRow(this.order, Constants.INSPECTIONS_COLUMN_DATA);
+	updateInspectionsLayout(column: InspectionsColumn, columns: InspectionsColumn[]): InspectionsColumn[] {
+		const newColumn = InspectionService.buildInspectionsRow(this.syncedOrder, Constants.INSPECTIONS_COLUMN_DATA);
 		columns.push(newColumn);
+		return [];
+	}
+
+	updateDetailsLayout(columns: InspectionDetailsColumn[]): InspectionDetailsColumn[] {
+		return [];
 	}
 
 }

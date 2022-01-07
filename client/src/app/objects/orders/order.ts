@@ -3,8 +3,9 @@ import { Client } from './client';
 import { Budget } from './budget';
 import { Vehicle } from './vehicles/vehicle';
 import { Builder } from '../../utils/builder';
+import { RealTimeObject } from '../real-time/update/real-time-object';
 
-export class Order {
+export class Order implements RealTimeObject {
 
 	number: number;
 	code: string;

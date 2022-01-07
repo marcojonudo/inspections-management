@@ -52,7 +52,6 @@ export class InspectionSheetComponent {
 		this.listElements = InspectionService.findGroupedItems(
 			items, 0, [(savedItem: SavedItem) => savedItem.item.category]
 		);
-		console.log('LIST ELEMENTS', this.listElements);
 		this.images = [];
 		this.imageListElements = [];
 

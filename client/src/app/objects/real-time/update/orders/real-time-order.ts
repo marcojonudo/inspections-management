@@ -1,27 +1,25 @@
 import { Order } from '../../../orders/order';
 import { InspectionsColumn } from '../../../../components/inspections/inspections.component';
+import { RealTimeAction } from '../real-time-action';
 
-export abstract class RealTimeOrder {
+export abstract class RealTimeOrder extends RealTimeAction {
 
-	private type: string;
 	protected orders: Order[];
 	protected syncedOrders: Order[];
 	order: Order;
 	syncedOrder: Order;
 
 	protected constructor(type: string, orders: Order[], syncedOrders: Order[], order: Order, syncedOrder: Order) {
-		this.type = type;
+		super(type);
 		this.orders = orders;
 		this.syncedOrders = syncedOrders;
 		this.order = order;
 		this.syncedOrder = syncedOrder;
 	}
 
-	abstract check(): boolean;
-
-	abstract update(): void;
-
-	abstract updateInspectionsLayout(column: InspectionsColumn, columns: InspectionsColumn[]): void;
+	findOrderNumber(): number {
+		return this.order.number;
+	}
 
 	findIndex(orders: Order[], order: Order): number {
 		return orders.findIndex(o => o.number === order.number);

@@ -12,12 +12,13 @@ import { RealTimeService } from '../../services/real-time.service';
 import { RealTimeOrder } from '../../objects/real-time/update/orders/real-time-order';
 
 export interface InspectionsColumn {
-	order: number;
+	order: string;
 	orderNumber: number;
 	brand: string;
 	model: string;
 	inspectionType: string;
 	inspectionState: string;
+	mechanic: string;
 	budgets: ItemBudget[];
 	clientContact: number;
 	acceptedBudget: boolean;
@@ -38,10 +39,10 @@ export class InspectionsComponent implements OnDestroy {
 	];
 
 	private budgetNotificationsSubscription: Subscription;
-	private realTimeOrdersSubscription: Subscription;
+	private realTimeActionsSubscription: Subscription;
 
 	columnsToDisplay: string[];
-	data: InspectionsColumn[];
+	rows: InspectionsColumn[];
 
 	constructor(
 		private inspectionService: InspectionService,
@@ -51,24 +52,29 @@ export class InspectionsComponent implements OnDestroy {
 		private snackBarService: SnackBarService
 	) {
 		this.columnsToDisplay = this.COLUMNS;
-		const orderInspections = this.findOrderInspections();
-		this.data = this.buildData(orderInspections);
+		const orderInspections = this.filterInspections();
+		const rows = this.buildRows(orderInspections);
+		this.rows = InspectionService.sortInspectionsRows(rows);
 		this.budgetNotificationsSubscription = this.inspectionService.budgetNotifications$.subscribe(() => {
 			/* La lista budgetNotifications ya se ha actualizado en el servicio. Aquí se consume el Observable para poder ejecutar un
 			 * ciclo de CD, y refrescar el contenido cuando se actualiza la notificación de cliente */
 			this.cdRef.detectChanges();
 		});
-		this.realTimeOrdersSubscription = this.realTimeService.realTimeOrders$.subscribe(realTimeOrders => {
-			if (realTimeOrders.length) {
-				console.log('Real time updates', realTimeOrders);
-				this.data.forEach(column => {
-					realTimeOrders.forEach(realTimeUpdate => {
-						const existent = column.orderNumber === realTimeUpdate.order.number;
+		this.realTimeActionsSubscription = this.realTimeService.realTimeActions$.subscribe(realTimeActions => {
+			if (realTimeActions.length) {
+				console.log('Inspections real time updates', realTimeActions);
+				let newRows = [];
+				this.rows.forEach(column => {
+					realTimeActions.forEach(realTimeUpdate => {
+						const existent = column.orderNumber === realTimeUpdate.findOrderNumber();
 						if (existent) {
-							realTimeUpdate.updateInspectionsLayout(column, this.data);
+							newRows = realTimeUpdate.updateInspectionsLayout(column, this.rows);
 						}
 					});
 				});
+				if (newRows.length) {
+					this.rows = newRows;
+				}
 				this.cdRef.detectChanges();
 			}
 		});
@@ -76,61 +82,22 @@ export class InspectionsComponent implements OnDestroy {
 
 	ngOnDestroy(): void {
 		this.budgetNotificationsSubscription.unsubscribe();
-		this.realTimeOrdersSubscription.unsubscribe();
+		this.realTimeActionsSubscription.unsubscribe();
 	}
 
-	findOrderInspections(orderInspections: OrderInspectionVehicle[] = InspectionService.orderInspections): OrderInspectionVehicle[] {
-		return this.filterInspections(orderInspections).sort((a, b) => {
-			let aType = this.findOrderItemBudgetType(a.order.number, false);
-			let bType = this.findOrderItemBudgetType(b.order.number, false);
-			if (!aType && !bType) {
-				aType = this.findOrderItemBudgetType(a.order.number, true);
-				bType = this.findOrderItemBudgetType(b.order.number, true);
-				if (!aType && !bType) {
-					const aState = InspectionService.findSavedInspection(a.order.number)?.state;
-					const bState = InspectionService.findSavedInspection(b.order.number)?.state;
-					if (aState && bState) {
-						const aStateOrder = this.findOrder(aState, Constants.INSPECTION_STATE_ORDER);
-						const bStateOrder = this.findOrder(bState, Constants.INSPECTION_STATE_ORDER);
-						return aStateOrder < bStateOrder ? -1 : (aStateOrder > bStateOrder ? 1 : 0);
-					} else if (aState) {
-						return -1;
-					} else if (bState) {
-						return 1;
-					} else {
-						const aCodeNumber = this.findCodeNumber(a.order.code);
-						const bCodeNumber = this.findCodeNumber(b.order.code);
-						return aCodeNumber < bCodeNumber ? -1 : (aCodeNumber > bCodeNumber ? 1 : 0);
-					}
-				}
-			}
-			const aOrder = this.findOrder(aType, Constants.BUDGET_TYPE_ORDER);
-			const bOrder = this.findOrder(bType, Constants.BUDGET_TYPE_ORDER);
-			return aOrder < bOrder ? -1 : (aOrder > bOrder ? 1 : 0);
-		});
-	}
-
-	findOrder(type: string, orderMap: any): number {
-		return orderMap[type] !== undefined ? orderMap[type] : 10;
-	}
-
-	findCodeNumber(orderCode: string): number {
-		return parseInt(orderCode.startsWith('C') ? orderCode.substring(1) : orderCode, 10);
-	}
-
-	filterInspections(orderInspections: OrderInspectionVehicle[]): OrderInspectionVehicle[] {
+	filterInspections(orderInspections: OrderInspectionVehicle[] = InspectionService.orderInspections): OrderInspectionVehicle[] {
 		return orderInspections.filter(o => o.order.keys && o.order.state !== Constants.ORDER_STATE.V);
 	}
 
-	buildData(orderInspections: OrderInspectionVehicle[], columnsData: any = Constants.INSPECTIONS_COLUMN_DATA): InspectionsColumn[] {
-		const data = [];
+	buildRows(orderInspections: OrderInspectionVehicle[], columnsData: any = Constants.INSPECTIONS_COLUMN_DATA): InspectionsColumn[] {
+		const rows = [];
 		orderInspections.forEach(orderInspection => {
 			const row = InspectionService.buildInspectionsRow(orderInspection.order, columnsData);
 			if (row) {
-				data.push(row);
+				rows.push(row);
 			}
 		});
-		return data;
+		return rows;
 	}
 
 	findColumnName(code: string): string {
@@ -147,7 +114,7 @@ export class InspectionsComponent implements OnDestroy {
 		return this.translate.instant(`inspection.state.${state}`);
 	}
 
-	checkRecommendedBudget(itemBudgets: ItemBudget[]): boolean {
+	checkRecommendedBudget(itemBudgets: ItemBudget[], a, b): boolean {
 		return itemBudgets.length > 0;
 	}
 

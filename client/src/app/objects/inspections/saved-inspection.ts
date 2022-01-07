@@ -1,11 +1,9 @@
 import { SavedItem } from './saved-items/saved-item';
 import { ItemBudget } from '../item-budget';
-import { Constants } from '../../utils/constants';
-import { Builder } from '../../utils/builder';
 import { Dayjs } from 'dayjs';
-import { InspectionService } from '../../services/inspection.service';
+import { RealTimeObject } from '../real-time/update/real-time-object';
 
-export class SavedInspection {
+export class SavedInspection implements RealTimeObject {
 
 	inspectionTypeCode: string;
 	orderNumber: number;
@@ -18,19 +16,14 @@ export class SavedInspection {
 	orderInspection: boolean;
 	saved: Dayjs;
 
-	constructor(savedInspection: any, itemBudgets: ItemBudget[]) {
+	constructor(savedInspection: any, savedItems: SavedItem[], itemBudgets: ItemBudget[]) {
 		this.inspectionTypeCode = savedInspection.inspectionTypeCode;
 		this.orderNumber = savedInspection.orderNumber;
 		this.vehicle = savedInspection.vehicle;
 		this.employeeCode = savedInspection.employeeCode;
 		this.state = savedInspection.state;
-		this.items = savedInspection.items.map(i => Builder.buildSavedItem(i));
-		this.itemBudgets = itemBudgets.filter(itemBudget => {
-			const item = this.items.find(savedItem =>
-				savedItem.item.type === Constants.ITEM_TYPE.SELECT && savedItem.item.code === itemBudget.itemCode
-			);
-			return item && item.filled && InspectionService.checkWrongSelectValue(item.findValue());
-		});
+		this.items = savedItems;
+		this.itemBudgets = itemBudgets;
 		this.orderInspection = savedInspection.orderInspection;
 	}
 

@@ -1,10 +1,11 @@
 package inspections.management.domains.savedItems
 
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import grails.gorm.annotation.Entity
 import org.grails.datastore.gorm.GormEntity
 
 @Entity
+@JsonIgnoreProperties(ignoreUnknown = true)
 class TextSavedItem extends SavedItem implements GormEntity<TextSavedItem> {
 
 	static hasMany = [fields: TextSavedItemField]

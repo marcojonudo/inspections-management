@@ -28,4 +28,8 @@ export class TextAreaSavedItem extends SavedItem {
 		this.updateCommonFields(employeeCode);
 	}
 
+	isUpdated(syncedSavedItem: TextAreaSavedItem): boolean {
+		return this.text !== syncedSavedItem.text;
+	}
+
 }

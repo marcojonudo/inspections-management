@@ -10,7 +10,7 @@ export class RealTimeBudgetLineUpdate extends RealTimeBudgetLine {
 	];
 
 	constructor(lines: BudgetLine[], syncedLines: BudgetLine[], line: BudgetLine, syncedLine: BudgetLine) {
-		super(Constants.REAL_TIME_BUDGET_LINE_TYPE.UPDATE, lines, syncedLines, line, syncedLine);
+		super(Constants.REAL_TIME_UPDATE_TYPE.UPDATE, lines, syncedLines, line, syncedLine);
 	}
 
 	check(): boolean {

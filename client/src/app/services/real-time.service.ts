@@ -4,31 +4,33 @@ import { Url } from '../utils/url';
 import { RealTimeType } from '../objects/real-time/real-time-type';
 import { OrderInspectionVehicle } from '../objects/order-inspection-vehicle';
 import { Observable, Subject } from 'rxjs';
-import { RealTimeOrderCreate } from '../objects/real-time/update/orders/real-time-order-create';
-import { RealTimeOrderDelete } from '../objects/real-time/update/orders/real-time-order-delete';
-import { RealTimeOrder } from '../objects/real-time/update/orders/real-time-order';
 import { Order } from '../objects/orders/order';
-import { RealTimeOrderUpdate } from '../objects/real-time/update/orders/real-time-order-update';
+import { SavedInspection } from '../objects/inspections/saved-inspection';
+import { RealTimeAction } from '../objects/real-time/update/real-time-action';
+import { RealTimeObject } from '../objects/real-time/update/real-time-object';
+import { RealTimeOrder } from '../objects/real-time/update/orders/real-time-order';
+import { RealTimeOrderDelete } from '../objects/real-time/update/orders/real-time-order-delete';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class RealTimeService {
 
-	realTimeOrdersSubject: Subject<RealTimeOrder[]>;
-	realTimeOrders$: Observable<RealTimeOrder[]>;
+	realTimeActionsSubject: Subject<RealTimeAction[]>;
+	realTimeActions$: Observable<RealTimeAction[]>;
 
 	constructor() {
 		this.connectUpdatePublisher();
 
-		this.realTimeOrdersSubject = new Subject<RealTimeOrder[]>();
-		this.realTimeOrders$ = this.realTimeOrdersSubject.asObservable();
+		this.realTimeActionsSubject = new Subject<RealTimeAction[]>();
+		this.realTimeActions$ = this.realTimeActionsSubject.asObservable();
 	}
 
 	connectUpdatePublisher(): void {
 		const eventSource = new EventSource(Url.publisher());
 		eventSource.onmessage = event => {
 			const updateInfo = JSON.parse(event.data);
+			console.log('Update info', updateInfo);
 			const type = RealTimeType.parse(updateInfo.type);
 			type.update(this, updateInfo);
 		};
@@ -39,34 +41,31 @@ export class RealTimeService {
 	): void {
 		const syncedOrders = syncedOrderInspections.map(o => o.order);
 		const orders = orderInspections.map(o => o.order);
-		const syncedUpdates = this.handleSyncedOrders(syncedOrders, orders);
-		const existentDataUpdates = this.handleExistentData(syncedOrders, orders);
+		/* Se obtienen las actualizaciones en tiempo real (creación, actualización y borrado de OR) */
+		const updates = this.findOrdersUpdates(RealTimeType.ORDER_INSPECTIONS, syncedOrders, orders);
 
-		const updates = syncedUpdates.concat(existentDataUpdates);
 		if (updates.length) {
 			updates.forEach(update => update.update());
-			this.realTimeOrdersSubject.next(updates);
+			this.realTimeActionsSubject.next(updates);
 		}
 	}
 
-	handleSyncedOrders(syncedOrders: Order[], orders: Order[]): RealTimeOrder[] {
+	findOrdersUpdates(type: RealTimeType, syncedOrders: Order[], orders: Order[]): RealTimeAction[] {
 		const updates = [];
+		/* Se recorre la lista de órdenes sincronizadas para comprobar si hay creaciones o actualizaciones */
 		syncedOrders.forEach(syncedOrder => {
-			const realTimeCreate = new RealTimeOrderCreate(orders, syncedOrders, undefined, syncedOrder);
-			if (realTimeCreate.check()) {
-				updates.push(realTimeCreate);
-			} else {
-				const order = realTimeCreate.find(syncedOrder);
-				const realTimeUpdate = new RealTimeOrderUpdate(orders, syncedOrders, order, syncedOrder);
-				if (realTimeUpdate.check()) {
-					updates.push(realTimeUpdate);
-				}
+			const update = this.handleCreateOrUpdateAction(type, orders, syncedOrder);
+			if (update) {
+				updates.push(update);
 			}
 		});
-		return updates;
+		/* Para comprobar si se ha borrado una orden, es necesario recorrer la lista de órdenes ya existentes (ya que una OR eliminada
+		 * no aparecerá en el nuevo array sincronizado) */
+		const deleteUpdates = this.findDeletedOrdersUpdates(syncedOrders, orders);
+		return updates.concat(deleteUpdates);
 	}
 
-	handleExistentData(syncedOrders: Order[], orders: Order[]): RealTimeOrder[] {
+	findDeletedOrdersUpdates(syncedOrders: Order[], orders: Order[]): RealTimeOrder[] {
 		const updates = [];
 		orders.forEach(order => {
 			const realTimeDelete = new RealTimeOrderDelete(orders, syncedOrders, order);
@@ -76,6 +75,33 @@ export class RealTimeService {
 			}
 		});
 		return updates;
+	}
+
+	syncSavedInspection(
+		syncedSavedInspection: SavedInspection, savedInspections: SavedInspection[] = InspectionService.savedInspections
+	): void {
+		/* Se obtienen las acciones para crear o actualizar una revisión. No se comprueba nada relativo a su eliminación, ya que desde la
+		 * aplicación de los móvil no se pueden borrar */
+		const syncedUpdate = this.handleCreateOrUpdateAction(RealTimeType.SAVED_INSPECTION, savedInspections, syncedSavedInspection);
+		if (syncedUpdate) {
+			syncedUpdate.update();
+			this.realTimeActionsSubject.next([syncedUpdate]);
+		}
+	}
+
+	handleCreateOrUpdateAction(type: RealTimeType, existentData: RealTimeObject[], syncedObject: RealTimeObject): RealTimeAction {
+		let realTimeAction;
+		const realTimeCreate = type.buildCreateAction(existentData, syncedObject);
+		if (realTimeCreate.check()) {
+			realTimeAction = realTimeCreate;
+		} else {
+			const object = realTimeCreate.find(syncedObject);
+			const realTimeUpdate = type.buildUpdateAction(existentData, object, syncedObject);
+			if (realTimeUpdate.check()) {
+				realTimeAction = realTimeUpdate;
+			}
+		}
+		return realTimeAction;
 	}
 
 }

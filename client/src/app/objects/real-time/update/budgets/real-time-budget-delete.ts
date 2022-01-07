@@ -5,7 +5,7 @@ import { Budget } from '../../../orders/budget';
 export class RealTimeBudgetDelete extends RealTimeBudget {
 
 	constructor(budgets: Budget[], syncedBudgets: Budget[], budget: Budget) {
-		super(Constants.REAL_TIME_BUDGET_TYPE.DELETE, budgets, syncedBudgets, budget, undefined);
+		super(Constants.REAL_TIME_UPDATE_TYPE.DELETE, budgets, syncedBudgets, budget, undefined);
 	}
 
 	check(): boolean {
