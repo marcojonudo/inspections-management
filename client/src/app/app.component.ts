@@ -27,6 +27,9 @@ export class AppComponent {
 		private translate: TranslateService,
 		private cdRef: ChangeDetectorRef
 	) {
+		RealTimeService.generateRandomId();
+		console.log('Session ID', RealTimeService.sessionId);
+
 		this.loading = true;
 
 		forkJoin([

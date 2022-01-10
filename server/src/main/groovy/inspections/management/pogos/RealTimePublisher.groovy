@@ -15,8 +15,8 @@ class RealTimePublisher {
 		return processor
 	}
 
-	static void send(RealTimeInfo realTimeInfo) {
-		find().onNext(Event.of(realTimeInfo))
+	static void send(RealTimeInfo realTimeInfo, String sessionId = "") {
+		processor.onNext(Event.of(realTimeInfo).id(sessionId))
 	}
 
 }

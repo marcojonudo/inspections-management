@@ -16,6 +16,8 @@ import { RealTimeOrderDelete } from '../objects/real-time/update/orders/real-tim
 })
 export class RealTimeService {
 
+	static sessionId: string;
+
 	realTimeActionsSubject: Subject<RealTimeAction[]>;
 	realTimeActions$: Observable<RealTimeAction[]>;
 
@@ -26,13 +28,19 @@ export class RealTimeService {
 		this.realTimeActions$ = this.realTimeActionsSubject.asObservable();
 	}
 
+	static generateRandomId(): void {
+		this.sessionId = Math.random().toString(36).slice(2);
+	}
+
 	connectUpdatePublisher(): void {
 		const eventSource = new EventSource(Url.publisher());
 		eventSource.onmessage = event => {
-			const updateInfo = JSON.parse(event.data);
-			console.log('Update info', updateInfo);
-			const type = RealTimeType.parse(updateInfo.type);
-			type.update(this, updateInfo);
+			if (event.lastEventId !== RealTimeService.sessionId) {
+				const updateInfo = JSON.parse(event.data);
+				console.log('Update info', updateInfo);
+				const type = RealTimeType.parse(updateInfo.type);
+				type.update(this, updateInfo);
+			}
 		};
 	}
 

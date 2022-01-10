@@ -38,6 +38,7 @@ import * as dayjs from 'dayjs';
 import { InspectionsColumn } from '../components/inspections/inspections.component';
 import { InspectionDetailsColumn } from '../components/inspection-details/inspection-details.component';
 import { TextSavedItemField } from '../objects/inspections/saved-items/text-saved-item-field';
+import { CountryHandlerType } from '../objects/country-info/country-handler-type';
 
 @Injectable({
 	providedIn: 'root'
@@ -82,11 +83,6 @@ export class InspectionService {
 			targetSavedItem.updateHidden(employeeCode, false),
 		REPLICATE: (targetSavedItem: SelectSavedItem, newValue: string, employeeCode: string) =>
 			targetSavedItem.update(Constants.SELECT_ITEM_OPTION_CODE.P, employeeCode)
-	};
-
-	static readonly COUNTRY_HANDLER_DECIDER: any = {
-		es: new SpainHandler(),
-		pt: new PortugalHandler()
 	};
 
 	filters: OrdersFilter[];
@@ -506,7 +502,7 @@ export class InspectionService {
 		return (language ? of(language) : this.http.get(Url.language(), { responseType: 'text' })).pipe(
 			catchError(() => of(Constants.DEFAULT_LANGUAGE)),
 			tap((lang: string) => {
-				InspectionService.countryHandler = InspectionService.COUNTRY_HANDLER_DECIDER[lang];
+				InspectionService.countryHandler = CountryHandlerType.parse(lang).handler;
 				LocalStorageService.setItem(Constants.LOCAL_STORAGE.LANGUAGE, lang);
 				console.log('Language', lang);
 			})

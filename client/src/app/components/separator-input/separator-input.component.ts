@@ -10,12 +10,12 @@ import {
 	Self,
 	ViewChildren
 } from '@angular/core';
-import { TextItemField } from '../objects/inspections/items/text-item-field';
-import { TextSavedItemField } from '../objects/inspections/saved-items/text-saved-item-field';
+import { TextItemField } from '../../objects/inspections/items/text-item-field';
+import { TextSavedItemField } from '../../objects/inspections/saved-items/text-saved-item-field';
 import { MAT_FORM_FIELD, MatFormField, MatFormFieldControl } from '@angular/material/form-field';
 import { AbstractControl, ControlValueAccessor, FormBuilder, FormGroup, NgControl, Validators } from '@angular/forms';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { Constants } from '../utils/constants';
+import { Constants } from '../../utils/constants';
 import { Subject } from 'rxjs';
 import { FocusMonitor } from '@angular/cdk/a11y';
 

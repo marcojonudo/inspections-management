@@ -144,7 +144,7 @@ export class Constants {
 
 	static readonly INSPECTION_DETAILS_COLUMN_DATA: any = {
 		item: (i: ItemBudget) => i,
-		image: (i: ItemBudget, savedItem: SavedItem) => savedItem.image,
+		image: (i: ItemBudget, savedItem: SavedItem) => savedItem.imageId,
 		budget: (i: ItemBudget, savedItem: SavedItem, budget: Budget) => budget
 	};
 

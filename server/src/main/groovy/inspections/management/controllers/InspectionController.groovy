@@ -8,6 +8,7 @@ import inspections.management.domains.schedules.EmployeeData
 import inspections.management.pogos.OrderInspection
 import inspections.management.pogos.RealTimePublisher
 import inspections.management.pogos.realTime.RealTimeInfo
+import inspections.management.pogos.realTime.RealTimeSavedInspection
 import inspections.management.services.InspectionService
 import inspections.management.services.data.*
 import inspections.management.utils.Constants
@@ -262,11 +263,18 @@ class InspectionController {
         content = @Content(schema = @Schema(implementation = BudgetNotification))
     )
     @ApiResponse(responseCode = "500", description = "Error actualizando la revisión")
-    HttpResponse<SavedInspection> updateInspection(@Body SavedInspection savedInspection) {
+    HttpResponse<SavedInspection> updateInspection(@Header String sessionId, @Body SavedInspection savedInspection) {
          SavedInspection newSavedInspection = inspectionService.saveInspection(
             savedInspection, savedInspection.orderNumber, savedInspection.sellerCode
         )
-        return newSavedInspection ? HttpResponse.ok(savedInspection) : HttpResponse.serverError(newSavedInspection)
+        HttpResponse<SavedInspection> response
+        if (newSavedInspection) {
+            RealTimePublisher.send(new RealTimeSavedInspection(savedInspection), sessionId)
+            response = HttpResponse.ok(savedInspection)
+        } else {
+            response = HttpResponse.serverError()
+        }
+        return response
     }
 
 }
