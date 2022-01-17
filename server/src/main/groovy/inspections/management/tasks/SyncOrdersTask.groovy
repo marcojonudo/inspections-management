@@ -39,9 +39,6 @@ class SyncOrdersTask {
 
         List<OrderInspection> orderInspections = inspectionService.findOrderInspections(orderInspectionOrders) +
             inspectionService.findDetectedAnomaliesInspections(detectedAnomaliesOrders)
-//        orderInspections.each { OrderInspection orderInspection ->
-//            orderInspection.savedInspection = savedInspections.find { it.orderNumber == orderInspection.order.number }
-//        }
         LOG.info("Sync JPDV task: ${ChronoUnit.MILLIS.between(refTime, LocalTime.now())}")
         RealTimePublisher.send(new RealTimeOrders(orderInspections))
     }

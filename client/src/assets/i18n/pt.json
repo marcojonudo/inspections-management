@@ -44,6 +44,7 @@
 			"RPF": "Curso de pedal travão",
 			"FFM": "Comprovar curso  travao de mão",
 			"KM": "Quilômetros",
+			"FPITV": "Próxima data de ITV",
 			"FCLX": "Comprovar buzina",
 			"FLPB": "Comprovar limpa vidros",
 			"LPDI": "Luz de presença DD",
@@ -189,5 +190,19 @@
 			"acceptedBudget": "Pto. Aceito",
 			"item": "Item"
 		}
+	},
+	"dialog": {
+		"employeeCode": "Código de empleado",
+		"introduceEmployeeCode": "Introduce el código de empleado"
+	},
+	"validation": {
+		"requiredEmployeeCode": "Debes introducir un código de empleado"
+	},
+	"message": {
+		"EMPLOYEE_NOT_FOUND": "Empleado no encontrado. Accede a la aplicación de horarios para sincronizarlos y prueba de nuevo",
+		"ERROR_SAVING_INSPECTION": "Error al guardar la revisión. Por favor, inténtalo de nuevo",
+		"SAVED_INSPECTION": "Revisión guardada correctamente",
+		"ORDER_WITHOUT_SAVED_INSPECTION": "La orden no tiene una revisión guardada asociada",
+		"noWrongItems": "Revisão sem itens em mau estado!"
 	}
 }

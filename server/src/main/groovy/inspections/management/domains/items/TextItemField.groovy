@@ -2,6 +2,7 @@ package inspections.management.domains.items
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonInclude
 import grails.gorm.annotation.Entity
 import org.grails.datastore.gorm.GormEntity
 
@@ -15,8 +16,15 @@ class TextItemField implements GormEntity<TextItemField> {
     String placeholder
     String separator
     String prefix
+    String inputType
+    boolean select
     Integer maxLength
     int order
+
+    @JsonInclude
+    Set<TextItemFieldValue> values
+
+    static hasMany = [values: TextItemFieldValue]
 
     static constraints = {
         placeholder nullable: true
@@ -27,6 +35,7 @@ class TextItemField implements GormEntity<TextItemField> {
 
     static mapping = {
         order column: '`order`'
+        values fetch: 'join'
     }
 
 }

@@ -1,5 +1,4 @@
 import { Order } from '../../../orders/order';
-import { InspectionsColumn } from '../../../../components/inspections/inspections.component';
 import { RealTimeAction } from '../real-time-action';
 
 export abstract class RealTimeOrder extends RealTimeAction {
@@ -18,7 +17,7 @@ export abstract class RealTimeOrder extends RealTimeAction {
 	}
 
 	findOrderNumber(): number {
-		return this.order.number;
+		return (this.order || this.syncedOrder).number;
 	}
 
 	findIndex(orders: Order[], order: Order): number {

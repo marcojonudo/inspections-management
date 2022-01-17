@@ -65,15 +65,28 @@
 							<span *ngIf="checkIndividualTextField(findTextItem(item))" matPrefix>
 								{{findTextItemField(item).prefix}}
 							</span>
-							<input
-								matInput
-								*ngIf="checkIndividualTextField(findTextItem(item)); else separatorInput"
-								type="tel"
-								[maxLength]="findTextItemFieldMaxLength(item)"
-								[placeholder]="findTextItemField(item).placeholder"
-								[(ngModel)]="findTextSavedItemField(item).text"
-								(change)="updateText(findTextSavedItem(item))"
-								autocomplete="off">
+							<ng-container *ngIf="checkIndividualTextField(findTextItem(item)); else separatorInput">
+								<mat-select
+									*ngIf="findTextItemField(item).select; else textInput"
+									[(ngModel)]="findTextSavedItemField(item).text"
+									(selectionChange)="updateText(findTextSavedItem(item))">
+									<mat-option
+										*ngFor="let option of findTextItemField(item).values | order"
+										[value]="option.value">
+										{{option.value}}
+									</mat-option>
+								</mat-select>
+								<ng-template #textInput>
+									<input
+										matInput
+										[type]="findTextItemField(item).inputType"
+										[maxLength]="findTextItemFieldMaxLength(item)"
+										[placeholder]="findTextItemField(item).placeholder"
+										[(ngModel)]="findTextSavedItemField(item).text"
+										(change)="updateText(findTextSavedItem(item))"
+										autocomplete="off">
+								</ng-template>
+							</ng-container>
 							<ng-template #separatorInput>
 								<app-separator-input
 									[fields]="findTextItem(item).fields"

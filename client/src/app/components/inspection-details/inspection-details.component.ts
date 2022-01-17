@@ -68,12 +68,14 @@ export class InspectionDetailsComponent implements OnDestroy {
 
 		this.realTimeActionsSubscription = this.realTimeService.realTimeActions$.subscribe(realTimeActions => {
 			if (realTimeActions.length && this.orderInspection) {
+				console.log('real time actions', realTimeActions);
 				const selectedOrderUpdate = realTimeActions.find(update => update.findOrderNumber() === this.orderInspection.order.number);
 				if (selectedOrderUpdate) {
 					const newRows = selectedOrderUpdate.updateDetailsLayout(this.data);
 					if (newRows.length) {
 						this.data = newRows;
 					}
+					console.log('details data', this.data);
 					this.cdRef.detectChanges();
 				}
 			}
@@ -147,7 +149,9 @@ export class InspectionDetailsComponent implements OnDestroy {
 
 	openInspection(): void {
 		const dialogRef = this.dialog.open(EmployeeDialogComponent);
+		console.log('dialog ref', dialogRef);
 		dialogRef.afterClosed().subscribe((employeeCode: string) => {
+			console.log('CLOSED!!!!');
 			if (employeeCode) {
 				EmployeeService.setEmployee(employeeCode);
 				this.router.navigate([`${Constants.PATH.HOME}${Constants.PATH.INSPECTION}`]);

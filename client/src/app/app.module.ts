@@ -40,6 +40,7 @@ import { ImageDialogComponent } from './components/image-dialog/image-dialog.com
 import { registerLocaleData } from '@angular/common';
 import { SeparatorInputComponent } from './components/separator-input/separator-input.component';
 import { SessionIdInterceptor } from './interceptors/session-id-interceptor';
+import { MatSelectModule } from '@angular/material/select';
 registerLocaleData(localeEs);
 
 @NgModule({
@@ -87,7 +88,8 @@ registerLocaleData(localeEs);
 		MatSnackBarModule,
 		MatDialogModule,
 		ChartsModule,
-		MatProgressSpinnerModule
+		MatProgressSpinnerModule,
+		MatSelectModule
 	],
 	providers: [
 		OrderPipe,

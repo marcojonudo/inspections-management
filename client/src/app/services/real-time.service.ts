@@ -53,6 +53,8 @@ export class RealTimeService {
 		const updates = this.findOrdersUpdates(RealTimeType.ORDER_INSPECTIONS, syncedOrders, orders);
 
 		if (updates.length) {
+			console.log('orders', orders);
+			console.log('updates', updates);
 			updates.forEach(update => update.update());
 			this.realTimeActionsSubject.next(updates);
 		}
