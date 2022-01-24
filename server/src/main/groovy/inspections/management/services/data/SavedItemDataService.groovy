@@ -13,6 +13,7 @@ abstract class SavedItemDataService {
 
 	@Inject TextSavedItemDataService textSavedItemDataService
 	@Inject SelectSavedItemDataService selectSavedItemDataService
+	@Inject TextAreaSavedItemDataService textAreaSavedItemDataService
 
 	abstract SavedItem update(Serializable id, String employeeCode, boolean hidden, LocalDateTime filled)
 
@@ -21,7 +22,7 @@ abstract class SavedItemDataService {
 	@Transactional
 	SavedItem update(SavedItem existent, SavedItem savedItem) {
 		update(existent.id, savedItem.employeeCode, savedItem.hidden, savedItem.filled)
-		return ((Closure<SavedItem>) savedItem.item.type.updateSavedItem)(existent.id, savedItem, this)
+		return ((Closure<SavedItem>) savedItem.item.type.updateSavedItem)(existent, savedItem, this)
 	}
 
 }

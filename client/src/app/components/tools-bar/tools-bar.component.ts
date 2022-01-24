@@ -10,6 +10,7 @@ import { filter, finalize } from 'rxjs/operators';
 import { Constants } from '../../utils/constants';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { SnackBarService } from '../../services/snack-bar.service';
+import { AllOrdersFilter } from '../../objects/filters/all-orders-filter';
 
 @Component({
 	selector: 'app-tools-bar',
@@ -37,10 +38,10 @@ import { SnackBarService } from '../../services/snack-bar.service';
 })
 export class ToolsBarComponent {
 
-	pendingFilter: OrdersFilter[];
-	todayFilter: OrdersFilter[];
-	allFilters: OrdersFilter[];
-	selectedFilters: OrdersFilter[];
+	pendingFilter: OrdersFilter;
+	todayFilter: OrdersFilter;
+	allFilter: OrdersFilter;
+	selectedFilter: OrdersFilter;
 	url: string;
 	saving: boolean;
 
@@ -52,10 +53,10 @@ export class ToolsBarComponent {
 		private router: Router,
 		private cdRef: ChangeDetectorRef
 	) {
-		this.pendingFilter = [new PendingOrdersFilter()];
-		this.todayFilter = [new TodayOrdersFilter()];
-		this.allFilters = this.todayFilter.concat(this.pendingFilter);
-		this.selectedFilters = this.todayFilter;
+		this.pendingFilter = new PendingOrdersFilter();
+		this.todayFilter = new TodayOrdersFilter();
+		this.allFilter = new AllOrdersFilter();
+		this.selectedFilter = this.todayFilter;
 		this.router.events.pipe(
 			filter(event => event instanceof NavigationEnd)
 		).subscribe((event: NavigationEnd) => {
@@ -72,14 +73,14 @@ export class ToolsBarComponent {
 		return url && url.includes(path);
 	}
 
-	checkSelectedFilter(filters: OrdersFilter[], selectedFilters: OrdersFilter[] = this.selectedFilters): boolean {
-		return filters === selectedFilters;
+	checkSelectedFilter(filter: OrdersFilter, selectedFilter: OrdersFilter = this.selectedFilter): boolean {
+		return filter === selectedFilter;
 	}
 
-	filterOrders(filters: OrdersFilter[]): void {
-		this.selectedFilters = filters;
+	filterOrders(filter: OrdersFilter): void {
+		this.selectedFilter = filter;
 		this.loadingService.start();
-		this.inspectionService.loadMainInfo(filters).subscribe(() => this.loadingService.stop());
+		this.inspectionService.loadMainInfo([filter]).subscribe(() => this.loadingService.stop());
 	}
 
 	print(): void {

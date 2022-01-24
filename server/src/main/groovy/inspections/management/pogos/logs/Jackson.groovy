@@ -13,8 +13,8 @@ class Jackson {
 		return mapper
 	}
 
-	static Map convertValue(Object object) {
-		return getMapper().convertValue(object, Map)
+	static Object convertValue(Object object, Class clazz = Object) {
+		return getMapper().convertValue(object, clazz)
 	}
 
 	static String writeValueAsString(Object object) {

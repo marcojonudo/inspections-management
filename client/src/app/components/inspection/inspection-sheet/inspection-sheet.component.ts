@@ -1,17 +1,11 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { ListElement } from '../../../objects/list-elements/list-element';
 import { SavedInspection } from '../../../objects/inspections/saved-inspection';
 import { InspectionHandler } from '../../../objects/inspection-handler/inspection-handler';
-import { ChartOptions } from 'chart.js';
-import { Color } from 'ng2-charts';
-import { Dayjs } from 'dayjs';
 import { Constants } from '../../../utils/constants';
 import { OrderPipe } from '../../../pipes/order.pipe';
 import { InspectionService } from '../../../services/inspection.service';
-import { OrderInspectionHandler } from '../../../objects/inspection-handler/order-inspection-handler';
-import { DetectedFaultsHandler } from '../../../objects/inspection-handler/detected-faults-handler';
 import { SavedItem } from '../../../objects/inspections/saved-items/saved-item';
-import * as dayjs from 'dayjs';
 import { Order } from '../../../objects/orders/order';
 import { Centre } from '../../../objects/centre';
 import { SelectItemOption } from '../../../objects/inspections/items/select-item-option';
@@ -26,11 +20,15 @@ import { Item } from '../../../objects/inspections/items/item';
 import { Url } from '../../../utils/url';
 import { Image } from '../../../objects/inspections/image';
 import { HttpClient } from '@angular/common/http';
+import { TextAreaSavedItem } from '../../../objects/inspections/saved-items/text-area-saved-item';
+import { TextItemField } from '../../../objects/inspections/items/text-item-field';
+import { TextSavedItemField } from '../../../objects/inspections/saved-items/text-saved-item-field';
 
 @Component({
 	selector: 'app-inspection-sheet',
 	templateUrl: './inspection-sheet.component.html',
-	styleUrls: ['./inspection-sheet.component.sass']
+	styleUrls: ['./inspection-sheet.component.sass'],
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class InspectionSheetComponent {
 
@@ -119,6 +117,10 @@ export class InspectionSheetComponent {
 		return item as SelectItem;
 	}
 
+	findTextItem(savedItem: SavedItem): TextItem {
+		return savedItem.item as TextItem;
+	}
+
 	findSelectSavedItem(item: SavedItem): SelectSavedItem {
 		return item as SelectSavedItem;
 	}
@@ -127,8 +129,12 @@ export class InspectionSheetComponent {
 		return item as TextSavedItem;
 	}
 
+	findTextAreaSavedItem(item: SavedItem): TextAreaSavedItem {
+		return item as TextAreaSavedItem;
+	}
+
 	findTextItemUnit(item: SavedItem): string {
-		return this.findTextSavedItem(item).text ? (item.item as TextItem).unit || '' : '';
+		return this.findTextSavedItem(item).isFilled() ? this.findTextItem(item).unit || '' : '';
 	}
 
 	findIconColor(code: string): string {
@@ -139,7 +145,23 @@ export class InspectionSheetComponent {
 		return item instanceof Category;
 	}
 
-	findTextAreaLines(item: TextSavedItem): string[] {
+	checkIndividualTextField(item: TextItem): boolean {
+		return item.fields.length === 1;
+	}
+
+	findTextItemField(savedItem: SavedItem): TextItemField {
+		return this.findTextItem(savedItem).fields[0];
+	}
+
+	findTextSavedItemField(savedItem: SavedItem): TextSavedItemField {
+		return this.findTextSavedItem(savedItem).fields[0];
+	}
+
+	findTextItemFieldMaxLength(savedItem: SavedItem): number {
+		return this.findTextItemField(savedItem).maxLength || Constants.TEXT_ITEM_MAX_LENGTH;
+	}
+
+	findTextAreaLines(item: TextAreaSavedItem): string[] {
 		return item.text ? item.text.split('\n') : [];
 	}
 
@@ -188,7 +210,7 @@ export class InspectionSheetComponent {
 		const selectedIndex = this.findOptionIndex(savedItem, item.options);
 		const newIndex = this.inspectionHandler.findSelectOptionIndex(selectedIndex, item.options.length);
 
-		InspectionService.updateItem(savedItem, item, item.options[newIndex].code, this.savedInspection).subscribe();
+		InspectionService.updateSelectItem(savedItem, item, item.options[newIndex].code, this.savedInspection).subscribe();
 	}
 
 	findOptionIndex(savedItem: SelectSavedItem, options: SelectItemOption[]): number {
@@ -197,8 +219,11 @@ export class InspectionSheetComponent {
 	}
 
 	updateText(savedItem: TextSavedItem): void {
-		InspectionService.updateItem(savedItem, savedItem.item, savedItem.text, this.savedInspection).subscribe();
-		console.log(savedItem.text);
+		InspectionService.updateTextItem(savedItem, savedItem.item, savedItem.fields, this.savedInspection);
+	}
+
+	updateSeparatorValue(savedItem: SavedItem, fields: TextSavedItemField[]): void {
+		InspectionService.updateTextItem(savedItem, savedItem.item, fields, this.savedInspection);
 	}
 
 	checkCategoryBreak(elem: ListElement): boolean {

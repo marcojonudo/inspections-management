@@ -18,9 +18,6 @@
 		button
 			@include flex-center
 
-			mat-icon
-				font-size: 2.25em
-
 	td
 		position: relative
 		text-align: center
@@ -36,6 +33,9 @@
 	.image-column, .inspection-button-column
 		width: 40px
 		max-width: 40px
+
+	.inspection-button-column mat-icon
+		font-size: 2.25em
 
 	.client-contact-header
 
@@ -53,9 +53,14 @@
 
 	#correct-inspection
 		height: 100%
-		@include flex-center
+		@include flex-column-center
 		text-align: center
 		background-color: $light-grey
 		color: rgba(0, 0, 0, .54)
 		font-size: $medium-font
 		font-weight: 500
+
+		mat-icon
+			height: 100%
+			width: 100%
+			font-size: 2.25em

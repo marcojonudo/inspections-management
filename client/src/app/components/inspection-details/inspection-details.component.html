@@ -70,7 +70,10 @@
 		</table>
 		<ng-template #emptyTemplate>
 			<div *ngIf="orderInspection" id="correct-inspection">
-				<p>¡Revisión sin items en mal estado!</p>
+				<p translate>message.noWrongItems</p>
+				<button mat-icon-button (click)="openInspection()">
+					<mat-icon>visibility</mat-icon>
+				</button>
 			</div>
 		</ng-template>
 	</div>

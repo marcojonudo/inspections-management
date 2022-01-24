@@ -29,4 +29,8 @@ export class SelectSavedItem extends SavedItem {
 		this.updateCommonFields(employeeCode);
 	}
 
+	isUpdated(syncedSavedItem: SelectSavedItem): boolean {
+		return this.value !== syncedSavedItem.value;
+	}
+
 }

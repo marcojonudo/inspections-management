@@ -1,0 +1,33 @@
+@import "src/styles/abstracts/mixins"
+
+\:host
+	font-size: 1.2em
+
+
+	.separator-input-container
+		display: flex
+
+		.separator-field-wrapper
+			display: flex
+			@include flex-1
+
+			.separator-input-element
+				width: 100%
+				text-align: center
+
+	&.separator-input-floating
+
+		.separator-input-spacer, .separator-field-wrapper .separator-input-element::placeholder
+			opacity: 1
+
+		.separator-input-element::placeholder
+			opacity: 0
+			transition: opacity $fast-transition
+
+	.mat-select
+		font-size: .8em
+		text-align: center
+
+.separator-input-spacer
+	opacity: 0
+	transition: opacity $fast-transition

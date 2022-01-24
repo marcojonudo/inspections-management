@@ -2,10 +2,20 @@ package inspections.management.services.data
 
 import grails.gorm.services.Service
 import inspections.management.domains.savedItems.TextSavedItem
+import inspections.management.domains.savedItems.TextSavedItemField
+
+import javax.inject.Inject
 
 @Service(TextSavedItem)
-interface TextSavedItemDataService {
+abstract class TextSavedItemDataService {
 
-	TextSavedItem update(Serializable id, String text)
+	@Inject TextSavedItemFieldDataService textSavedItemFieldDataService
+
+	TextSavedItem update(TextSavedItem savedItem, Set<TextSavedItemField> fields) {
+		fields.each {
+			textSavedItemFieldDataService.update(savedItem, it.order, it.text)
+		}
+		return savedItem
+	}
 
 }

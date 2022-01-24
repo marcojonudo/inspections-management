@@ -1,8 +1,17 @@
+import { Order } from '../objects/orders/order';
+import { OrderInspectionVehicle } from '../objects/order-inspection-vehicle';
+import { SavedInspection } from '../objects/inspections/saved-inspection';
+import { InspectionService } from '../services/inspection.service';
+import { ItemBudget } from '../objects/item-budget';
+import { SavedItem } from '../objects/inspections/saved-items/saved-item';
+import { Budget } from '../objects/orders/budget';
+
 export class Constants {
 
 	static readonly DEFAULT_LANGUAGE: string = 'es';
 	static readonly DETECTED_ANOMALIES_CODE = 'AD';
 	static readonly EMPLOYEE_CODE_MAX_LENGTH: number = 7;
+	static readonly TEXT_ITEM_MAX_LENGTH = 10;
 
 	static readonly LOCAL_STORAGE: any = {
 		LANGUAGE: 'language',
@@ -110,6 +119,33 @@ export class Constants {
 	static readonly VEHICLE_TYPE: any = {
 		CAR: 'CAR',
 		SCOOTER: 'SCOOTER'
+	};
+
+	static readonly REAL_TIME_UPDATE_TYPE: any = {
+		CREATE: 'CREATE',
+		DELETE: 'DELETE',
+		UPDATE: 'UPDATE'
+	};
+
+	static readonly INSPECTIONS_COLUMN_DATA: any = {
+		order: (o: Order) => o.code,
+		orderNumber: (o: Order) => o.number,
+		brand: (o: Order) => o.vehicle.brand,
+		model: (o: Order) => o.vehicle.model,
+		inspectionType: (o: Order, inspection: OrderInspectionVehicle) =>
+			inspection.inspection?.inspectionType?.code || Constants.DETECTED_ANOMALIES_CODE,
+		inspectionState: (o: Order, inspection: OrderInspectionVehicle, savedInspection: SavedInspection) =>
+			savedInspection ? savedInspection.state : Constants.INSPECTION_STATE.PENDING,
+		mechanic: (o: Order, inspection: OrderInspectionVehicle, savedInspection: SavedInspection) =>
+			InspectionService.findMechanicCode(o, savedInspection),
+		budgets: (o: Order, inspection: OrderInspectionVehicle, savedInspection: SavedInspection) =>
+			savedInspection ? savedInspection.itemBudgets : []
+	};
+
+	static readonly INSPECTION_DETAILS_COLUMN_DATA: any = {
+		item: (i: ItemBudget) => i,
+		image: (i: ItemBudget, savedItem: SavedItem) => savedItem.imageId,
+		budget: (i: ItemBudget, savedItem: SavedItem, budget: Budget) => budget
 	};
 
 }

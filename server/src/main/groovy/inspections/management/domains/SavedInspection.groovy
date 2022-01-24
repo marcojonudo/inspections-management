@@ -1,7 +1,9 @@
 package inspections.management.domains
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import grails.gorm.annotation.Entity
+import inspections.management.deserializers.SavedItemsDeserializer
 import inspections.management.domains.savedItems.SavedItem
 import inspections.management.utils.Constants
 import org.grails.datastore.gorm.GormEntity
@@ -21,6 +23,9 @@ class SavedInspection implements GormEntity<SavedInspection> {
 
 	@JsonFormat(pattern = Constants.DateTimeFormat.yyyy_MM_dd_HH_mm_ss, timezone = Constants.SPAIN_TIMEZONE)
 	LocalDateTime saved
+
+	@JsonDeserialize(using = SavedItemsDeserializer)
+	Set<SavedItem> items
 
 	static hasMany = [items: SavedItem]
 

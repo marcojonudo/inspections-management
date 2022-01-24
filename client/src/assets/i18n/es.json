@@ -44,6 +44,7 @@
 			"RPF": "Recorrido pedal de freno",
 			"FFM": "Función freno de mano",
 			"KM": "Kilómetros",
+			"FPITV": "Fecha próxima ITV",
 			"FCLX": "Funcionamiento Claxon",
 			"FLPB": "Funcionamiento lavaparabrisas",
 			"LPDI": "Luz de posición DI",
@@ -141,6 +142,7 @@
 			"DFTI": "Disco de frenos TI",
 			"LAFTI": "Latiguillo de freno TI",
 			"ATI": "Amortiguador TI",
+			"PN": "Promedia neumáticos",
 			"PPN": "Puesta a presión neumáticos",
 			"CVGN": "Control visual geometría neumáticos",
 			"SF": "Silencioso final",
@@ -398,6 +400,7 @@
 		"EMPLOYEE_NOT_FOUND": "Empleado no encontrado. Accede a la aplicación de horarios para sincronizarlos y prueba de nuevo",
 		"ERROR_SAVING_INSPECTION": "Error al guardar la revisión. Por favor, inténtalo de nuevo",
 		"SAVED_INSPECTION": "Revisión guardada correctamente",
-		"ORDER_WITHOUT_SAVED_INSPECTION": "La orden no tiene una revisión guardada asociada"
+		"ORDER_WITHOUT_SAVED_INSPECTION": "La orden no tiene una revisión guardada asociada",
+		"noWrongItems": "¡Revisión sin items en mal estado!"
 	}
 }

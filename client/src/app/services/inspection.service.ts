@@ -35,6 +35,10 @@ import { OrderInspectionHandler } from '../objects/inspection-handler/order-insp
 import { DetectedFaultsHandler } from '../objects/inspection-handler/detected-faults-handler';
 import { InspectionHandler } from '../objects/inspection-handler/inspection-handler';
 import * as dayjs from 'dayjs';
+import { InspectionsColumn } from '../components/inspections/inspections.component';
+import { InspectionDetailsColumn } from '../components/inspection-details/inspection-details.component';
+import { TextSavedItemField } from '../objects/inspections/saved-items/text-saved-item-field';
+import { CountryHandlerType } from '../objects/country-info/country-handler-type';
 
 @Injectable({
 	providedIn: 'root'
@@ -79,11 +83,6 @@ export class InspectionService {
 			targetSavedItem.updateHidden(employeeCode, false),
 		REPLICATE: (targetSavedItem: SelectSavedItem, newValue: string, employeeCode: string) =>
 			targetSavedItem.update(Constants.SELECT_ITEM_OPTION_CODE.P, employeeCode)
-	};
-
-	static readonly COUNTRY_HANDLER_DECIDER: any = {
-		es: new SpainHandler(),
-		pt: new PortugalHandler()
 	};
 
 	filters: OrdersFilter[];
@@ -137,6 +136,15 @@ export class InspectionService {
 		const builtItemBudgets = itemBudgets.map(i => new ItemBudget(i));
 		LocalStorageService.setItem(Constants.LOCAL_STORAGE.ITEM_BUDGETS, builtItemBudgets);
 		return builtItemBudgets;
+	}
+
+	static filterItemBudgets(savedItems: SavedItem[], itemBudgets: ItemBudget[] = this.itemBudgets): ItemBudget[] {
+		return itemBudgets.filter(itemBudget => {
+			const item = savedItems.find(savedItem =>
+				savedItem.item.type === Constants.ITEM_TYPE.SELECT && savedItem.item.code === itemBudget.itemCode
+			);
+			return item && item.filled && InspectionService.checkWrongSelectValue(item.findValue());
+		});
 	}
 
 	static findOrderInspection(
@@ -217,7 +225,6 @@ export class InspectionService {
 		savedInspections.forEach(savedInspection => {
 			const orderInspection = this.findOrderInspection(savedInspection.orderNumber);
 
-			// console.log('order inspection', savedInspection.orderNumber, orderInspection);
 			const foundItemBudgets = type ?
 				savedInspection.itemBudgets.filter(itemBudget => itemBudget.budgetType === type) : savedInspection.itemBudgets;
 			const pendingItemBudgets = foundItemBudgets.filter(itemBudget =>
@@ -339,7 +346,103 @@ export class InspectionService {
 		return value === Constants.SELECT_ITEM_OPTION_CODE.SN || value === Constants.SELECT_ITEM_OPTION_CODE.PS;
 	}
 
-	static updateItem(
+	static buildInspectionsRow(order: Order, columnsData: any): InspectionsColumn {
+		const inspection = InspectionService.findOrderInspection(order.number);
+		let row = undefined;
+		if (inspection) {
+			const allColumns = Object.keys(columnsData);
+			const savedInspection = InspectionService.findSavedInspection(order.number);
+			row = {};
+			allColumns.forEach(key => {
+				const handler = columnsData[key];
+				if (handler) {
+					row[key] = handler(order, inspection, savedInspection);
+				}
+			});
+		}
+		return row;
+	}
+
+	static sortInspectionsRows(rows: InspectionsColumn[]): InspectionsColumn[] {
+		return rows.sort((a, b) => {
+			let aType = this.findOrderItemBudgetType(a.orderNumber, false);
+			let bType = this.findOrderItemBudgetType(b.orderNumber, false);
+			if (!aType && !bType) {
+				aType = this.findOrderItemBudgetType(a.orderNumber, true);
+				bType = this.findOrderItemBudgetType(b.orderNumber, true);
+				if (!aType && !bType) {
+					const aState = InspectionService.findSavedInspection(a.orderNumber)?.state;
+					const bState = InspectionService.findSavedInspection(b.orderNumber)?.state;
+					if (aState && bState) {
+						const aStateOrder = this.findInspectionsRowOrder(aState, Constants.INSPECTION_STATE_ORDER);
+						const bStateOrder = this.findInspectionsRowOrder(bState, Constants.INSPECTION_STATE_ORDER);
+						return aStateOrder < bStateOrder ? -1 : (aStateOrder > bStateOrder ? 1 : 0);
+					} else if (aState) {
+						return -1;
+					} else if (bState) {
+						return 1;
+					} else {
+						return this.compareCodeNumbers(a, b);
+					}
+				}
+			}
+			const aOrder = this.findInspectionsRowOrder(aType, Constants.BUDGET_TYPE_ORDER);
+			const bOrder = this.findInspectionsRowOrder(bType, Constants.BUDGET_TYPE_ORDER);
+			if (aOrder === bOrder) {
+				return this.compareCodeNumbers(a, b);
+			}
+			return aOrder < bOrder ? -1 : (aOrder > bOrder ? 1 : 0);
+		});
+	}
+
+	static compareCodeNumbers(a: InspectionsColumn, b: InspectionsColumn): number {
+		const aCodeNumber = this.findCodeNumber(a.order);
+		const bCodeNumber = this.findCodeNumber(b.order);
+		return aCodeNumber < bCodeNumber ? -1 : (aCodeNumber > bCodeNumber ? 1 : 0);
+	}
+
+	static findInspectionsRowOrder(type: string, orderMap: any): number {
+		return orderMap[type] !== undefined ? orderMap[type] : 10;
+	}
+
+	static findCodeNumber(orderCode: string): number {
+		return parseInt(orderCode.startsWith('C') ? orderCode.substring(1) : orderCode, 10);
+	}
+
+	static buildInspectionDetailsRow(
+		itemBudget: ItemBudget,
+		orderInspection: OrderInspectionVehicle = this.selectedOrderInspection,
+		savedItems: SavedItem[] = this.selectedSavedInspection.items,
+		columnsData: any = Constants.INSPECTION_DETAILS_COLUMN_DATA
+	): InspectionDetailsColumn {
+		let row = undefined;
+		const allColumns = Object.keys(columnsData);
+		const savedItem = savedItems.find(i => i.item.code === itemBudget.itemCode);
+		const budget = InspectionService.findBudget(
+			itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
+		);
+		row = {};
+		allColumns.forEach(key => {
+			row[key] = columnsData[key](itemBudget, savedItem, budget);
+		});
+		return row;
+	}
+
+	static findMechanicCode(order: Order, savedInspection: SavedInspection): string {
+		let mechanicCode;
+		if (savedInspection) {
+			mechanicCode = savedInspection.employeeCode || this.findItemsMechanicCode(savedInspection.items);
+		}
+		return mechanicCode ? mechanicCode : order.mechanicCode;
+	}
+
+	static findItemsMechanicCode(items: SavedItem[]): string {
+		const maxFilled = Math.max(...items.map(i => i.filled.valueOf()));
+		const maxFilledItem = items.find(i => i.filled.valueOf() === maxFilled);
+		return maxFilledItem.employeeCode;
+	}
+
+	static updateSelectItem(
 		savedItem: SavedItem,
 		item: Item,
 		value: string,
@@ -383,12 +486,23 @@ export class InspectionService {
 		}
 	}
 
+	static updateTextItem(
+		savedItem: SavedItem,
+		item: Item,
+		fields: TextSavedItemField[],
+		savedInspection: SavedInspection,
+		employee: Employee = EmployeeService.employee
+	): void {
+		savedItem.update(fields, employee.code);
+		LocalStorageService.setItem(Constants.LOCAL_STORAGE.SAVED_INSPECTION, savedInspection);
+	}
+
 	findLanguage(): Observable<string> {
 		const language = LocalStorageService.getItem(Constants.LOCAL_STORAGE.LANGUAGE);
 		return (language ? of(language) : this.http.get(Url.language(), { responseType: 'text' })).pipe(
 			catchError(() => of(Constants.DEFAULT_LANGUAGE)),
 			tap((lang: string) => {
-				InspectionService.countryHandler = InspectionService.COUNTRY_HANDLER_DECIDER[lang];
+				InspectionService.countryHandler = CountryHandlerType.parse(lang).handler;
 				LocalStorageService.setItem(Constants.LOCAL_STORAGE.LANGUAGE, lang);
 				console.log('Language', lang);
 			})

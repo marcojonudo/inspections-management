@@ -1,13 +1,14 @@
 package inspections.management.domains.items
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import grails.gorm.annotation.Entity
 import org.grails.datastore.gorm.GormEntity
 
 @Entity
+@JsonIgnoreProperties(ignoreUnknown = true)
 class TextItem extends Item implements GormEntity<TextItem> {
 
-    String separator
     String unit
 
     @JsonInclude
@@ -16,7 +17,6 @@ class TextItem extends Item implements GormEntity<TextItem> {
     static hasMany = [fields: TextItemField]
 
     static constraints = {
-        separator nullable: true
         unit nullable: true
     }
 

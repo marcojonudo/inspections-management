@@ -9,7 +9,7 @@ import { HomeComponent } from './components/home/home.component';
 import { SummaryComponent } from './components/summary/summary.component';
 import { InspectionsComponent } from './components/inspections/inspections.component';
 import { InspectionDetailsComponent } from './components/inspection-details/inspection-details.component';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
@@ -38,6 +38,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import localeEs from '@angular/common/locales/es';
 import { ImageDialogComponent } from './components/image-dialog/image-dialog.component';
 import { registerLocaleData } from '@angular/common';
+import { SeparatorInputComponent } from './components/separator-input/separator-input.component';
+import { SessionIdInterceptor } from './interceptors/session-id-interceptor';
+import { MatSelectModule } from '@angular/material/select';
 registerLocaleData(localeEs);
 
 @NgModule({
@@ -56,7 +59,8 @@ registerLocaleData(localeEs);
 		InspectionSheetComponent,
 		InspectionHeaderComponent,
 		InspectionComponent,
-		ImageDialogComponent
+		ImageDialogComponent,
+		SeparatorInputComponent
 	],
 	imports: [
 		BrowserModule,
@@ -84,9 +88,17 @@ registerLocaleData(localeEs);
 		MatSnackBarModule,
 		MatDialogModule,
 		ChartsModule,
-		MatProgressSpinnerModule
+		MatProgressSpinnerModule,
+		MatSelectModule
 	],
-	providers: [OrderPipe],
+	providers: [
+		OrderPipe,
+		{
+			provide: HTTP_INTERCEPTORS,
+			useClass: SessionIdInterceptor,
+			multi: true
+		}
+		],
 	bootstrap: [AppComponent]
 })
 export class AppModule {

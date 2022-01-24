@@ -1,20 +1,31 @@
 package inspections.management.domains.savedItems
 
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import grails.gorm.annotation.Entity
 import org.grails.datastore.gorm.GormEntity
 
 @Entity
+@JsonIgnoreProperties(ignoreUnknown = true)
 class TextSavedItem extends SavedItem implements GormEntity<TextSavedItem> {
 
-	String text
+	static hasMany = [fields: TextSavedItemField]
 
-	static constraints = {
-		text nullable: true
+	static mapping = {
+		fields fetch: 'join'
 	}
 
 	boolean equals(SavedItem savedItem) {
-		return equalsSaveItem(savedItem) && text == ((TextSavedItem) savedItem).text
+		if (!equalsSaveItem(savedItem)) {
+			return false
+		}
+		TextSavedItem textSavedItem = (TextSavedItem) savedItem
+		if (fields.size() != textSavedItem.fields.size()) {
+			return false;
+		}
+		TextSavedItemField differentField = fields.find { TextSavedItemField field ->
+			field.text != textSavedItem.fields.find { it.order == field.order }.text
+		}
+		return !differentField
 	}
 
 }

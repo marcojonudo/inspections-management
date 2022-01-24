@@ -5,6 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { LoadingService } from './services/loading.service';
 import { forkJoin } from 'rxjs';
 import { EmployeeService } from './services/employee.service';
+import { RealTimeService } from './services/real-time.service';
 
 @Component({
 	selector: 'app-root',
@@ -22,9 +23,13 @@ export class AppComponent {
 		private inspectionService: InspectionService,
 		private employeeService: EmployeeService,
 		private loadingService: LoadingService,
+		private realTimeService: RealTimeService,
 		private translate: TranslateService,
 		private cdRef: ChangeDetectorRef
 	) {
+		RealTimeService.generateRandomId();
+		console.log('Session ID', RealTimeService.sessionId);
+
 		this.loading = true;
 
 		forkJoin([

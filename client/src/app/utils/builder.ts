@@ -10,13 +10,15 @@ import { ListElement } from '../objects/list-elements/list-element';
 import { Car } from '../objects/orders/vehicles/car';
 import { Vehicle } from '../objects/orders/vehicles/vehicle';
 import { Scooter } from '../objects/orders/vehicles/scooter';
+import { TextAreaSavedItem } from '../objects/inspections/saved-items/text-area-saved-item';
+import { InspectionService } from '../services/inspection.service';
 
 export class Builder {
 
 	static savedItemBuilder: { [key: string]: ((savedItem: any) => SavedItem) } = {
 		TEXT: (savedItem: TextSavedItem) => new TextSavedItem(savedItem),
 		SELECT: (savedItem: SelectSavedItem) => new SelectSavedItem(savedItem),
-		TEXT_AREA: (savedItem: TextSavedItem) => new TextSavedItem(savedItem)
+		TEXT_AREA: (savedItem: TextAreaSavedItem) => new TextAreaSavedItem(savedItem)
 	};
 
 	static vehicleBuilder: { [key: string]: ((vehicle: any) => Vehicle) } = {
@@ -25,11 +27,12 @@ export class Builder {
 	};
 
 	static buildSavedInspection(savedInspection: any, itemBudgets: ItemBudget[]): SavedInspection {
-		const builtSavedInspection = new SavedInspection(savedInspection, itemBudgets);
+		const savedItems = savedInspection.items.map(i => this.buildSavedItem(i));
+		const filteredItemBudgets = InspectionService.filterItemBudgets(savedItems, itemBudgets);
+		const builtSavedInspection = new SavedInspection(savedInspection, savedItems, filteredItemBudgets);
 		const items = builtSavedInspection.items.map(i => i.item);
 		items.forEach(item => {
-			const baseItem = items.find(i => i.name === item.name);
-			item.relations = baseItem.relations.map(itemRelation =>
+			item.relations = item.relations.map(itemRelation =>
 				new ItemRelation(itemRelation, items.find(i => i.name === itemRelation.targetItem.name))
 			);
 		});
