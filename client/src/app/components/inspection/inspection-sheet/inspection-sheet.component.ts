@@ -23,6 +23,7 @@ import { HttpClient } from '@angular/common/http';
 import { TextAreaSavedItem } from '../../../objects/inspections/saved-items/text-area-saved-item';
 import { TextItemField } from '../../../objects/inspections/items/text-item-field';
 import { TextSavedItemField } from '../../../objects/inspections/saved-items/text-saved-item-field';
+import { PrintService } from '../../../services/print.service';
 
 @Component({
 	selector: 'app-inspection-sheet',
@@ -33,12 +34,16 @@ import { TextSavedItemField } from '../../../objects/inspections/saved-items/tex
 export class InspectionSheetComponent {
 
 	private readonly ROW_ITEMS = 4;
+	private readonly BASE_TOP = 192;
+	private readonly HEADER_ROW_TOP = 11.5;
 
 	images: Image[];
 	listElements: ListElement[];
 	imageListElements: any[];
+	printing: boolean;
 
 	constructor(
+		private printService: PrintService,
 		private orderPipe: OrderPipe,
 		private http: HttpClient,
 		private cdRef: ChangeDetectorRef
@@ -67,6 +72,11 @@ export class InspectionSheetComponent {
 				this.cdRef.detectChanges();
 			});
 		}
+
+		this.printService.printing$.subscribe((printing: boolean) => {
+			this.printing = printing;
+			this.cdRef.detectChanges();
+		});
 	}
 
 	// region Getters / setters
@@ -89,6 +99,10 @@ export class InspectionSheetComponent {
 
 	get centre(): Centre {
 		return InspectionService.centre;
+	}
+
+	get headerVehicleItem(): string {
+		return Constants.HEADER_CARD.VEHICLE;
 	}
 
 	// endregion
@@ -226,10 +240,33 @@ export class InspectionSheetComponent {
 		InspectionService.updateTextItem(savedItem, savedItem.item, fields, this.savedInspection);
 	}
 
-	checkCategoryBreak(elem: ListElement): boolean {
+	checkCategoryBreak(elem: ListElement, inspectionTypeCode: string = this.savedInspection.inspectionTypeCode): boolean {
+		if (inspectionTypeCode === Constants.INSPECTION_TYPE.N) {
+			return false;
+		}
 		const gasCategory = this.checkCategoryElement(elem) && (elem as Category).code === 'G';
 		if (gasCategory) { return true; }
 		return !this.checkCategoryElement(elem) && (elem as SavedItem).item.code === 'C';
+	}
+
+	findSheetTop(order: Order = this.order, printing: boolean = this.printing): number {
+		// TODO enum
+		let top = 0;
+		if (printing) {
+			let offset = 0;
+			if (order.vehicle.type === Constants.VEHICLE_TYPE.CAR) {
+				const headerItems = this.findHeaderItems();
+				offset = headerItems.length * this.HEADER_ROW_TOP;
+			}
+			top = this.BASE_TOP + offset;
+		}
+		return top;
+	}
+
+	findHeaderItems(
+		code: string = this.headerVehicleItem, items: SavedItem[] = this.savedInspection.items
+	): SavedItem[] {
+		return items.filter(item => item.item.header === code);
 	}
 
 }

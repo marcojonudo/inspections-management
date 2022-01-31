@@ -148,4 +148,8 @@ export class Constants {
 		budget: (i: ItemBudget, savedItem: SavedItem, budget: Budget) => budget
 	};
 
+	static readonly INSPECTION_TYPE: any = {
+		N: 'N'
+	};
+
 }

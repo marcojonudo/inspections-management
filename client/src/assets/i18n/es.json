@@ -31,7 +31,10 @@
 			"PC": "Revisión prueba en carretera",
 			"PE": "Revisión patinete eléctrico",
 			"ST": "Revisión servicio tranquilidad",
-			"AD": "Anomalías detectadas"
+			"AD": "Anomalías detectadas",
+			"N": "Neumáticos",
+			"AG": "Análisis gases",
+			"VF": "Visual Flexicar"
 		},
 		"state": {
 			"PENDING": "Pendiente",
@@ -142,7 +145,7 @@
 			"DFTI": "Disco de frenos TI",
 			"LAFTI": "Latiguillo de freno TI",
 			"ATI": "Amortiguador TI",
-			"PN": "Promedia neumáticos",
+			"PN": "Medida neumático",
 			"PPN": "Puesta a presión neumáticos",
 			"CVGN": "Control visual geometría neumáticos",
 			"SF": "Silencioso final",
@@ -387,6 +390,10 @@
 			"ITV": "Resultado ITV",
 			"S": "Seguridad",
 			"T": "Transmisión"
+		},
+		"header": {
+			"KM": "KM",
+			"FPITV": "Fecha prox. ITV"
 		}
 	},
 	"dialog": {
