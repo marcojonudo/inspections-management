@@ -233,11 +233,15 @@ export class InspectionSheetComponent {
 	}
 
 	updateText(savedItem: TextSavedItem): void {
-		InspectionService.updateTextItem(savedItem, savedItem.item, savedItem.fields, this.savedInspection);
+		InspectionService.updateTextItem(savedItem, savedItem.fields, this.savedInspection);
 	}
 
 	updateSeparatorValue(savedItem: SavedItem, fields: TextSavedItemField[]): void {
-		InspectionService.updateTextItem(savedItem, savedItem.item, fields, this.savedInspection);
+		InspectionService.updateTextItem(savedItem, fields, this.savedInspection);
+	}
+
+	updateTextArea(savedItem: TextAreaSavedItem): void {
+		InspectionService.updateTextAreaItem(savedItem, savedItem.text, this.savedInspection);
 	}
 
 	checkCategoryBreak(elem: ListElement, inspectionTypeCode: string = this.savedInspection.inspectionTypeCode): boolean {

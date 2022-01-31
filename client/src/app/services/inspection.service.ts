@@ -488,12 +488,21 @@ export class InspectionService {
 
 	static updateTextItem(
 		savedItem: SavedItem,
-		item: Item,
 		fields: TextSavedItemField[],
 		savedInspection: SavedInspection,
 		employee: Employee = EmployeeService.employee
 	): void {
 		savedItem.update(fields, employee.code);
+		LocalStorageService.setItem(Constants.LOCAL_STORAGE.SAVED_INSPECTION, savedInspection);
+	}
+
+	static updateTextAreaItem(
+		savedItem: SavedItem,
+		text: string,
+		savedInspection: SavedInspection,
+		employee: Employee = EmployeeService.employee
+	): void {
+		savedItem.update(text, employee.code);
 		LocalStorageService.setItem(Constants.LOCAL_STORAGE.SAVED_INSPECTION, savedInspection);
 	}
 

@@ -62,7 +62,7 @@
 				<mat-card-title translate>print.vehicle</mat-card-title>
 			</mat-card-header>
 			<mat-card-content [ngSwitch]="order.vehicle.type">
-				<section #vehicleSection *ngSwitchCase="carType" class="key-value-section">
+				<section *ngSwitchCase="carType" class="key-value-section">
 					<div>
 						<div translate>print.numberPlate</div>
 						<div>{{order.vehicle.identifier}}</div>
@@ -92,7 +92,7 @@
 						<div>{{item.findValue()}}</div>
 					</div>
 				</section>
-				<section #vehicleSection *ngSwitchCase="scooterType" class="key-value-section">
+				<section *ngSwitchCase="scooterType" class="key-value-section">
 					<div>
 						<div translate>print.numberPlate</div>
 						<div>{{order.vehicle.identifier}}</div>
