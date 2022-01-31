@@ -149,9 +149,7 @@ export class InspectionDetailsComponent implements OnDestroy {
 
 	openInspection(): void {
 		const dialogRef = this.dialog.open(EmployeeDialogComponent);
-		console.log('dialog ref', dialogRef);
 		dialogRef.afterClosed().subscribe((employeeCode: string) => {
-			console.log('CLOSED!!!!');
 			if (employeeCode) {
 				EmployeeService.setEmployee(employeeCode);
 				this.router.navigate([`${Constants.PATH.HOME}${Constants.PATH.INSPECTION}`]);
