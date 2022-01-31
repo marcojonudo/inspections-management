@@ -31,7 +31,10 @@
 			"PC": "Revisão teste de estrada",
 			"PE": "Revisão de scooter elétrica",
 			"ST": "Revisão a tranquilidade do serviço",
-			"AD": "Anomalias detectadas"
+			"AD": "Anomalias detectadas",
+			"N": "Pneu",
+			"AG": "Análise gás",
+			"VF": "Visual Flexicar"
 		},
 		"state": {
 			"PENDING": "Pendente",
@@ -189,6 +192,48 @@
 			"doneBudget": "Pt. Feito",
 			"acceptedBudget": "Pto. Aceito",
 			"item": "Item"
+		}
+	},
+	"print": {
+		"info": "Información",
+		"adviser": "Asesor",
+		"mechanic": "Mecánico",
+		"mechanics": "Mecánicos",
+		"day": "Día",
+		"orderNumber": "Nº orden",
+		"centre": "Centro",
+		"vehicle": "Vehículo",
+		"client": "Cliente",
+		"summary": "Resumen",
+		"numberPlate": "Matrícula",
+		"model": "Modelo",
+		"cylinder": "Cilindrada",
+		"engine": "Motor",
+		"power": "Potencia",
+		"registration": "Matriculación",
+		"category": {
+			"I": "Iluminación",
+			"C": "Carrocería",
+			"N": "Neumáticos",
+			"EM": "Elementos mecánicos",
+			"SE": "Sistema de escape",
+			"CL": "Calidad líquidos",
+			"NL": "Niveles líquidos",
+			"SC": "Sistema de carga",
+			"D": "Diagnosis",
+			"DI": "Dirección",
+			"DO": "Documentación",
+			"EE": "Elementos eléctricos",
+			"E": "Equipo",
+			"F": "Frenómetro",
+			"G": "Gases",
+			"ITV": "Resultado ITV",
+			"S": "Seguridad",
+			"T": "Transmisión"
+		},
+		"header": {
+			"KM": "KM",
+			"FPITV": "Próx. data ITV"
 		}
 	},
 	"dialog": {

@@ -128,7 +128,6 @@ class InspectionController {
             orders.detectedAnomaliesOrders
         )
         return orderInspections + detectedAnomaliesOrderInspections
-
     }
 
     @Post("/savedInspections")

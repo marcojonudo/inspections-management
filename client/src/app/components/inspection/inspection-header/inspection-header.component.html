@@ -87,8 +87,8 @@
 						<div translate>print.registration</div>
 						<div>{{findCar(order.vehicle).registrationYear ? findCar(order.vehicle).registrationYear : '-'}}</div>
 					</div>
-					<div *ngFor="let item of findHeaderItems(headerVehicleItem)">
-						<div>{{item.item.code | titlecase}}</div>
+					<div *ngFor="let item of findHeaderItems(headerVehicleItem) | printOrder">
+						<div translate>print.header.{{item.item.code}}</div>
 						<div>{{item.findValue()}}</div>
 					</div>
 				</section>
