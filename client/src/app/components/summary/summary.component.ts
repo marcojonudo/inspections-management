@@ -135,7 +135,7 @@ export class SummaryComponent implements OnDestroy {
 	findNotFinishedInspectionOrders(): number {
 		return this.orderInspections.filter(orderInspection => {
 			const savedInspection = InspectionService.findSavedInspection(orderInspection.order.number);
-			return (orderInspection.order.state === Constants.ORDER_STATE.F || orderInspection.order.state === Constants.ORDER_STATE.E) &&
+			return Constants.NOT_FINISHED_ORDER_STATES.find(s => s === orderInspection.order.state) !== undefined &&
 				savedInspection?.state !== Constants.INSPECTION_STATE.FINISHED;
 		}).length;
 	}
