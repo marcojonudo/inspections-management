@@ -64,7 +64,8 @@ export class Constants {
 		V: 'V',
 		F: 'F',
 		X: 'X',
-		E: 'E'
+		E: 'E',
+		C: 'C'
 	};
 
 	static readonly INSPECTION_STATE: any = {
@@ -151,5 +152,7 @@ export class Constants {
 	static readonly INSPECTION_TYPE: any = {
 		N: 'N'
 	};
+
+	static readonly NOT_FINISHED_ORDER_STATES: string[] = [Constants.ORDER_STATE.F, Constants.ORDER_STATE.C, Constants.ORDER_STATE.E];
 
 }
