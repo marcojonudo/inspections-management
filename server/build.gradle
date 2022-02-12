@@ -41,6 +41,11 @@ dependencies {
     annotationProcessor "io.micronaut.configuration:micronaut-openapi:1.5.3"
     compile "io.swagger.core.v3:swagger-annotations"
     compileOnly "io.micronaut.configuration:micronaut-openapi:1.5.3"
+
+    implementation "com.itextpdf:itext7-core:7.1.9"
+    implementation "com.itextpdf:html2pdf:4.0.1"
+
+    implementation "org.apache.commons:commons-text:1.9"
 }
 
 mainClassName = "inspections.management.Application"

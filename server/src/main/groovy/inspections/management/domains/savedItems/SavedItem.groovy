@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import grails.gorm.annotation.Entity
 import inspections.management.deserializers.ItemDeserializer
+import inspections.management.domains.Image
 import inspections.management.domains.SavedInspection
 import inspections.management.domains.items.Item
 import inspections.management.utils.Constants
@@ -31,6 +32,8 @@ abstract class SavedItem implements GormEntity<SavedItem> {
 	@JsonDeserialize(using = LocalDateTimeDeserializer)
 	LocalDateTime filled
 
+	Image image
+
 	static belongsTo = SavedInspection
 
 	static constraints = {
@@ -44,7 +47,13 @@ abstract class SavedItem implements GormEntity<SavedItem> {
 		item fetch: 'join'
 	}
 
+	static transients = ['image']
+
 	abstract boolean equals(SavedItem savedItem)
+
+	abstract String buildHtml()
+
+	abstract String findValue()
 
 	boolean equalsSaveItem(SavedItem savedItem) {
 		return hidden == savedItem.hidden

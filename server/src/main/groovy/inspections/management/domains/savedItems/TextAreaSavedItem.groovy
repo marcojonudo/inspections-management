@@ -18,4 +18,12 @@ class TextAreaSavedItem extends SavedItem implements GormEntity<TextAreaSavedIte
 		return equalsSaveItem(savedItem) && text == ((TextAreaSavedItem) savedItem).text
 	}
 
+	String buildHtml() {
+		return ""
+	}
+
+	String findValue() {
+		return text
+	}
+
 }

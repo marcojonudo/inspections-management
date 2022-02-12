@@ -23,6 +23,8 @@ abstract class OrderDataService {
 	@Inject CarDataService carDataService
 	@Inject ScooterDataService scooterDataService
 
+	abstract Order findOrder(int number)
+
 	@Where({ day == day && !(state in Constants.CLOSED_ORDER_STATES) })
 	abstract List<Order> findAllOrders(LocalDate day)
 
@@ -31,6 +33,11 @@ abstract class OrderDataService {
 
 	@Where({ number in numbers })
 	abstract List<Order> findAllOrders(List<Integer> numbers)
+
+	Order find(int number) {
+		Order order = findOrder(number)
+		return fillOrder(order)
+	}
 
 	List<Order> findAll(LocalDate from, LocalDate to) {
 		List<Order> orders = findAllOrders(from, to)
@@ -70,6 +77,17 @@ abstract class OrderDataService {
 			}
 		}
 		return orders
+	}
+
+	Order fillOrder(Order order) {
+		OrderTime orderTime = orderTimeDataService.find(order.number)
+		IVehicle vehicle = carDataService.find(order.carIdentifier) ?: scooterDataService.find(order.carIdentifier)
+		order.vehicle = vehicle.buildVehicle()
+
+		order.code = orderTime.code
+		order.mechanicCode = orderTime.mechanicCode
+		order.keys = order.isAppointment() ? orderTime.day != null : true
+		return order
 	}
 
 }

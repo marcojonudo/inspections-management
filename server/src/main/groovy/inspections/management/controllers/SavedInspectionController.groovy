@@ -1,0 +1,43 @@
+package inspections.management.controllers
+
+import groovy.transform.CompileStatic
+import inspections.management.domains.SavedInspection
+import inspections.management.domains.fviberi.Centre
+import inspections.management.domains.fviberi.Order
+import inspections.management.services.PdfService
+import inspections.management.services.data.CentreDataService
+import inspections.management.services.data.OrderDataService
+import inspections.management.services.data.SavedInspectionDataService
+import io.micronaut.core.io.ResourceLoader
+import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.server.types.files.SystemFile
+
+import javax.inject.Inject
+
+@Controller("/savedInspections")
+@CompileStatic
+class SavedInspectionController {
+
+    @Inject ResourceLoader resourceLoader
+
+    @Inject SavedInspectionDataService savedInspectionDataService
+    @Inject OrderDataService orderDataService
+    @Inject CentreDataService centreDataService
+    @Inject PdfService pdfService
+
+    @Get(value = "/{numberPlate}", consumes = MediaType.MULTIPART_FORM_DATA)
+    SystemFile getPdf(String numberPlate) {
+        SavedInspection savedInspection = savedInspectionDataService.find(numberPlate)
+        SystemFile pdf = null
+        if (savedInspection) {
+            Centre centre = centreDataService.find()
+            Order order = orderDataService.find(savedInspection.orderNumber)
+            File pdfFile = pdfService.buildPdf(centre, order, savedInspection)
+            pdf = new SystemFile(pdfFile).attach("${numberPlate}.pdf")
+        }
+        return pdf
+    }
+
+}

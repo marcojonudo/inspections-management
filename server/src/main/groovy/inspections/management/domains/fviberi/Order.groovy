@@ -23,6 +23,7 @@ class Order implements GormEntity<Order> {
 	Client client
 	String sellerCode
 	String mechanicCode
+	String vehicleType
 	boolean keys
 
 	@JsonInclude
@@ -45,6 +46,7 @@ class Order implements GormEntity<Order> {
 		sellerCode column: 'covended'
 		lines fetch: 'join'
 		relatedBudgets fetch: 'join'
+		vehicleType column: 'tipvehicu'
 
 		id generator: 'assigned', name: 'number'
 		version false
@@ -54,6 +56,21 @@ class Order implements GormEntity<Order> {
 
 	boolean isAppointment() {
 		return code.startsWith(Constants.APPOINTMENT_IDENTIFIER)
+	}
+
+	enum VehicleType {
+
+		E_BIKE("BICICLETA"),
+		CAR("COCHE"),
+		MOTORBIKE("MOTO"),
+		E_SCOOTER("PATINETE")
+
+		final String type
+
+		VehicleType(String type) {
+			this.type = type
+		}
+
 	}
 
 }

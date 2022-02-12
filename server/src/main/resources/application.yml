@@ -59,6 +59,8 @@ hibernate:
     hbm2ddl:
         auto: 'none'
 
+pdf.resources.url: http://${host.ip}:${micronaut.server.port}/html-to-pdf/
+
 dataSource:
     dbCreate: validate
     driverClassName: com.mysql.jdbc.Driver
