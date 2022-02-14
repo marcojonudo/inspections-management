@@ -2,6 +2,8 @@ package inspections.management.domains.savedItems
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import grails.gorm.annotation.Entity
+import inspections.management.pogos.pdf.inspection.items.PdfTextAreaItem
+import inspections.management.pogos.pdf.structure.elements.items.PdfItem
 import org.grails.datastore.gorm.GormEntity
 
 @Entity
@@ -24,6 +26,10 @@ class TextAreaSavedItem extends SavedItem implements GormEntity<TextAreaSavedIte
 
 	String findValue() {
 		return text
+	}
+
+	PdfItem buildPdfItem() {
+		return new PdfTextAreaItem(this)
 	}
 
 }

@@ -9,6 +9,7 @@ import inspections.management.deserializers.ItemDeserializer
 import inspections.management.domains.Image
 import inspections.management.domains.SavedInspection
 import inspections.management.domains.items.Item
+import inspections.management.pogos.pdf.structure.elements.items.PdfItem
 import inspections.management.utils.Constants
 import org.grails.datastore.gorm.GormEntity
 
@@ -54,6 +55,8 @@ abstract class SavedItem implements GormEntity<SavedItem> {
 	abstract String buildHtml()
 
 	abstract String findValue()
+
+	abstract PdfItem buildPdfItem()
 
 	boolean equalsSaveItem(SavedItem savedItem) {
 		return hidden == savedItem.hidden

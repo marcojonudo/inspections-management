@@ -9,6 +9,7 @@ import inspections.management.domains.fviberi.Centre
 import inspections.management.domains.fviberi.Order
 import inspections.management.services.data.CentreDataService
 import inspections.management.services.data.ImageDataService
+import inspections.management.services.data.InspectionTypeDataService
 import inspections.management.services.data.OrderDataService
 import inspections.management.services.data.SavedInspectionDataService
 import inspections.management.utils.HtmlBuilder
@@ -31,10 +32,12 @@ class PdfService {
 	@Inject CentreDataService centreDataService
 	@Inject OrderDataService orderDataService
 	@Inject ImageDataService imageDataService
+	@Inject InspectionTypeDataService inspectionTypeDataService
 
 	File buildPdf(Centre centre, Order order, SavedInspection savedInspection) {
 		List<Image> images = imageDataService.getAll((List<Long>) savedInspection.items.findAll { it.imageId }*.imageId)
-		String html = HtmlBuilder.buildHtml(centre, order, savedInspection, images)
+		String inspectionName = inspectionTypeDataService.findInspectionTypeName(savedInspection.inspectionTypeCode)
+		String html = HtmlBuilder.buildHtml(centre, order, inspectionName, savedInspection, images)
 		File htmlFile = createTempFile(HTML_FILE_NAME, html)
 		File pdf = createTempFile(PDF_FILE_NAME)
 

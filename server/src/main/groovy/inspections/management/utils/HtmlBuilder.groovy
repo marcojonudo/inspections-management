@@ -13,6 +13,7 @@ import inspections.management.domains.savedItems.SelectSavedItem
 import inspections.management.domains.savedItems.TextAreaSavedItem
 import inspections.management.domains.savedItems.TextSavedItem
 import inspections.management.pogos.pdf.CategoryItems
+import inspections.management.pogos.pdf.inspection.PdfInspection
 import inspections.management.pogos.vehicles.CarVehicle
 import inspections.management.pogos.vehicles.ScooterVehicle
 import org.apache.commons.text.WordUtils
@@ -379,6 +380,7 @@ class HtmlBuilder {
     static buildPage(Centre centre, Order order, SavedInspection savedInspection, List<CategoryItems> categories) {
         return """
             <div class="page">
+                <img src="img/car-background.svg" class="background-image"/>
                 ${buildHeaderHtml(centre, order, savedInspection)}
                 ${categories.collect { buildCategory(it) }.join("")}
             </div>
@@ -394,30 +396,23 @@ class HtmlBuilder {
         """
     }
     
-    static String buildHtml(Centre centre, Order order, SavedInspection savedInspection, List<Image> images) {
+    static String buildHtml(
+        Centre centre, Order order, String inspectionName, SavedInspection savedInspection, List<Image> images
+    ) {
         List<CategoryItems> categories = buildPrintCategories(savedInspection.items)
         List<List<CategoryItems>> groupedCategories = buildGroupedCategories(categories)
 
         List<CategoryItems> imageCategories = []
         if (images) {
             Set<SavedItem> imageSavedItems = images.collect { Image i ->
-                savedInspection.items.find { it.imageId == i.id }.tap {
-                    image = i
-                }
+                savedInspection.items.find { it.imageId == i.id }.tap { image = i }
             }.toSet()
             imageCategories = buildPrintCategories(imageSavedItems)
         }
-        String html = """
-            <!doctype html>
-            <html lang="es">
-            ${HEAD}
-            <body>
-            ${groupedCategories.collect { buildPage(centre, order, savedInspection, (List<CategoryItems>) it) }.join("") }
-            ${imageCategories ? buildImagePage(centre, order, savedInspection, imageCategories) : ""}
-            </body>
-            </html>
-        """
-        return html
+        PdfInspection inspection = new PdfInspection(
+            centre, order, inspectionName, savedInspection, groupedCategories, imageCategories
+        )
+        return inspection.toHtml()
     }
 
     static List<CategoryItems> buildPrintCategories(Set<SavedItem> savedItems) {

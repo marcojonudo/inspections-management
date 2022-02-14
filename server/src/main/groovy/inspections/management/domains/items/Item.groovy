@@ -1,7 +1,6 @@
 package inspections.management.domains.items
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import grails.gorm.annotation.Entity
 import inspections.management.domains.InspectionVehicle
@@ -67,19 +66,22 @@ class Item implements GormEntity<Item> {
 			TextSavedItem,
 			{ TextSavedItem existent, TextSavedItem savedItem, SavedItemDataService savedItemDataService ->
 				return savedItemDataService.textSavedItemDataService.update(existent, savedItem.fields)
-			}),
+			}
+		),
 		SELECT(
 			SelectItem,
 			SelectSavedItem,
 			{ SelectSavedItem existent, SelectSavedItem savedItem, SavedItemDataService savedItemDataService ->
 				return savedItemDataService.selectSavedItemDataService.update(existent.id, savedItem.value)
-			}),
+			}
+		),
 		TEXT_AREA(
 			TextAreaItem,
 			TextAreaSavedItem,
 			{ TextAreaSavedItem existent, TextAreaSavedItem savedItem, SavedItemDataService savedItemDataService ->
 				return savedItemDataService.textAreaSavedItemDataService.update(existent.id, savedItem.text)
-			})
+			}
+		)
 
 		Class clazz
 		Class savedItemClazz

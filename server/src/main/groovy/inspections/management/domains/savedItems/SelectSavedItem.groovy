@@ -2,6 +2,9 @@ package inspections.management.domains.savedItems
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import grails.gorm.annotation.Entity
+import inspections.management.domains.items.SelectItem
+import inspections.management.pogos.pdf.inspection.items.PdfSelectItem
+import inspections.management.pogos.pdf.structure.elements.items.PdfItem
 import inspections.management.utils.HtmlBuilder
 import org.grails.datastore.gorm.GormEntity
 
@@ -23,6 +26,10 @@ class SelectSavedItem extends SavedItem implements GormEntity<SelectSavedItem> {
 		return value
 	}
 
+	String findPrintIcon() {
+		return ((SelectItem) this.item).options.find { it.code == this.value }.printIcon
+	}
+
 	enum Value {
 
 		P('#7b7979'),
@@ -38,6 +45,10 @@ class SelectSavedItem extends SavedItem implements GormEntity<SelectSavedItem> {
 			this.color = color
 		}
 
+	}
+
+	PdfItem buildPdfItem() {
+		return new PdfSelectItem(this)
 	}
 
 }
