@@ -11,7 +11,7 @@ class PdfSelectItem extends PdfItem {
     ItemImage image
 
     PdfSelectItem(SelectSavedItem savedItem) {
-        super(savedItem.item.name)
+        super(savedItem.item)
         image = new ItemImage("img/icons/${savedItem.findPrintIcon()}.svg", SelectSavedItem.Value.valueOf(savedItem.value).color)
         if (savedItem.value != SelectSavedItem.Value.C.toString()) {
             classes << "highlight"

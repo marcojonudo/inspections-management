@@ -269,8 +269,11 @@ body {
     width: 16px;
 }
 
-.item-text-value, .item-unit {
-    /*background-color: #fff;*/
+.item-text-value {
+    flex: 1 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: end;
 }
 
 .image-category .card-content {

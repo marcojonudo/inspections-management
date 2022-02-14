@@ -11,7 +11,7 @@ class PdfImageItem extends PdfItem {
     Image image
 
     PdfImageItem(SavedItem savedItem) {
-        super(savedItem.item.name)
+        super(savedItem.item)
         this.classes = ["image-item"]
         String base64Code = new String(Base64.encoder.encode(savedItem.image.image))
         image = new Image([], null, "data:image/png;base64,$base64Code")

@@ -12,7 +12,7 @@ class PdfTextItem extends PdfItem {
     boolean multipleFields
 
     PdfTextItem(TextSavedItem savedItem) {
-        super(savedItem.item.name, savedItem.fields.size() > 2)
+        super(savedItem.item, savedItem.fields.size() > 2)
         value = savedItem.findValue()
         unit = savedItem.findUnit()
     }

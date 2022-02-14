@@ -19,6 +19,7 @@ class Item implements GormEntity<Item> {
 	Type type
 	String code
 	String name
+	String shortName
 	Integer order
 	Integer printOrder
 	ItemCategory category

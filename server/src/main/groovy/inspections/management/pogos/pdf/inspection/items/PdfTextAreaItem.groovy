@@ -10,7 +10,7 @@ class PdfTextAreaItem extends PdfItem {
     String text
 
     PdfTextAreaItem(TextAreaSavedItem savedItem) {
-        super(savedItem.item.name)
+        super(savedItem.item)
         text = savedItem.findValue()
     }
 
