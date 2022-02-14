@@ -52,8 +52,6 @@ abstract class SavedItem implements GormEntity<SavedItem> {
 
 	abstract boolean equals(SavedItem savedItem)
 
-	abstract String buildHtml()
-
 	abstract String findValue()
 
 	abstract PdfItem buildPdfItem()

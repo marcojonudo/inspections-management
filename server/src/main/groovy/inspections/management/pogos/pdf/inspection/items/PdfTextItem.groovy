@@ -9,9 +9,10 @@ class PdfTextItem extends PdfItem {
 
     String value
     String unit
+    boolean multipleFields
 
     PdfTextItem(TextSavedItem savedItem) {
-        super(savedItem.item.name)
+        super(savedItem.item.name, savedItem.fields.size() > 2)
         value = savedItem.findValue()
         unit = savedItem.findUnit()
     }

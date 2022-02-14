@@ -24,7 +24,7 @@ class PdfInspection extends IPdf {
             new PdfInspectionPage(centre, order, inspectionName, savedInspection, it)
         }
         if (imageCategories) {
-            pages << new PdfInspectionPage(centre, order, inspectionName, savedInspection, imageCategories)
+            pages << new PdfInspectionPage(centre, order, inspectionName, savedInspection, imageCategories, true)
         }
     }
 

@@ -5,7 +5,6 @@ import grails.gorm.annotation.Entity
 import inspections.management.domains.items.SelectItem
 import inspections.management.pogos.pdf.inspection.items.PdfSelectItem
 import inspections.management.pogos.pdf.structure.elements.items.PdfItem
-import inspections.management.utils.HtmlBuilder
 import org.grails.datastore.gorm.GormEntity
 
 @Entity
@@ -16,10 +15,6 @@ class SelectSavedItem extends SavedItem implements GormEntity<SelectSavedItem> {
 
 	boolean equals(SavedItem savedItem) {
 		return equalsSaveItem(savedItem) && value == ((SelectSavedItem) savedItem).value
-	}
-
-	String buildHtml() {
-		return HtmlBuilder.buildSelectItem(this)
 	}
 
 	String findValue() {

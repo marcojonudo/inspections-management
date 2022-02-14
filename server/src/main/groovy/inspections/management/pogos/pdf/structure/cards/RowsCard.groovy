@@ -1,12 +1,10 @@
 package inspections.management.pogos.pdf.structure.cards
 
 import groovy.transform.CompileStatic
-import groovy.transform.TupleConstructor
 import inspections.management.pogos.pdf.structure.elements.Title
 import inspections.management.pogos.pdf.structure.elements.items.PdfItem
 
 @CompileStatic
-@TupleConstructor
 class RowsCard extends Card {
 
     List<PdfItem> items
@@ -23,7 +21,6 @@ class RowsCard extends Card {
             <div class="${findClasses()}">
                 ${title.toHtml()}
                 <div class="card-content">
-                    <div class="card-content-cover"></div>
                     ${items.collate(4).collect { buildRow(it) }.join("\n")}
                 </div>
             </div>

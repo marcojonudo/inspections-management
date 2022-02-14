@@ -6,6 +6,7 @@ import inspections.management.domains.fviberi.Centre
 import inspections.management.domains.fviberi.Order
 import inspections.management.pogos.pdf.CategoryItems
 import inspections.management.pogos.pdf.inspection.cards.CategoryCard
+import inspections.management.pogos.pdf.inspection.cards.ImageCategoryCard
 import inspections.management.pogos.pdf.inspection.cards.ItemCategoryCard
 import inspections.management.pogos.pdf.inspection.header.PdfHeader
 import inspections.management.pogos.pdf.structure.IPdf
@@ -23,14 +24,19 @@ class PdfInspectionPage extends IPdf {
         Order order,
         String inspectionName,
         SavedInspection savedInspection,
-        List<CategoryItems> categories
+        List<CategoryItems> categories,
+        boolean images = false
     ) {
         classes = ["page"]
         this.vehicleType = Order.VehicleType.values().find { it.type == order.vehicleType } ?:
             Order.VehicleType.CAR
         header = new PdfHeader(centre, order, inspectionName, savedInspection, this.vehicleType)
-        this.categories = categories.collect {
-            it.category ? new CategoryCard(it) : new ItemCategoryCard(it.items[0])
+        if (images) {
+            this.categories = categories.collect { (Card) new ImageCategoryCard(it) }
+        } else {
+            this.categories = categories.collect {
+                it.category ? new CategoryCard(it) : new ItemCategoryCard(it.items[0])
+            }
         }
     }
 
@@ -38,8 +44,9 @@ class PdfInspectionPage extends IPdf {
         return """
             <div class="${findClasses()}">
                 ${header.toHtml()}
-                ${categories.collect { it.toHtml() }.join("\n")}
-                <img src="img/backgrounds/${vehicleType.backgroundImage}" class="background-image">
+                <div class="categories-container" style="background-image: url(img/backgrounds/${vehicleType.backgroundImage})">
+                    ${categories.collect { it.toHtml() }.join("\n")}
+                </div>
             </div>
         """
     }

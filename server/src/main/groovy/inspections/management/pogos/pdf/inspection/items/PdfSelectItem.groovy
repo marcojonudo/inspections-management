@@ -13,10 +13,12 @@ class PdfSelectItem extends PdfItem {
     PdfSelectItem(SelectSavedItem savedItem) {
         super(savedItem.item.name)
         image = new ItemImage("img/icons/${savedItem.findPrintIcon()}.svg", SelectSavedItem.Value.valueOf(savedItem.value).color)
+        if (savedItem.value != SelectSavedItem.Value.C.toString()) {
+            classes << "highlight"
+        }
     }
 
     String toHtml() {
-        //TODO Check highlight
         return """
             <div class="${findClasses()}">
                 ${super.toHtml()}
