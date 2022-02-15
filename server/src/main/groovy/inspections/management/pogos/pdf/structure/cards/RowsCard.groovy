@@ -2,7 +2,7 @@ package inspections.management.pogos.pdf.structure.cards
 
 import groovy.transform.CompileStatic
 import inspections.management.pogos.pdf.structure.elements.Title
-import inspections.management.pogos.pdf.structure.elements.items.PdfItem
+import inspections.management.pogos.pdf.structure.elements.PdfItem
 
 @CompileStatic
 class RowsCard extends Card {

@@ -9,7 +9,7 @@ import inspections.management.deserializers.ItemDeserializer
 import inspections.management.domains.Image
 import inspections.management.domains.SavedInspection
 import inspections.management.domains.items.Item
-import inspections.management.pogos.pdf.structure.elements.items.PdfItem
+import inspections.management.pogos.pdf.structure.elements.PdfItem
 import inspections.management.utils.Constants
 import org.grails.datastore.gorm.GormEntity
 

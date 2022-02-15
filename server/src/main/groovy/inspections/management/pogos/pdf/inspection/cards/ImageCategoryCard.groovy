@@ -5,7 +5,7 @@ import inspections.management.pogos.pdf.CategoryItems
 import inspections.management.pogos.pdf.inspection.cards.title.CardTitle
 import inspections.management.pogos.pdf.inspection.items.PdfImageItem
 import inspections.management.pogos.pdf.structure.cards.ImagesCard
-import inspections.management.pogos.pdf.structure.elements.items.PdfItem
+import inspections.management.pogos.pdf.structure.elements.PdfItem
 
 @CompileStatic
 class ImageCategoryCard extends ImagesCard {

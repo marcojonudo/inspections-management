@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import grails.gorm.annotation.Entity
 import inspections.management.domains.items.SelectItem
 import inspections.management.pogos.pdf.inspection.items.PdfSelectItem
-import inspections.management.pogos.pdf.structure.elements.items.PdfItem
+import inspections.management.pogos.pdf.structure.elements.PdfItem
 import org.grails.datastore.gorm.GormEntity
 
 @Entity

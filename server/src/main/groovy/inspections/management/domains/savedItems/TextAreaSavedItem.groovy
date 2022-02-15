@@ -3,7 +3,7 @@ package inspections.management.domains.savedItems
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import grails.gorm.annotation.Entity
 import inspections.management.pogos.pdf.inspection.items.PdfTextAreaItem
-import inspections.management.pogos.pdf.structure.elements.items.PdfItem
+import inspections.management.pogos.pdf.structure.elements.PdfItem
 import org.grails.datastore.gorm.GormEntity
 
 @Entity

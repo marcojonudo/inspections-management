@@ -7,6 +7,7 @@ import inspections.management.domains.fviberi.Order
 import inspections.management.pogos.pdf.CategoryItems
 import inspections.management.pogos.pdf.inspection.cards.CategoryCard
 import inspections.management.pogos.pdf.inspection.cards.ImageCategoryCard
+import inspections.management.pogos.pdf.inspection.cards.ImageItemCategoryCard
 import inspections.management.pogos.pdf.inspection.cards.ItemCategoryCard
 import inspections.management.pogos.pdf.inspection.header.PdfHeader
 import inspections.management.pogos.pdf.structure.IPdf
@@ -32,7 +33,9 @@ class PdfInspectionPage extends IPdf {
             Order.VehicleType.CAR
         header = new PdfHeader(centre, order, inspectionName, savedInspection, this.vehicleType)
         if (images) {
-            this.categories = categories.collect { (Card) new ImageCategoryCard(it) }
+            this.categories = categories.collect {
+                (Card) (it.category ? new ImageCategoryCard(it) : new ImageItemCategoryCard(it.items[0]))
+            }
         } else {
             this.categories = categories.collect {
                 it.category ? new CategoryCard(it) : new ItemCategoryCard(it.items[0])

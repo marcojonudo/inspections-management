@@ -18,13 +18,13 @@ class PdfInspection extends IPdf {
         String inspectionName,
         SavedInspection savedInspection,
         List<List<CategoryItems>> groupedCategories,
-        List<CategoryItems> imageCategories
+        List<List<CategoryItems>> groupedImageCategories
     ) {
         pages = groupedCategories.collect {
             new PdfInspectionPage(centre, order, inspectionName, savedInspection, it)
         }
-        if (imageCategories) {
-            pages << new PdfInspectionPage(centre, order, inspectionName, savedInspection, imageCategories, true)
+        groupedImageCategories.each {
+            pages << new PdfInspectionPage(centre, order, inspectionName, savedInspection, it, true)
         }
     }
 

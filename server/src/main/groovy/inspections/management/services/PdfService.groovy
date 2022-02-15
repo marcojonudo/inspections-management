@@ -13,6 +13,7 @@ import inspections.management.domains.savedItems.SelectSavedItem
 import inspections.management.pogos.pdf.CategoryItems
 import inspections.management.pogos.pdf.inspection.PdfInspection
 import inspections.management.services.data.*
+import inspections.management.utils.Constants
 import io.micronaut.context.annotation.Property
 
 import javax.inject.Inject
@@ -24,6 +25,7 @@ class PdfService {
 
 	private static final String HTML_FILE_NAME = "inspection.html"
 	private static final String PDF_FILE_NAME = "inspection.pdf"
+	private static final int IMAGES_ROW_ITEMS = 3
 
 	@Property(name = "pdf.resources.url")
 	String resourcesUrl
@@ -38,11 +40,15 @@ class PdfService {
 		List<Image> images = imageDataService.getAll((List<Long>) savedInspection.items.findAll { it.imageId }*.imageId)
 		String inspectionName = inspectionTypeDataService.findInspectionTypeName(savedInspection.inspectionTypeCode)
 
-		List<CategoryItems> categories = buildPrintCategories(savedInspection.items)
+		Set<SavedItem> savedItems = savedInspection.items.findAll {
+			!it.item.header && (it.item.type == Item.Type.SELECT ? ((SelectSavedItem) it).value != 'NA' : true)
+		}
+		List<CategoryItems> categories = buildPrintCategories(savedItems)
 		List<List<CategoryItems>> groupedCategories = buildGroupedCategories(categories)
 		List<CategoryItems> imageCategories = buildImageCategories(savedInspection.items, images)
+		List<List<CategoryItems>> groupedImageCategories = buildGroupedImageCategories(imageCategories)
 		PdfInspection pdfInspection = new PdfInspection(
-			centre, order, inspectionName, savedInspection, groupedCategories, imageCategories
+			centre, order, inspectionName, savedInspection, groupedCategories, groupedImageCategories
 		)
 		File htmlFile = createTempFile(HTML_FILE_NAME, pdfInspection.toHtml())
 		File pdf = createTempFile(PDF_FILE_NAME)
@@ -56,19 +62,16 @@ class PdfService {
 
 	static List<CategoryItems> buildPrintCategories(Set<SavedItem> savedItems) {
 		List<CategoryItems> categories = []
-		savedItems = savedItems.findAll {
-			!it.item.header && (it.item.type == Item.Type.SELECT ? ((SelectSavedItem) it).value != 'NA' : true)
-		}
 		savedItems.each { SavedItem savedItem ->
 			if (savedItem.item.category) {
 				def existent = categories.find { it.category && it.category.code == savedItem.item.category.code }
 				if (existent) {
-					existent.items << savedItem
+					existent.addItem(savedItem)
 				} else {
-					categories << new CategoryItems(savedItem, savedItem.item.category)
+					categories << new CategoryItems([savedItem], savedItem.item.category)
 				}
 			} else {
-				categories << new CategoryItems(savedItem)
+				categories << new CategoryItems([savedItem])
 			}
 		}
 		return categories
@@ -89,6 +92,34 @@ class PdfService {
 			imageCategories = buildPrintCategories(imageSavedItems)
 		}
 		return imageCategories
+	}
+
+	static List<List<CategoryItems>> buildGroupedImageCategories(List<CategoryItems> categories) {
+		List<List<CategoryItems>> groupedCategories = [(List<CategoryItems>) []]
+		categories.sort { it.category ? it.category.order : 999 }.eachWithIndex { CategoryItems categoryItems, int i = 0 ->
+			int rows = (int) (((List<CategoryItems>) groupedCategories.last()).collect {
+				Math.ceil((float) (it.items.size() / Constants.ROW_IMAGES))
+			}.sum() ?: 0)
+			int newRows = rows + categoryItems.rows.size()
+			int pageRows = rows < IMAGES_ROW_ITEMS ? (newRows - IMAGES_ROW_ITEMS > 0 ? newRows - IMAGES_ROW_ITEMS : newRows) : 0
+			int newPageRows = categoryItems.rows.size() - pageRows
+			if (newPageRows > 0) {
+				if (pageRows) {
+					List<SavedItem> samePageItems = ((List<SavedItem>) categoryItems.rows[0..pageRows-1].flatten())
+					CategoryItems samePageCategoryItems = categoryItems.clone(samePageItems)
+					List<SavedItem> newPageItems = ((List<SavedItem>) categoryItems.rows[pageRows..-1].flatten())
+					CategoryItems newPageCategoryItems = categoryItems.clone(newPageItems)
+
+					groupedCategories.last() << samePageCategoryItems
+					groupedCategories << [newPageCategoryItems]
+				} else {
+					groupedCategories << [categoryItems]
+				}
+			} else {
+				groupedCategories.last() << categoryItems
+			}
+		}
+		return groupedCategories
 	}
 
 	static File createTempFile(String name, String content = "") {

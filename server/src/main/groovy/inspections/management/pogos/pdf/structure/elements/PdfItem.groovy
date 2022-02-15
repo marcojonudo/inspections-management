@@ -1,4 +1,4 @@
-package inspections.management.pogos.pdf.structure.elements.items
+package inspections.management.pogos.pdf.structure.elements
 
 import groovy.transform.CompileStatic
 import inspections.management.domains.items.Item

@@ -72,6 +72,7 @@ body {
     width: 15%;
     position: absolute;
     right: .25rem;
+    top: .75rem;
 }
 
 #info {
@@ -120,54 +121,6 @@ body {
     white-space: nowrap;
 }
 
-/*#info .header-block {*/
-/*    flex: 1 0 0;*/
-/*    display: flex;*/
-/*    flex-direction: column;*/
-/*    align-items: center;*/
-/*    justify-content: flex-start;*/
-/*    margin: 0 .25rem;*/
-/*    border-radius: .25rem;*/
-/*    background-color: #f3f3f3;*/
-/*}*/
-
-/*#info .header-block > *:first-child {*/
-/*    font-weight: 600;*/
-/*    line-height: 1;*/
-/*}*/
-
-/*#info .header-block:not(:last-child) > div:last-child {*/
-/*    display: flex;*/
-/*    flex-direction: column;*/
-/*}*/
-
-/*#info .header-block:not(:last-child) > div:last-child > span {*/
-/*    line-height: 1.5;*/
-/*}*/
-
-/*#info #summary-container {*/
-/*    height: 50%;*/
-/*    display: flex;*/
-/*    align-items: center;*/
-/*    justify-content: center;*/
-/*}*/
-
-/*#info #summary {*/
-/*    width: 65%;*/
-/*    display: flex;*/
-/*    align-items: center;*/
-/*    justify-content: center;*/
-/*}*/
-
-/*#centre-card .card-title {*/
-/*    background-color: #5b953c;*/
-/*}*/
-
-/*#centre-card span {*/
-/*    display: block;*/
-/*    width: 100%;*/
-/*}*/
-
 #legend {
     display: flex;
     align-items: center;
@@ -193,15 +146,6 @@ body {
 .category {
     position: relative;
     margin-bottom: .25rem;
-}
-
-.category::after {
-    content: '';
-    width: 100%;
-    height: .25rem;
-    position: absolute;
-    top: 100%;
-    background-color: red;
 }
 
 .category .card {
@@ -276,22 +220,30 @@ body {
     justify-content: end;
 }
 
-.image-category .card-content {
+.images-row {
     display: flex;
+    align-items: center;
+    justify-content: space-around;
 }
 
 .image-item {
-    width: 25%;
+    width: 24%;
+    margin-right: .7rem;
 }
 
-.image-item > div {
+.image-item:last-child {
+    margin-right: 0 !important;
+}
+
+.image-item .item-text {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.image-item > img {
+.image-item img {
     width: 100%;
+    border-radius: 4px;
 }
 
 .item-category .card-content {

@@ -3,7 +3,7 @@ package inspections.management.pogos.pdf.inspection.items
 import groovy.transform.CompileStatic
 import inspections.management.domains.savedItems.SelectSavedItem
 import inspections.management.pogos.pdf.inspection.elements.ItemImage
-import inspections.management.pogos.pdf.structure.elements.items.PdfItem
+import inspections.management.pogos.pdf.structure.elements.PdfItem
 
 @CompileStatic
 class PdfSelectItem extends PdfItem {
