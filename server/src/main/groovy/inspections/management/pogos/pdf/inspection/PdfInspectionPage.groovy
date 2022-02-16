@@ -19,6 +19,8 @@ class PdfInspectionPage extends IPdf {
     PdfHeader header
     List<Card> categories
     Order.VehicleType vehicleType
+    boolean tyreInspection
+    boolean images
 
     PdfInspectionPage(
         Centre centre,
@@ -28,7 +30,8 @@ class PdfInspectionPage extends IPdf {
         List<CategoryItems> categories,
         boolean images = false
     ) {
-        classes = ["page"]
+        tyreInspection = savedInspection.inspectionTypeCode == "N"
+        classes = tyreInspection ? (List<String>) [] : ["page"]
         this.vehicleType = Order.VehicleType.values().find { it.type == order.vehicleType } ?:
             Order.VehicleType.CAR
         header = new PdfHeader(centre, order, inspectionName, savedInspection, this.vehicleType)
@@ -41,12 +44,13 @@ class PdfInspectionPage extends IPdf {
                 it.category ? new CategoryCard(it) : new ItemCategoryCard(it.items[0])
             }
         }
+        this.images = images
     }
 
     String toHtml() {
         return """
             <div class="${findClasses()}">
-                ${header.toHtml()}
+                ${tyreInspection && images ? '' : header.toHtml()}
                 <div class="categories-container" style="background-image: url(img/backgrounds/${vehicleType.backgroundImage})">
                     ${categories.collect { it.toHtml() }.join("\n")}
                 </div>

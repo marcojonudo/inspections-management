@@ -10,18 +10,25 @@ import inspections.management.domains.fviberi.Order
 import inspections.management.domains.items.Item
 import inspections.management.domains.savedItems.SavedItem
 import inspections.management.domains.savedItems.SelectSavedItem
+import inspections.management.pogos.logs.Log
 import inspections.management.pogos.pdf.CategoryItems
 import inspections.management.pogos.pdf.inspection.PdfInspection
 import inspections.management.services.data.*
 import inspections.management.utils.Constants
 import io.micronaut.context.annotation.Property
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import java.time.LocalTime
+import java.time.temporal.ChronoUnit
 
 @Singleton
 @CompileStatic
 class PdfService {
+
+	private static final Logger LOG = LoggerFactory.getLogger(PdfService)
 
 	private static final String HTML_FILE_NAME = "inspection.html"
 	private static final String PDF_FILE_NAME = "inspection.pdf"
@@ -53,9 +60,11 @@ class PdfService {
 		File htmlFile = createTempFile(HTML_FILE_NAME, pdfInspection.toHtml())
 		File pdf = createTempFile(PDF_FILE_NAME)
 
+		LocalTime refTime = LocalTime.now()
 		ConverterProperties properties = new ConverterProperties()
 		properties.setBaseUri(resourcesUrl)
 		HtmlConverter.convertToPdf(htmlFile, pdf, properties)
+		LOG.info(new Log((Map) [message: "Generating inspection PDF", millis: ChronoUnit.MILLIS.between(refTime, LocalTime.now())]).toString())
 
 		return pdf
 	}
@@ -95,8 +104,11 @@ class PdfService {
 	}
 
 	static List<List<CategoryItems>> buildGroupedImageCategories(List<CategoryItems> categories) {
-		List<List<CategoryItems>> groupedCategories = [(List<CategoryItems>) []]
+		List<List<CategoryItems>> groupedCategories = []
 		categories.sort { it.category ? it.category.order : 999 }.eachWithIndex { CategoryItems categoryItems, int i = 0 ->
+			if (i == 0) {
+				groupedCategories << []
+			}
 			int rows = (int) (((List<CategoryItems>) groupedCategories.last()).collect {
 				Math.ceil((float) (it.items.size() / Constants.ROW_IMAGES))
 			}.sum() ?: 0)

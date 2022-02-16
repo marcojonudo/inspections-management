@@ -4,7 +4,7 @@ database:
         password: gDwXYI4a@G3^qZ#kCQ0l5xI1ukIW#W3p
 
 cron:
-    sync-orders: '0/30 * * * * ?'
+    sync-orders: '0/45 * * * * ?'
 
 dataSource:
     logSql: false

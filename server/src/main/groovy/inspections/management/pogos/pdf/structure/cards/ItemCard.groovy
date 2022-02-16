@@ -10,7 +10,7 @@ class ItemCard extends Card {
 
     ItemCard(Title title, String text) {
         this.title = title
-        this.text = text
+        this.text = text ?: '-'
     }
 
     String toHtml() {
