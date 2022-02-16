@@ -27,7 +27,7 @@ export class Builder {
 	};
 
 	static buildSavedInspection(savedInspection: any, itemBudgets: ItemBudget[]): SavedInspection {
-		const savedItems = savedInspection.items.map(i => this.buildSavedItem(i));
+		const savedItems = savedInspection.items ? savedInspection.items.map(i => this.buildSavedItem(i)) : [];
 		const filteredItemBudgets = InspectionService.filterItemBudgets(savedItems, itemBudgets);
 		const builtSavedInspection = new SavedInspection(savedInspection, savedItems, filteredItemBudgets);
 		const items = builtSavedInspection.items.map(i => i.item);

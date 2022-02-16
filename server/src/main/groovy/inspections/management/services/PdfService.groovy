@@ -63,8 +63,9 @@ class PdfService {
 		LocalTime refTime = LocalTime.now()
 		ConverterProperties properties = new ConverterProperties()
 		properties.setBaseUri(resourcesUrl)
+		LOG.info(new Log((Map) [message: "Generating inspection PDF.."]).toString())
 		HtmlConverter.convertToPdf(htmlFile, pdf, properties)
-		LOG.info(new Log((Map) [message: "Generating inspection PDF", millis: ChronoUnit.MILLIS.between(refTime, LocalTime.now())]).toString())
+		LOG.info(new Log((Map) [message: "Inspection PDF generated!", millis: ChronoUnit.MILLIS.between(refTime, LocalTime.now())]).toString())
 
 		return pdf
 	}

@@ -69,7 +69,7 @@ class Order implements GormEntity<Order> {
 		E_BIKE("BICICLETA", { CarVehicle car, Set<SavedItem> headerItems -> null }, "bike.jpg"),
 		CAR("COCHE", { CarVehicle car, Set<SavedItem> headerItems -> new CarCard(car, headerItems) }, "car.jpg"),
 		MOTORBIKE("MOTO", { CarVehicle car, Set<SavedItem> headerItems -> null }, "motorbike.jpg"),
-		E_SCOOTER("PATINETE", { ScooterVehicle scooter -> new ScooterCard(scooter) }, "scooter.jpg")
+		E_SCOOTER("PATINETE", { ScooterVehicle scooter, Set<SavedItem> headerItems -> new ScooterCard(scooter) }, "scooter.jpg")
 
 		final String type
 		final Closure<VehicleCard> buildCard
