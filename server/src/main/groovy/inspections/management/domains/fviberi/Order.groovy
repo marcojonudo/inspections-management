@@ -3,6 +3,12 @@ package inspections.management.domains.fviberi
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonInclude
 import grails.gorm.annotation.Entity
+import inspections.management.domains.savedItems.SavedItem
+import inspections.management.pogos.pdf.inspection.cards.CarCard
+import inspections.management.pogos.pdf.inspection.cards.ScooterCard
+import inspections.management.pogos.pdf.inspection.cards.VehicleCard
+import inspections.management.pogos.vehicles.CarVehicle
+import inspections.management.pogos.vehicles.ScooterVehicle
 import inspections.management.pogos.vehicles.Vehicle
 import inspections.management.utils.Constants
 import org.grails.datastore.gorm.GormEntity
@@ -23,6 +29,7 @@ class Order implements GormEntity<Order> {
 	Client client
 	String sellerCode
 	String mechanicCode
+	String vehicleType
 	boolean keys
 
 	@JsonInclude
@@ -45,6 +52,7 @@ class Order implements GormEntity<Order> {
 		sellerCode column: 'covended'
 		lines fetch: 'join'
 		relatedBudgets fetch: 'join'
+		vehicleType column: 'tipvehicu'
 
 		id generator: 'assigned', name: 'number'
 		version false
@@ -54,6 +62,25 @@ class Order implements GormEntity<Order> {
 
 	boolean isAppointment() {
 		return code.startsWith(Constants.APPOINTMENT_IDENTIFIER)
+	}
+
+	enum VehicleType {
+
+		E_BIKE("BICICLETA", { CarVehicle car, Set<SavedItem> headerItems -> null }, "bike.jpg"),
+		CAR("COCHE", { CarVehicle car, Set<SavedItem> headerItems -> new CarCard(car, headerItems) }, "car.jpg"),
+		MOTORBIKE("MOTO", { CarVehicle car, Set<SavedItem> headerItems -> null }, "motorbike.jpg"),
+		E_SCOOTER("PATINETE", { ScooterVehicle scooter, Set<SavedItem> headerItems -> new ScooterCard(scooter) }, "scooter.jpg")
+
+		final String type
+		final Closure<VehicleCard> buildCard
+		final String backgroundImage
+
+		VehicleType(String type, Closure<VehicleCard> buildCard, String backgroundImage) {
+			this.type = type
+			this.buildCard = buildCard
+			this.backgroundImage = backgroundImage
+		}
+
 	}
 
 }

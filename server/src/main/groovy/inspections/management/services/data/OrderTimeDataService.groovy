@@ -14,4 +14,6 @@ interface OrderTimeDataService {
 	@Where({ orderNumber in orderNumbers })
 	List<OrderTime> findAll(List<Integer> orderNumbers)
 
+	OrderTime find(Integer orderNumber)
+
 }

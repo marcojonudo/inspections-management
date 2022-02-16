@@ -2,6 +2,10 @@ package inspections.management.domains.savedItems
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import grails.gorm.annotation.Entity
+import inspections.management.domains.items.TextItem
+import inspections.management.domains.items.TextItemField
+import inspections.management.pogos.pdf.inspection.items.PdfTextItem
+import inspections.management.pogos.pdf.structure.elements.PdfItem
 import org.grails.datastore.gorm.GormEntity
 
 @Entity
@@ -26,6 +30,22 @@ class TextSavedItem extends SavedItem implements GormEntity<TextSavedItem> {
 			field.text != textSavedItem.fields.find { it.order == field.order }.text
 		}
 		return !differentField
+	}
+
+	String findValue() {
+		Set<TextItemField> itemFields = ((TextItem) item).fields
+		return fields.sort { it.order }.collect { TextSavedItemField savedField ->
+			TextItemField itemField = itemFields.find { it.order == savedField.order }
+			return savedField.text ? "${itemField.prefix ?: ''}$savedField.text${itemField.separator ?: ''}" : '-'
+		}.join("")
+	}
+
+	String findUnit() {
+		return findValue() ? ((TextItem) this.item).unit ?: "" : ""
+	}
+
+	PdfItem buildPdfItem() {
+		return new PdfTextItem(this)
 	}
 
 }

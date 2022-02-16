@@ -17,6 +17,7 @@ class SavedInspection implements GormEntity<SavedInspection> {
 	int orderNumber
 	String vehicle
 	String employeeCode
+	String numberPlate
 	String sellerCode
 	State state
 	boolean orderInspection

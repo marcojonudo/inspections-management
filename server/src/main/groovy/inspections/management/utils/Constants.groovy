@@ -8,6 +8,7 @@ class Constants {
     static final String SPAIN_TIMEZONE = "Europe/Madrid"
     static final List<String> CLOSED_ORDER_STATES = ['V', 'X']
     static final String APPOINTMENT_IDENTIFIER = "C"
+    static final int ROW_IMAGES = 4
 
     static class DataSource {
 
