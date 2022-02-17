@@ -46,6 +46,7 @@ class Item implements GormEntity<Item> {
 
 	static constraints = {
 		type maxSize: 25
+		shortName nullable: true
 		order nullable: true
 		printOrder nullable: true
 		category nullable: true
