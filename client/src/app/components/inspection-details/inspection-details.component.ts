@@ -15,7 +15,6 @@ import { EmployeeDialogComponent } from '../employee-dialog/employee-dialog.comp
 import { ImageDialogComponent } from '../image-dialog/image-dialog.component';
 import { Image } from '../../objects/inspections/image';
 import { RealTimeService } from '../../services/real-time.service';
-import { RealTimeOrder } from '../../objects/real-time/update/orders/real-time-order';
 
 export interface InspectionDetailsColumn {
 	item: ItemBudget;

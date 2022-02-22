@@ -1,3 +1,6 @@
-<div mat-dialog-content>
-	<img *ngIf="image" [src]="findImageUrl(image.image)">
+<div mat-dialog-content id="image-wrapper">
+	<img
+		*ngIf="image"
+		[ngStyle]="{'width.%': image.landscape ? 52 : 39, 'height.%': image.landscape ? 39 : 52}"
+		[src]="findImageUrl(image.image)">
 </div>
