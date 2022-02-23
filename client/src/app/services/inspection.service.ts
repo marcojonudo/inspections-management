@@ -24,8 +24,6 @@ import { Builder } from '../utils/builder';
 import { ItemRelation } from '../objects/inspections/item-relation';
 import { SelectSavedItem } from '../objects/inspections/saved-items/select-saved-item';
 import { CountryHandler } from '../objects/country-info/country-handler';
-import { SpainHandler } from '../objects/country-info/spain-handler';
-import { PortugalHandler } from '../objects/country-info/portugal-handler';
 import { SelectItemOption } from '../objects/inspections/items/select-item-option';
 import { SelectItem } from '../objects/inspections/items/select-item';
 import { Centre } from '../objects/centre';
@@ -45,6 +43,7 @@ import { CountryHandlerType } from '../objects/country-info/country-handler-type
 })
 export class InspectionService {
 
+	static orders: Order[];
 	static orderInspections: OrderInspectionVehicle[];
 	static savedInspections: SavedInspection[];
 	static itemBudgets: ItemBudget[];
@@ -147,6 +146,10 @@ export class InspectionService {
 		});
 	}
 
+	static findOrder(orderNumber: number, orders: Order[] = this.orders): Order {
+		return orders.find(o => o.number === orderNumber);
+	}
+
 	static findOrderInspection(
 		orderNumber: number, orderInspections: OrderInspectionVehicle[] = this.orderInspections
 	): OrderInspectionVehicle {
@@ -223,14 +226,12 @@ export class InspectionService {
 	static findPendingItemBudgets(type: string = undefined, savedInspections: SavedInspection[] = this.savedInspections): ItemBudget[] {
 		const itemBudgets = [];
 		savedInspections.forEach(savedInspection => {
-			const orderInspection = this.findOrderInspection(savedInspection.orderNumber);
+			const order = this.findOrder(savedInspection.orderNumber);
 
 			const foundItemBudgets = type ?
 				savedInspection.itemBudgets.filter(itemBudget => itemBudget.budgetType === type) : savedInspection.itemBudgets;
 			const pendingItemBudgets = foundItemBudgets.filter(itemBudget =>
-				this.findExistentBudget(
-					itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
-				) === undefined
+				this.findExistentBudget(itemBudget.itemCode, savedInspection.vehicle, order.budgets) === undefined
 			);
 			itemBudgets.push(...pendingItemBudgets);
 		});
@@ -519,14 +520,13 @@ export class InspectionService {
 	}
 
 	loadMainInfo(filters: OrdersFilter[] = this.filters): Observable<any> {
-		let openedOrders = [];
 		return this.findOrders(filters).pipe(
 			mergeMap(orders => {
-				openedOrders = orders.filter(o => o.state !== Constants.ORDER_STATE.F);
-				console.log('Opened orders', openedOrders);
+				InspectionService.orders = orders.filter(o => o.state !== Constants.ORDER_STATE.F);
+				console.log('Opened orders', InspectionService.orders);
 
-				if (openedOrders.length) {
-					const orderNumbers = openedOrders.map(o => o.number);
+				if (InspectionService.orders.length) {
+					const orderNumbers = InspectionService.orders.map(o => o.number);
 					const budgetNotificationsUrl = `${Url.budgetNotification()}?orderNumbers=${orderNumbers.join('&orderNumbers=')}`;
 					return forkJoin([
 						this.findItemBudgets(),
@@ -546,9 +546,9 @@ export class InspectionService {
 					/* Una vez obtenidas las revisiones guardadas, se puede comprobar qué números de orden tienen asociada una revisión de
 					 * anomalías detectadas */
 					const detectedAnomaliesOrders = InspectionService.savedInspections.filter(i => !i.orderInspection).map(i =>
-						openedOrders.find(o => o.number === i.orderNumber)
+						InspectionService.orders.find(o => o.number === i.orderNumber)
 					);
-					const body = { openedOrders, detectedAnomaliesOrders };
+					const body = { openedOrders: InspectionService.orders, detectedAnomaliesOrders };
 					return this.http.post(Url.inspections(), body);
 				}
 				return of([]);
