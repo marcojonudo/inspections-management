@@ -74,7 +74,9 @@ class PdfService {
 		List<CategoryItems> categories = []
 		savedItems.each { SavedItem savedItem ->
 			if (savedItem.item.category) {
-				def existent = categories.find { it.category && it.category.code == savedItem.item.category.code }
+				CategoryItems existent = categories.find {
+					it.category && it.category.code == savedItem.item.category.code
+				}
 				if (existent) {
 					existent.addItem(savedItem)
 				} else {

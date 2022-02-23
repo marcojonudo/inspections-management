@@ -12,6 +12,7 @@ export interface DialogData {
 @Component({
 	selector: 'app-image-dialog',
 	templateUrl: './image-dialog.component.html',
+	styleUrls: ['./image-dialog.component.sass'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ImageDialogComponent {
