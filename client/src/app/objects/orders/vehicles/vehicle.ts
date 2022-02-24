@@ -7,7 +7,7 @@ export class Vehicle {
 
 	constructor(vehicle: any) {
 		this.type = vehicle.type;
-		this.identifier = vehicle.identifier;
+		this.identifier = vehicle.identifier.trim();
 		this.brand = vehicle.brand;
 		this.model = vehicle.model;
 	}
