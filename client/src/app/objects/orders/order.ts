@@ -22,7 +22,7 @@ export class Order implements RealTimeObject {
 		this.number = order.number;
 		this.code = order.code;
 		this.state = order.state;
-		this.vehicle = Builder.buildVehicle(order.vehicle);
+		this.vehicle = order.vehicle ? Builder.buildVehicle(order.vehicle) : undefined;
 		this.client = new Client(order.client);
 		this.sellerCode = order.sellerCode;
 		this.mechanicCode = order.mechanicCode;
