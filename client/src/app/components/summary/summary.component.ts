@@ -84,17 +84,20 @@ export class SummaryComponent implements OnDestroy {
 		const acceptedBudgets = [];
 		savedInspections.forEach(savedInspection => {
 			const orderInspection = InspectionService.findOrderInspection(savedInspection.orderNumber);
-			savedInspection.itemBudgets.forEach(itemBudget => {
-				const budget = InspectionService.findExistentBudget(
-					itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
-				);
-				if (budget && InspectionService.checkAcceptedBudget(budget)) {
-					const alreadyAddedBudget = acceptedBudgets.indexOf(budget) !== -1;
-					if (!alreadyAddedBudget) {
-						acceptedBudgets.push(budget);
+			/* Si hay una revisión guardada, pero la orden no tiene código de revisión, no existe orderInspection */
+			if (orderInspection) {
+				savedInspection.itemBudgets.forEach(itemBudget => {
+					const budget = InspectionService.findExistentBudget(
+						itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
+					);
+					if (budget && InspectionService.checkAcceptedBudget(budget)) {
+						const alreadyAddedBudget = acceptedBudgets.indexOf(budget) !== -1;
+						if (!alreadyAddedBudget) {
+							acceptedBudgets.push(budget);
+						}
 					}
-				}
-			});
+				});
+			}
 		});
 		return InspectionService.findBudgetsPrice(acceptedBudgets);
 	}
@@ -103,12 +106,14 @@ export class SummaryComponent implements OnDestroy {
 		const doneBudgets = [];
 		savedInspections.forEach(savedInspection => {
 			const orderInspection = InspectionService.findOrderInspection(savedInspection.orderNumber);
-			const doneOrderBudgets = savedInspection.itemBudgets.filter(itemBudget =>
-				InspectionService.findExistentBudget(
-					itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
-				) !== undefined
-			);
-			doneBudgets.push(...doneOrderBudgets);
+			if (orderInspection) {
+				const doneOrderBudgets = savedInspection.itemBudgets.filter(itemBudget =>
+					InspectionService.findExistentBudget(
+						itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
+					) !== undefined
+				);
+				doneBudgets.push(...doneOrderBudgets);
+			}
 		});
 		return doneBudgets;
 	}
@@ -117,13 +122,15 @@ export class SummaryComponent implements OnDestroy {
 		const doneBudgets = [];
 		savedInspections.forEach(savedInspection => {
 			const orderInspection = InspectionService.findOrderInspection(savedInspection.orderNumber);
-			const doneOrderBudgets = savedInspection.itemBudgets.filter(itemBudget => {
-				const budget = InspectionService.findExistentBudget(
-					itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
-				);
-				return budget && InspectionService.checkAcceptedBudget(budget);
-			});
-			doneBudgets.push(...doneOrderBudgets);
+			if (orderInspection) {
+				const doneOrderBudgets = savedInspection.itemBudgets.filter(itemBudget => {
+					const budget = InspectionService.findExistentBudget(
+						itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
+					);
+					return budget && InspectionService.checkAcceptedBudget(budget);
+				});
+				doneBudgets.push(...doneOrderBudgets);
+			}
 		});
 		return doneBudgets;
 	}
