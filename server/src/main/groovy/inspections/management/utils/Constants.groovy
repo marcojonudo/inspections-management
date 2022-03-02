@@ -9,6 +9,8 @@ class Constants {
     static final List<String> CLOSED_ORDER_STATES = ['V', 'X']
     static final String APPOINTMENT_IDENTIFIER = "C"
     static final int ROW_IMAGES = 4
+    static final List<String> CAR_POSITION = ['DI', 'DD', 'TI', 'TD']
+    static final DEPTH_ITEM_PREFIX = 'PN'
 
     static class DataSource {
 
@@ -34,6 +36,26 @@ class Constants {
         static final String SAVING_INSPECTION = "Saving inspection"
         static final String ERROR_SAVING_INSPECTION = "Error saving inspection"
         static final String SAVED_INSPECTION = "Saved inspection!"
+
+    }
+
+    static class SelectItemOption {
+
+        static final String NA = "NA"
+
+    }
+
+    static class ItemCode {
+
+        static final String CVGN = "CVGN"
+        static final String PPN = "PPN"
+        static final String PN = "PN"
+
+    }
+
+    static class InspectionType {
+
+        static final String N = "N"
 
     }
 

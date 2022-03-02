@@ -4,27 +4,41 @@ import groovy.transform.CompileStatic
 import inspections.management.domains.SavedInspection
 import inspections.management.domains.fviberi.Centre
 import inspections.management.domains.fviberi.Order
+import inspections.management.domains.items.SelectItemOption
 import inspections.management.pogos.pdf.CategoryItems
+import inspections.management.pogos.pdf.inspection.header.PdfHeader
+import inspections.management.pogos.pdf.inspection.pages.ImagesPage
+import inspections.management.pogos.pdf.inspection.pages.ItemsPage
+import inspections.management.pogos.pdf.inspection.pages.PdfInspectionPage
+import inspections.management.pogos.pdf.inspection.pages.TyresPage
 import inspections.management.pogos.pdf.structure.IPdf
 
 @CompileStatic
 class PdfInspection extends IPdf {
 
-    List<PdfInspectionPage> pages
+    List<PdfInspectionPage> pages = []
 
     PdfInspection(
         Centre centre,
         Order order,
         String inspectionName,
         SavedInspection savedInspection,
+        List<CategoryItems> tyreCategories,
         List<List<CategoryItems>> groupedCategories,
-        List<List<CategoryItems>> groupedImageCategories
+        List<List<CategoryItems>> groupedImageCategories,
+        List<SelectItemOption> options
     ) {
-        pages = groupedCategories.collect {
-            new PdfInspectionPage(centre, order, inspectionName, savedInspection, it)
+        Order.VehicleType vehicleType = Order.VehicleType.values().find { it.type == order.vehicleType } ?:
+            Order.VehicleType.CAR
+        PdfHeader header = new PdfHeader(centre, order, inspectionName, savedInspection, vehicleType)
+        if (tyreCategories) {
+            pages << new TyresPage(header, savedInspection, tyreCategories, vehicleType, options)
+        }
+        groupedCategories.each {
+            pages << (PdfInspectionPage) new ItemsPage(header, savedInspection, it, vehicleType)
         }
         groupedImageCategories.each {
-            pages << new PdfInspectionPage(centre, order, inspectionName, savedInspection, it, true)
+            pages << (PdfInspectionPage) new ImagesPage(header, savedInspection, it, vehicleType)
         }
     }
 

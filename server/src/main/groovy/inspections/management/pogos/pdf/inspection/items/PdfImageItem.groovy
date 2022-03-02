@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import inspections.management.domains.savedItems.SavedItem
 import inspections.management.pogos.pdf.structure.elements.Image
 import inspections.management.pogos.pdf.structure.elements.PdfItem
+import inspections.management.services.PdfService
 
 @CompileStatic
 class PdfImageItem extends PdfItem {
@@ -14,8 +15,7 @@ class PdfImageItem extends PdfItem {
     PdfImageItem(SavedItem savedItem, boolean showTitle = true) {
         super(savedItem.item)
         this.classes = ["image-item"]
-        String base64Code = new String(Base64.encoder.encode(savedItem.image.image))
-        image = new Image([], null, "data:image/png;base64,$base64Code")
+        image = new Image([], null, PdfService.buildImageUrl(savedItem))
         this.showTitle = showTitle
     }
 

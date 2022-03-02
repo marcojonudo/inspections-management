@@ -4,10 +4,12 @@ import com.itextpdf.html2pdf.ConverterProperties
 import com.itextpdf.html2pdf.HtmlConverter
 import groovy.transform.CompileStatic
 import inspections.management.domains.Image
+import inspections.management.domains.ItemCategory
 import inspections.management.domains.SavedInspection
 import inspections.management.domains.fviberi.Centre
 import inspections.management.domains.fviberi.Order
 import inspections.management.domains.items.Item
+import inspections.management.domains.items.SelectItemOption
 import inspections.management.domains.savedItems.SavedItem
 import inspections.management.domains.savedItems.SelectSavedItem
 import inspections.management.pogos.logs.Log
@@ -33,6 +35,7 @@ class PdfService {
 	private static final String HTML_FILE_NAME = "inspection.html"
 	private static final String PDF_FILE_NAME = "inspection.pdf"
 	private static final int IMAGES_ROW_ITEMS = 3
+	private static final List<String> TYRE_ITEM_CODES = ['EN', 'FN', 'PN']
 
 	@Property(name = "pdf.resources.url")
 	String resourcesUrl
@@ -42,20 +45,39 @@ class PdfService {
 	@Inject OrderDataService orderDataService
 	@Inject ImageDataService imageDataService
 	@Inject InspectionTypeDataService inspectionTypeDataService
+	@Inject SelectItemOptionDataService selectItemOptionDataService
 
 	File buildPdf(Centre centre, Order order, SavedInspection savedInspection) {
 		List<Image> images = imageDataService.getAll((List<Long>) savedInspection.items.findAll { it.imageId }*.imageId)
 		String inspectionName = inspectionTypeDataService.findInspectionTypeName(savedInspection.inspectionTypeCode)
 
 		Set<SavedItem> savedItems = savedInspection.items.findAll {
-			!it.item.header && (it.item.type == Item.Type.SELECT ? ((SelectSavedItem) it).value != 'NA' : true)
+			!it.item.header &&
+			(it.item.type == Item.Type.SELECT ? ((SelectSavedItem) it).value != Constants.SelectItemOption.NA : true)
+		}.each { SavedItem savedItem ->
+			savedItem.image = images.find { it.id == savedItem.imageId }
 		}
+
+		Set<SavedItem> depthImageItems = findTyreDepthItems(savedItems).findAll { it.imageId }
+		List<CategoryItems> tyreCategories = depthImageItems ? buildTyreCategories(savedItems) : null
+		List<SelectItemOption> options = selectItemOptionDataService.findAll()
+
 		List<CategoryItems> categories = buildPrintCategories(savedItems)
 		List<List<CategoryItems>> groupedCategories = buildGroupedCategories(categories)
-		List<CategoryItems> imageCategories = buildImageCategories(savedInspection.items, images)
+
+		Set<SavedItem> imageItems = findImageItems(savedItems)
+		List<CategoryItems> imageCategories = buildPrintCategories(imageItems)
 		List<List<CategoryItems>> groupedImageCategories = buildGroupedImageCategories(imageCategories)
+
 		PdfInspection pdfInspection = new PdfInspection(
-			centre, order, inspectionName, savedInspection, groupedCategories, groupedImageCategories
+			centre,
+			order,
+			inspectionName,
+			savedInspection,
+			tyreCategories,
+			groupedCategories,
+			groupedImageCategories,
+			options
 		)
 		File htmlFile = createTempFile(HTML_FILE_NAME, pdfInspection.toHtml())
 		File pdf = createTempFile(PDF_FILE_NAME)
@@ -68,6 +90,15 @@ class PdfService {
 		LOG.info(new Log((Map) [message: "Inspection PDF generated!", millis: ChronoUnit.MILLIS.between(refTime, LocalTime.now())]).toString())
 
 		return pdf
+	}
+
+	static List<CategoryItems> buildTyreCategories(Set<SavedItem> savedItems) {
+		return Constants.CAR_POSITION.collect { String position ->
+			List<SavedItem> positionSavedItems = savedItems.findAll {
+				it.item.code in TYRE_ITEM_CODES.collect { (String) "$it$position" }
+			}.toList()
+			return new CategoryItems(positionSavedItems, new ItemCategory(name: position))
+		}
 	}
 
 	static List<CategoryItems> buildPrintCategories(Set<SavedItem> savedItems) {
@@ -95,15 +126,14 @@ class PdfService {
 		return (List<List<CategoryItems>>) (i != -1 ? [categories[0..i], categories[i+1..-1]] : [categories])
 	}
 
-	static List<CategoryItems> buildImageCategories(Set<SavedItem> savedItems, List<Image> images) {
-		List<CategoryItems> imageCategories = []
-		if (images) {
-			Set<SavedItem> imageSavedItems = images.collect { Image i ->
-				savedItems.find { it.imageId == i.id }.tap { image = i }
-			}.toSet()
-			imageCategories = buildPrintCategories(imageSavedItems)
-		}
-		return imageCategories
+	static Set<SavedItem> findImageItems(Set<SavedItem> savedItems) {
+		Set<SavedItem> depthImageItems = findTyreDepthItems(savedItems).findAll { it.imageId }
+		return savedItems.findAll { it.image && !(it.item.code in depthImageItems*.item.code) }
+	}
+
+	static Set<SavedItem> findTyreDepthItems(Set<SavedItem> savedItems) {
+		List<String> depthCodes = Constants.CAR_POSITION.collect { (String) "$Constants.DEPTH_ITEM_PREFIX$it" }
+		return savedItems.findAll { it.item.code in depthCodes }
 	}
 
 	static List<List<CategoryItems>> buildGroupedImageCategories(List<CategoryItems> categories) {
@@ -142,6 +172,11 @@ class PdfService {
 		file.deleteOnExit()
 		file.write(content)
 		return file
+	}
+
+	static String buildImageUrl(SavedItem savedItem) {
+		String base64Code = new String(Base64.encoder.encode(savedItem.image.image))
+		return "data:image/png;base64,$base64Code"
 	}
 
 }
