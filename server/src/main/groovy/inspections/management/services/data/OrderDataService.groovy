@@ -62,7 +62,7 @@ abstract class OrderDataService {
 		List<Budget> budgets = budgetNumbers ? budgetDataService.findAll(budgetNumbers) : []
 		orders.each { Order order ->
 			IVehicle vehicle = carDataService.find(order.carIdentifier) ?: scooterDataService.find(order.carIdentifier)
-			order.vehicle = vehicle.buildVehicle()
+			order.vehicle = vehicle?.buildVehicle()
 
 			OrderTime orderTime = ordersTime.find { it.orderNumber == order.number }
 			order.code = orderTime.code

@@ -2,7 +2,9 @@ package inspections.management.domains.fviberi
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import grails.gorm.annotation.Entity
+import inspections.management.deserializers.VehicleDeserializer
 import inspections.management.domains.savedItems.SavedItem
 import inspections.management.pogos.pdf.inspection.cards.CarCard
 import inspections.management.pogos.pdf.inspection.cards.ScooterCard
@@ -25,6 +27,8 @@ class Order implements GormEntity<Order> {
 	@JsonFormat(pattern = Constants.DateFormat.yyyy_MM_dd, timezone = Constants.SPAIN_TIMEZONE)
 	LocalDate day
 	String carIdentifier
+
+	@JsonDeserialize(using = VehicleDeserializer)
 	Vehicle vehicle
 	Client client
 	String sellerCode

@@ -10,7 +10,7 @@ export class DetectedFaultsHandler implements InspectionHandler {
 	}
 
 	findSavedInspection(savedInspection: SavedInspection): SavedInspection {
-		const newSavedInspection = Builder.buildSavedInspection(savedInspection, savedInspection.itemBudgets);
+		const newSavedInspection = Builder.buildSavedInspection(savedInspection, savedInspection.itemBudgets, false);
 		/* Se obtienen únicamente aquellos items con valor definido. En el caso de los de selección, aquellos cuyo
 		 * valor sea distinto de 'Pendiente', y en los texto, aquellos que tienen algún valor */
 		newSavedInspection.items = newSavedInspection.items.filter(savedItem =>

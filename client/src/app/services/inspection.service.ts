@@ -250,7 +250,11 @@ export class InspectionService {
 	}
 
 	static findOrdersBudgets(savedInspections: SavedInspection[] = this.savedInspections): Budget[] {
-		const orderInspections = savedInspections.map(i => InspectionService.findOrderInspection(i.orderNumber));
+		/* Si hay una revisión guardada, pero la orden no tiene código de revisión (por algún fallo de JPDV o porque lo hayan quitado),
+		 * el elemento de la lista será undefined. Por tanto, se filtra para eliminar estos casos */
+		const orderInspections = savedInspections
+			.map(i => InspectionService.findOrderInspection(i.orderNumber))
+			.filter(o => o !== undefined);
 		return [].concat(...orderInspections.map(o => o.order).map(o => o.budgets));
 	}
 

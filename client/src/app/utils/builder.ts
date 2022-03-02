@@ -26,16 +26,18 @@ export class Builder {
 		SCOOTER: (vehicle: any) => new Scooter(vehicle)
 	};
 
-	static buildSavedInspection(savedInspection: any, itemBudgets: ItemBudget[]): SavedInspection {
+	static buildSavedInspection(savedInspection: any, itemBudgets: ItemBudget[], buildRelation: boolean = true): SavedInspection {
 		const savedItems = savedInspection.items ? savedInspection.items.map(i => this.buildSavedItem(i)) : [];
 		const filteredItemBudgets = InspectionService.filterItemBudgets(savedItems, itemBudgets);
 		const builtSavedInspection = new SavedInspection(savedInspection, savedItems, filteredItemBudgets);
 		const items = builtSavedInspection.items.map(i => i.item);
-		items.forEach(item => {
-			item.relations = item.relations.map(itemRelation =>
-				new ItemRelation(itemRelation, items.find(i => i.name === itemRelation.targetItem.name))
-			);
-		});
+		if (buildRelation) {
+			items.forEach(item => {
+				item.relations = item.relations.map(itemRelation =>
+					new ItemRelation(itemRelation, items.find(i => i.name === itemRelation.targetItem.name))
+				);
+			});
+		}
 		return builtSavedInspection;
 	}
 
