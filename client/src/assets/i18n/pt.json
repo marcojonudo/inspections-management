@@ -211,6 +211,11 @@
 		"engine": "Motor",
 		"power": "Potencia",
 		"registration": "Matriculación",
+		"tyre": "Pneu",
+		"tyreState": "Estado pneu",
+		"tyreMin": "1.6mm mínimo legal",
+		"tyreDepth": "Profundidade pneu",
+		"tyreAge": "Idade pneu",
 		"category": {
 			"I": "Iluminación",
 			"C": "Carrocería",
@@ -234,6 +239,10 @@
 		"header": {
 			"KM": "KM",
 			"FPITV": "Próx. data ITV"
+		},
+		"item": {
+			"CVGN": "Controlo visual geometria",
+			"PPN": "Ajuste pressão"
 		}
 	},
 	"dialog": {

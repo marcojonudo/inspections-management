@@ -8,13 +8,7 @@ import { Observable, Subject } from 'rxjs';
 })
 export class PrintService {
 
-	printingSubject: Subject<boolean>;
-	printing$: Observable<boolean>;
-
-	constructor(private router: Router) {
-		this.printingSubject = new Subject<boolean>();
-		this.printing$ = this.printingSubject.asObservable();
-	}
+	constructor(private router: Router) {}
 
 	print(): void {
 		this.router.navigate([
@@ -24,11 +18,9 @@ export class PrintService {
 	}
 
 	openPrintDialog(): void {
-		this.printingSubject.next(true);
 		setTimeout(() => {
 			window.print();
 			this.router.navigate(['/']);
-			this.printingSubject.next(false);
 		});
 	}
 

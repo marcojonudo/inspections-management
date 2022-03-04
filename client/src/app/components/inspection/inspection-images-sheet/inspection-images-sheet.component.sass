@@ -1,0 +1,25 @@
+@import "abstracts/mixins"
+
+.category
+	margin-bottom: $tiny-gap
+
+.image-category-content
+	width: 100%
+	display: grid
+	grid-template-columns: repeat(4, 1fr)
+	grid-gap: $default-gap
+
+	.image-item
+		@include flex-column-center
+		text-align: center
+
+		.image-container
+			height: 100%
+			@include flex-1
+			@include flex-center
+
+		img
+			width: 100%
+			height: auto
+			object-fit: cover
+			border-radius: $border-radius

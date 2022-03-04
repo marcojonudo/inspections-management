@@ -41,6 +41,8 @@ import { registerLocaleData } from '@angular/common';
 import { SeparatorInputComponent } from './components/separator-input/separator-input.component';
 import { SessionIdInterceptor } from './interceptors/session-id-interceptor';
 import { MatSelectModule } from '@angular/material/select';
+import { InspectionTyreSheetComponent } from './components/inspection/inspection-tyre-sheet/inspection-tyre-sheet.component';
+import { InspectionImagesSheetComponent } from './components/inspection/inspection-images-sheet/inspection-images-sheet.component';
 registerLocaleData(localeEs);
 
 @NgModule({
@@ -60,7 +62,9 @@ registerLocaleData(localeEs);
 		InspectionHeaderComponent,
 		InspectionComponent,
 		ImageDialogComponent,
-		SeparatorInputComponent
+		SeparatorInputComponent,
+		InspectionTyreSheetComponent,
+		InspectionImagesSheetComponent
 	],
 	imports: [
 		BrowserModule,

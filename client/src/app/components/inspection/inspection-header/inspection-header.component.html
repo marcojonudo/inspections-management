@@ -4,12 +4,12 @@
 		<img id="logo" src="assets/img/feuvert-logo.png">
 	</div>
 	<div id="info">
-		<mat-card id="info-card">
-			<mat-card-header>
-				<mat-icon mat-card-avatar>info</mat-icon>
-				<mat-card-title translate>print.info</mat-card-title>
-			</mat-card-header>
-			<mat-card-content>
+		<div id="info-card" class="card">
+			<div class="card-header">
+				<mat-icon>info</mat-icon>
+				<div translate>print.info</div>
+			</div>
+			<div class="card-content">
 				<section class="key-value-section">
 					<div>
 						<div translate>print.day</div>
@@ -38,30 +38,30 @@
 						<div>{{order.client.name | titlecase}}</div>
 					</div>
 				</section>
-			</mat-card-content>
-		</mat-card>
-		<mat-card>
-			<mat-card-header>
-				<mat-icon mat-card-avatar>home</mat-icon>
-				<mat-card-title translate>print.centre</mat-card-title>
-			</mat-card-header>
-			<mat-card-content>
+			</div>
+		</div>
+		<div class="card">
+			<div class="card-header">
+				<mat-icon>home</mat-icon>
+				<div translate>print.centre</div>
+			</div>
+			<div class="card-content">
 				<span>{{centre.name | titlecase}}</span>
 				<span>{{centre.addressLine1 | titlecase}}</span>
 				<span>{{centre.addressLine2 | titlecase}}</span>
 				<span>{{centre.addressLine3 | titlecase}}</span>
 				<span>{{centre.phoneNumber | titlecase}}</span>
-			</mat-card-content>
-		</mat-card>
-		<mat-card>
-			<mat-card-header>
+			</div>
+		</div>
+		<div id="vehicle-card" class="card">
+			<div class="card-header">
 				<ng-container [ngSwitch]="order.vehicle.type">
-					<mat-icon *ngSwitchCase="carType" mat-card-avatar>directions_car</mat-icon>
-					<mat-icon *ngSwitchCase="scooterType" mat-card-avatar>electric_scooter</mat-icon>
+					<mat-icon *ngSwitchCase="carType">directions_car</mat-icon>
+					<mat-icon *ngSwitchCase="scooterType">electric_scooter</mat-icon>
 				</ng-container>
-				<mat-card-title translate>print.vehicle</mat-card-title>
-			</mat-card-header>
-			<mat-card-content [ngSwitch]="order.vehicle.type">
+				<div translate>print.vehicle</div>
+			</div>
+			<div class="card-content" [ngSwitch]="order.vehicle.type">
 				<section *ngSwitchCase="carType" class="key-value-section">
 					<div>
 						<div translate>print.numberPlate</div>
@@ -102,35 +102,15 @@
 						<div>{{order.vehicle.brand | titlecase}} {{order.vehicle.model | titlecase}}</div>
 					</div>
 				</section>
-			</mat-card-content>
-		</mat-card>
-		<mat-card id="summary-card">
-			<mat-card-header>
-				<mat-icon mat-card-avatar>summarize</mat-icon>
-				<mat-card-title translate>print.summary</mat-card-title>
-			</mat-card-header>
-			<mat-card-content id="summary-container">
-				<div id="summary">
-					<canvas
-						baseChart
-						width="1px"
-						height="1px"
-						[chartType]="chartType"
-						[options]="options"
-						[colors]="colors"
-						[data]="findData()">
-					</canvas>
-				</div>
-			</mat-card-content>
-		</mat-card>
+			</div>
+		</div>
 	</div>
-	<mat-card>
-		<mat-card-content id="legend">
+	<div>
+		<div id="legend" class="card-content">
 			<div *ngFor="let label of groupLabels(findLabels())" class="label">
 				<div class="label-color" [style.background-color]="findIconColor(label.code)"></div>
 				<span translate>inspection.selectItemOption.{{label.code}}</span>
 			</div>
-		</mat-card-content>
-	</mat-card>
+		</div>
+	</div>
 </header>
-<router-outlet></router-outlet>

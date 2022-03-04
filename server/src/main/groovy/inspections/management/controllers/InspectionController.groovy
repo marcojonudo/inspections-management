@@ -186,34 +186,6 @@ class InspectionController {
         return HttpResponse.ok(budgetNotificationDataService.findAll(orderNumbers))
     }
 
-    @Get("/image")
-    @Operation(
-        summary = "Obtiene una imágen",
-        description = "Obtiene una imágen"
-    )
-    @ApiResponse(
-        responseCode = "200",
-        description = "Imagen obtenida correctamente",
-        content = @Content(schema = @Schema(implementation = Image))
-    )
-    Image findImage(@QueryValue int id) {
-        return imageDataService.get(id)
-    }
-
-    @Get("/images")
-    @Operation(
-        summary = "Obtiene una lista de imágenes",
-        description = "Obtiene una lista de imágenes"
-    )
-    @ApiResponse(
-        responseCode = "200",
-        description = "Imagen obtenida correctamente",
-        content = @Content(array = @ArraySchema(schema = @Schema(implementation = Image)))
-    )
-    List<Image> findImages(@QueryValue List<Long> ids) {
-        return imageDataService.getAll(ids)
-    }
-
     @Post("/budgetNotification")
     @Operation(
         summary = "Crea una notificación de cliente avisado",

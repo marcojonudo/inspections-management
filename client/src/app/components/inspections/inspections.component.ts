@@ -75,7 +75,6 @@ export class InspectionsComponent implements OnDestroy {
 				if (newRows.length) {
 					this.rows = newRows;
 				}
-				console.log('rows', this.rows);
 				this.cdRef.detectChanges();
 			}
 		});
