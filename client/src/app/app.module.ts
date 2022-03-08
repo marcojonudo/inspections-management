@@ -30,7 +30,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 import { EmployeeDialogComponent } from './components/employee-dialog/employee-dialog.component';
-import { ChartsModule } from 'ng2-charts';
 import { InspectionSheetComponent } from './components/inspection/inspection-sheet/inspection-sheet.component';
 import { InspectionHeaderComponent } from './components/inspection/inspection-header/inspection-header.component';
 import { InspectionComponent } from './components/inspection/inspection.component';
@@ -91,7 +90,6 @@ registerLocaleData(localeEs);
 		ReactiveFormsModule,
 		MatSnackBarModule,
 		MatDialogModule,
-		ChartsModule,
 		MatProgressSpinnerModule,
 		MatSelectModule
 	],

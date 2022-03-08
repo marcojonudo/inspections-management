@@ -181,7 +181,9 @@ class TyresCard extends Card {
     }
 
     float findIndicatorLeft(String depth) {
-        return DEPTH_BAR_MARGIN + ((depth as float) * barWidth / BAR_WIDTH_MM) - 6
+        float d = depth as float
+        d = d > BAR_WIDTH_MM ? BAR_WIDTH_MM : (d < 0 ? 0 : d)
+        return DEPTH_BAR_MARGIN + (d * barWidth / BAR_WIDTH_MM) - 6
     }
 
     float findThresholdLeft() {

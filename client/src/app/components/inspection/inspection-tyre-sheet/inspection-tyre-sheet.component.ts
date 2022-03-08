@@ -76,7 +76,9 @@ export class InspectionTyreSheetComponent implements OnInit {
 	}
 
 	findIndicatorLeft(depth: string): number {
-		return this.DEPTH_BAR_MARGIN + (parseFloat(depth) * this.barWidth / this.BAR_WIDTH_MM) - 6;
+		let d = parseFloat(depth);
+		d = d > this.BAR_WIDTH_MM ? this.BAR_WIDTH_MM : (d < 0 ? 0 : d);
+		return this.DEPTH_BAR_MARGIN + (d * this.barWidth / this.BAR_WIDTH_MM) - 6;
 	}
 
 	findVisualControlColorName(value: string): string {

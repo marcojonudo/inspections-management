@@ -27,7 +27,6 @@
 		"@ngx-translate/http-loader": "^6.0.0",
 		"chart.js": "^2.9.4",
 		"dayjs": "^1.10.6",
-		"ng2-charts": "^2.4.2",
 		"rxjs": "^6.5.5",
 		"tslib": "^1.10.0",
 		"zone.js": "~0.10.2"
