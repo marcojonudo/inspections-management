@@ -12,6 +12,8 @@ import { Url } from '../utils/url';
 })
 export class EmployeeService {
 
+	private static readonly ADMIN_ID = '0000';
+
 	static employees: Employee[];
 	static employee: Employee;
 
@@ -31,6 +33,10 @@ export class EmployeeService {
 		this.employees = employees.map(employee => new Employee(employee));
 		LocalStorageService.setItem(Constants.LOCAL_STORAGE.EMPLOYEES, this.employees);
 		console.log('Employees', this.employees);
+	}
+
+	static checkAdminEmployee(employeeCode: string = this.employee.code): boolean {
+		return employeeCode.startsWith(this.ADMIN_ID);
 	}
 
 	findEmployees(): Observable<any> {

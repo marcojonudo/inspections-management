@@ -1,22 +1,18 @@
-import { ChangeDetectionStrategy, Component, HostBinding, HostListener } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostBinding, HostListener, Input } from '@angular/core';
 import { Dayjs } from 'dayjs';
 import * as dayjs from 'dayjs';
 import { Router } from '@angular/router';
-import { ChartOptions, ChartType } from 'chart.js';
-import { Color } from 'ng2-charts';
 import { Employee } from '../../../objects/employee';
 import { Constants } from '../../../utils/constants';
 import { SavedInspection } from '../../../objects/inspections/saved-inspection';
 import { OrderPipe } from '../../../pipes/order.pipe';
 import { InspectionService } from '../../../services/inspection.service';
-import { EmployeeService } from '../../../services/employee.service';
 import { SavedItem } from '../../../objects/inspections/saved-items/saved-item';
 import { Order } from '../../../objects/orders/order';
 import { Centre } from '../../../objects/centre';
 import { SelectItemOption } from '../../../objects/inspections/items/select-item-option';
 import { Car } from '../../../objects/orders/vehicles/car';
 import { Vehicle } from '../../../objects/orders/vehicles/vehicle';
-import { SelectSavedItem } from '../../../objects/inspections/saved-items/select-saved-item';
 
 @Component({
 	selector: 'app-inspection-header',
@@ -29,12 +25,10 @@ export class InspectionHeaderComponent {
 	private readonly GROUP_LABELS: { [key: string]: string[] };
 	private readonly EXIT_INSPECTION = 'exit-inspection';
 
-	chartType: ChartType;
-	options: ChartOptions;
-	colors: Color[];
+	@Input() adviser: Employee;
+	@Input() mechanics: Employee[];
+
 	today: Dayjs;
-	adviser: Employee;
-	mechanics: Employee[];
 	avoidLegendItems: string[] = [Constants.SELECT_ITEM_OPTION_CODE.NA];
 
 	@HostBinding('class') classes = this.EXIT_INSPECTION;
@@ -53,16 +47,6 @@ export class InspectionHeaderComponent {
 			]
 		};
 		this.today = dayjs();
-		this.adviser = EmployeeService.findEmployee(this.order.sellerCode);
-		this.mechanics = this.savedInspection.items.map(i => i.employeeCode).filter(
-			(value, index, self) => self.indexOf(value) === index
-		).map(employeeCode => EmployeeService.findEmployee(employeeCode));
-
-		this.chartType = 'pie';
-		this.options = { animation: { duration: 0 } };
-		this.colors = [{
-			backgroundColor: this.findLabels().map(label => this.findIconColor(label.code))
-		}];
 	}
 
 	// region Getters / setters
@@ -103,39 +87,6 @@ export class InspectionHeaderComponent {
 
 	findIconColor(code: string): string {
 		return InspectionService.findIconColor(code);
-	}
-
-	findSelectItems(items: SavedItem[] = this.savedInspection.items): SelectSavedItem[] {
-		return items.filter(item => item.item.type === Constants.ITEM_TYPE.SELECT) as SelectSavedItem[];
-	}
-
-	groupData(
-		labels: SelectItemOption[], data: number[], groupLabels: { [key: string]: string[] } = this.GROUP_LABELS
-	): number[] {
-		Object.entries(groupLabels).forEach(([name, codes]) => {
-			const codesLabels = labels.filter(label => codes.find(code => code === label.code));
-			const existentCodes = codesLabels.length === codes.length;
-			if (existentCodes) {
-				const groupedData = data.filter((v: number, i: number) =>
-					codesLabels.find(l => l.order === i + 1)
-				).reduce((a, b) => a + b, 0);
-				codesLabels.forEach(label =>
-					data.splice(data.findIndex((n: number, i: number) => i === label.order - 1), 1)
-				);
-				data.splice(codesLabels[0].order - 1, 0, groupedData);
-			}
-		});
-		return data;
-	}
-
-	findData(items: SavedItem[] = this.savedInspection.items): number[] {
-		const labels = this.findLabels();
-		const selectItems = this.findSelectItems(items);
-		const data = [];
-		labels.forEach(label => {
-			data.push(selectItems.filter(item => item.value === label.code).length);
-		});
-		return this.groupData(labels, data);
 	}
 
 	findHeaderItems(code: string, items: SavedItem[] = this.savedInspection.items): SavedItem[] {

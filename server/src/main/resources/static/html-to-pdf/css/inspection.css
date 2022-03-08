@@ -12,12 +12,25 @@ body {
     page-break-after: always;
 }
 
+.page > div {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.background-image {
+    height: 875px;
+    position: absolute;
+    top: 200px;
+}
+
 .categories-container {
     background-repeat: no-repeat;
     background-size: auto 100%;
 }
 
 .card {
+    position: relative;
     margin: 0 .25rem;
     border-radius: 0;
     color: #000;
@@ -248,4 +261,293 @@ body {
 
 .item-category .card-content {
     padding: 0 .25rem
+}
+
+#central-image {
+    width: 41.15%;
+    height: 400px;
+    position: absolute;
+    top: 170px;
+    left: 282px;
+}
+
+#central-image > div {
+    position: relative;
+}
+
+#car-axis {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#steering-wheel {
+    width: 5rem;
+    position: absolute;
+    top: 50px;
+    left: 55.5px;
+}
+
+#central-image .item {
+    width: 90%;
+    position: absolute;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    padding: .1rem .25rem;
+    font-size: .8em;
+    font-weight: bold;
+    color: #fff;
+    border-radius: .25rem;
+    background-color: #717171;
+}
+
+#central-image .item img {
+    padding: .15rem;
+    background-color: #fff;
+    border-radius: 50%;
+}
+
+#visual-control-item {
+    top: -2.5rem;
+}
+
+#pressure-item {
+    top: 14rem;
+}
+
+.tyre-row {
+    height: 27rem;
+    display: flex;
+    align-items: center;
+}
+
+.tyre-section {
+    width: 50%;
+    height: 26.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tyre-section:nth-child(odd) {
+    justify-content: flex-start;
+}
+
+.tyre-section:nth-child(even) {
+    justify-content: flex-end;
+}
+
+.tyre-section-wrapper {
+    width: 194px;
+    height: 100%;
+    padding: .25rem;
+    box-sizing: border-box;
+    background-color: #717171;
+    color: #fff;
+    border-radius: .25rem;
+}
+
+.tyre-section-header {
+    font-weight: bold;
+}
+
+.tyre-section-header > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.photo-wrapper {
+    width: 100%;
+    height: 254px;
+    box-sizing: border-box;
+    overflow: hidden;
+    border-radius: .25rem;
+}
+
+.photo-wrapper > * {
+    width: 100%;
+    border-radius: .25rem;
+}
+
+.no-image {
+    padding-bottom: 136%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    color: #000;
+}
+
+.no-image img {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate3d(-50%, -50%, 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3em;
+    color: #717171;
+}
+
+.tyre-state {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0 .25rem .25rem .25rem;
+    font-weight: bold;
+}
+
+.tyre-state .item-icon-container, #central-image .item-icon-container {
+    width: 20px;
+    position: absolute;
+    top: 4px;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#central-image .item-icon-container {
+    right: .15rem;
+}
+
+.tyre-state img, #central-image .item-icon-container img {
+    width: 16px;
+    padding: .15rem;
+    background-color: #fff;
+    border-radius: 50%;
+}
+
+.state-graph {
+    padding: .25rem;
+    background-color: #fff;
+    color: #000;
+    border-radius: .25rem;
+}
+
+.state-name {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2em;
+}
+
+.state-name-bar-wrapper {
+    position: relative;
+    box-sizing: border-box;
+}
+
+.indicator {
+    width: 12px;
+    position: relative;
+    top: 5px;
+}
+
+.indicator > div {
+    position: absolute;
+    top: -8px;
+    left: -6px;
+    font-size: .6em;
+    line-height: 1;
+}
+
+.indicator > img {
+    width: 12px;
+}
+
+.bar-wrapper {
+    position: relative;
+}
+
+.bar {
+    height: .5rem;
+    background-image: linear-gradient(90deg, red, yellow, green);
+    border-radius: .25rem;
+}
+
+.bar-measurements {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.bar-measurements > span {
+    flex: 1 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .6em;
+}
+
+.bar-measurements > span.hide {
+    opacity: 0;
+}
+
+.threshold-indicator {
+    position: absolute;
+    top: 0;
+    width: .2rem;
+    height: 2rem;
+    background-color: #ec0000;
+    border-radius: .25rem;
+}
+
+.threshold-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .8em;
+    margin-left: 1rem;
+}
+
+.depth-section {
+    width: 25%;
+    height: 100%;
+    box-sizing: border-box;
+    padding: .25rem .5rem;
+    font-weight: bold;
+}
+
+.depth-section-title {
+    text-align: center;
+}
+
+.depth-section-value {
+    width: 60%;
+    text-align: center;
+    padding: .25rem;
+    margin: 0 auto;
+    border: 1px solid #cdcdcd;
+    border-radius: .25rem;
+}
+
+.depth .depth-section-value {
+    color: #fff;
+}
+
+.depth-section img {
+    width: 100%;
+    margin-top: .25rem;
+}
+
+.green-background {
+    background-color: #4a8522;
+    fill: #4a8522;
+}
+
+.orange-background {
+    background-color: #d29500;
+    fill: #d29500;
+}
+
+.red-background {
+    background-color: #ff0000;
+    fill: #ff0000;
 }

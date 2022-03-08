@@ -4,21 +4,15 @@ canvas
 	display: inline-block !important
 	margin-bottom: 2px
 
-mat-card
-	padding: $tiny-gap
-	margin: 0 $tiny-gap
+.card-header
+	background-color: #00764B
+	color: #fff
 
-	.mat-card-header .mat-card-title, .mat-card-content
-		margin-bottom: 0 !important
+	mat-icon
+		order: 0
 
-	.mat-card-avatar
-		height: auto
-		width: auto
-
-	mat-card-header
-
-		mat-icon
-			order: 0
+	& > div
+		padding-left: $small-gap
 
 header
 	width: 100%
@@ -26,7 +20,7 @@ header
 	margin-bottom: $tiny-gap
 
 	#title
-		height: 2.5rem
+		height: 2rem
 		position: relative
 		@include flex-center
 		font-size: $medium-font
@@ -44,10 +38,10 @@ header
 		font-size: $small-font
 		margin-bottom: $tiny-gap
 
-		& > mat-card, & > div
-			@include flex-2
+		& > .card, & > div
+			@include flex-1
 
-			mat-card-content
+			.card-content
 				@include flex-column
 
 				span
@@ -56,7 +50,7 @@ header
 		#summary-card
 			@include flex-1
 
-		#info-card mat-card-content, #summary-card mat-card-content
+		#info-card .card-content, #summary-card .card-content
 			height: calc(100% - 24px)
 
 		#info-card .key-value-section > div > div:first-child
@@ -113,6 +107,8 @@ header
 	#legend
 		@include flex-center
 		justify-content: space-around
+		margin: 0 $tiny-gap
+		border-radius: $border-radius
 
 		.label
 			display: flex
@@ -127,13 +123,15 @@ header
 @media print
 
 	header
-		position: fixed
-		top: 0
+		display: flex !important
 
-	mat-card
+	.card
 
-		.mat-card-header .mat-card-title, .mat-card-content
+		&-header, &-content
 			font-size: 1em
+
+		&-header mat-icon
+			font-size: 1.6em
 
 	#logo
 		display: block !important

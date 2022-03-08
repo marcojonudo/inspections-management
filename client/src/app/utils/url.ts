@@ -46,12 +46,8 @@ export class Url {
 		return `${environment.serverUrl}/inspection/centre`;
 	}
 
-	static image(): string {
-		return `${environment.serverUrl}/inspection/image`;
-	}
-
 	static images(): string {
-		return `${environment.serverUrl}/inspection/images`;
+		return `${environment.serverUrl}/images`;
 	}
 
 }

@@ -1,0 +1,224 @@
+@import "abstracts/mixins"
+
+.card
+	position: relative
+	margin: 0
+
+	&-header
+		font-size: .8em
+
+	mat-icon
+		width: .86rem
+		height: .86rem
+		font-size: .86rem
+
+	#central-image
+		width: 25%
+		height: 29rem
+		position: absolute
+		top: 50%
+		left: 50%
+		transform: translate3d(-50%, -58%, 0)
+
+		img
+			width: 100%
+			position: absolute
+			top: 0
+
+		svg
+			width: 5rem
+			position: absolute
+			left: 50%
+			top: 2.5rem
+			transform: translateX(-54%)
+
+		.item
+			width: 90%
+			position: absolute
+			left: 50%
+			@include flex-center
+			justify-content: space-between
+			transform: translateX(-50%)
+			padding: .1rem $tiny-gap
+			font-size: $small-font
+			font-weight: bold
+			color: $white
+			border-radius: $border-radius
+			background-color: $dark-grey
+
+			mat-icon
+				padding: .15rem
+				background-color: $white
+				border-radius: 50%
+
+		#visual-control-item
+			top: -2.5rem
+
+		#pressure-item
+			top: 14rem
+
+	.tyre-row
+		height: 27rem
+		box-sizing: border-box
+		padding: $small-gap 0
+		display: flex
+
+	.tyre-section
+		width: 50%
+		height: 100%
+		@include flex-center
+
+		&:nth-child(odd)
+			justify-content: flex-start
+
+		&:nth-child(even)
+			justify-content: flex-end
+
+		&-wrapper
+			width: 192px
+			padding: $tiny-gap
+			box-sizing: border-box
+			background-color: $dark-grey
+			color: $white
+			border-radius: $border-radius
+
+			.tyre-section-header
+				font-weight: bold
+
+				& > div
+					@include flex-center
+
+			.photo-wrapper
+				width: 100%
+				height: 245.3px
+				@include flex-center
+				box-sizing: border-box
+				overflow: hidden
+				border-radius: $border-radius
+
+				& > *
+					width: 100%
+					border-radius: $border-radius
+
+				.no-image
+					padding-bottom: 136%
+					position: relative
+					@include flex-center
+					background-color: $white
+					color: $black
+
+					mat-icon
+						width: 100%
+						height: 100%
+						position: absolute
+						top: 50%
+						left: 50%
+						transform: translate3d(-50%, -50%, 0)
+						@include flex-center
+						font-size: $big-font
+						color: $dark-grey
+
+			.tyre-state
+				@include flex-center
+				justify-content: space-between
+				padding: $tiny-gap
+				font-weight: bold
+
+				mat-icon
+					padding: .15rem
+					background-color: $white
+					border-radius: 50%
+
+			.state-graph
+				padding: $tiny-gap
+				background-color: $white
+				color: $black
+				border-radius: $border-radius
+
+				.state-name
+					@include flex-center
+
+				&-bar-wrapper
+					position: relative
+					box-sizing: border-box
+
+					.indicator
+						width: 12px
+						position: relative
+						top: 5px
+
+						& > div
+							position: absolute
+							transform: translate3d(-20%, -100%, 0)
+							font-size: .6em
+							line-height: 1
+
+					.bar-wrapper
+						position: relative
+
+						.bar
+							height: $small-gap
+							background-image: linear-gradient(90deg, red, yellow, green)
+							border-radius: $border-radius
+
+						.bar-measurements
+							display: flex
+							align-items: center
+							justify-content: space-between
+
+							& > span
+								@include flex-center
+								font-size: $tiny-font
+
+								&.hide
+									visibility: hidden
+
+						.threshold-indicator
+							position: absolute
+							top: 0
+							width: .2rem
+							height: 2rem
+							background-color: #ec0000
+							border-radius: $border-radius
+
+				.threshold-text
+					@include flex-center
+					justify-content: flex-end
+					font-size: $small-font
+
+		.depth-section
+			width: 25%
+			height: 100%
+			box-sizing: border-box
+			padding: $tiny-gap $small-gap
+			font-weight: bold
+
+			&-title
+				text-align: center
+
+			&-value
+				width: 60%
+				@include flex-center
+				padding: $tiny-gap
+				margin: 0 auto
+				border: 1px solid $grey
+				border-radius: $border-radius
+
+			.depth .depth-section-value
+				color: $white
+
+			svg
+				width: 100%
+				margin-top: $tiny-gap
+
+	.green-background
+		background-color: #4a8522
+		fill: #4a8522
+
+	.orange-background
+		background-color: #d29500
+		fill: #d29500
+
+	.red-background
+		background-color: #ff0000
+		fill: #ff0000

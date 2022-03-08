@@ -1,3 +1,20 @@
 <div id="inspection-container">
-	<router-outlet name="template"></router-outlet>
+	<div *ngIf="showTyreSheet" class="page">
+		<app-inspection-header [adviser]="adviser" [mechanics]="mechanics"></app-inspection-header>
+		<app-inspection-tyre-sheet
+			[tyreGroupedItems]="tyreGroupedItems"
+			[visualControlSavedItem]="visualControlSavedItem"
+			[pressureSavedItem]="pressureSavedItem"
+			[measurementSavedItem]="measurementSavedItem"
+			[images]="images">
+		</app-inspection-tyre-sheet>
+	</div>
+	<div *ngFor="let categories of groupedCategories" class="page">
+		<app-inspection-header [adviser]="adviser" [mechanics]="mechanics"></app-inspection-header>
+		<app-inspection-sheet [categories]="categories" [vehicleType]="vehicleType"></app-inspection-sheet>
+	</div>
+	<div *ngFor="let categories of groupedImageCategories" class="page">
+		<app-inspection-header [adviser]="adviser" [mechanics]="mechanics"></app-inspection-header>
+		<app-inspection-images-sheet [categories]="categories" [images]="images" [vehicleType]="vehicleType"></app-inspection-images-sheet>
+	</div>
 </div>

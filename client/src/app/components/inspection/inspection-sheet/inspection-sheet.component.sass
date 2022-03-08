@@ -25,31 +25,8 @@
 				object-fit: cover
 				border-radius: $border-radius
 
-	.page-break
-		page-break-after: always
-
 	.text-area-card
 		height: 8rem !important
-
-	canvas
-		display: inline-block !important
-		margin-bottom: 2px
-
-	mat-card
-		padding: $tiny-gap 0
-		margin: 0 $tiny-gap
-
-		.mat-card-header .mat-card-title, .mat-card-content
-			font-size: 1em
-			margin-bottom: 0 !important
-
-		.mat-card-avatar
-			height: auto
-			width: auto
-
-		.mat-card-header-text
-			display: flex
-			align-items: center
 
 	.category
 		position: relative
@@ -61,21 +38,9 @@
 		.highlight
 			font-weight: bold
 
-		mat-card
+		.card
 
-			.graph-container
-				width: 100%
-				height: 100%
-				position: absolute
-				top: 0
-				@include flex-center
-
-				.graph-info
-					width: 10%
-					position: absolute
-					right: 0
-
-			mat-card-content
+			&-content
 				display: flex
 				box-sizing: border-box
 
@@ -136,6 +101,7 @@
 
 									&.front
 										transform: translateX(-100%) rotateY(0)
+										opacity: 1
 
 									&.left
 										transform: translateX(-100%) rotateY(-180deg)
@@ -164,17 +130,13 @@
 				display: none
 				flex-direction: column
 
-			mat-card-content
+			.card-content
 				width: 100%
 				@include flex-column
+				padding: $tiny-gap $small-gap
 
 				& > div
 					line-height: 1.5
-
-		.text-area-card, .image-card
-
-			.mat-card-content
-				padding: $tiny-gap $small-gap
 
 @media print
 
@@ -189,20 +151,19 @@
 		font-size: $small-font
 		margin: 0 0 $tiny-gap 0 !important
 
-		mat-card
-			padding: $tiny-gap !important
+		.card
 
-		mat-card-header
-			align-items: center
+			&-header
+				align-items: center
 
-			mat-icon
-				width: .86rem
-				height: .86rem
-				font-size: .86rem
+				mat-icon
+					width: .86rem
+					height: .86rem
+					font-size: .86rem
 
-			mat-card-title
-				height: .86rem
-				@include flex-center
+				& > div
+					height: .86rem
+					@include flex-center
 
 		.items-info
 			grid-auto-rows: 1rem
@@ -237,7 +198,7 @@
 
 		.text-area-card
 
-			.mat-card-content
+			.card-content
 				padding: $tiny-gap !important
 
 				mat-form-field
@@ -246,5 +207,12 @@
 				.text-area-card-content
 					display: flex !important
 
-		.select-item-icon.right
-			transform: translateX(-100%) rotateY(90deg) !important
+		.select-item-icon
+			background-color: transparent !important
+
+			&.left
+				opacity: 0
+
+			&.right
+				transform: translateX(-100%) rotateY(90deg) !important
+				opacity: 0

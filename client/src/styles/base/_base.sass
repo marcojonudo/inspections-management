@@ -112,13 +112,51 @@ html, body
 	.mat-select-value
 		max-width: 100%
 
+.card
+	margin: 0 $tiny-gap
+
+	&-header
+		display: flex
+		align-items: center
+		line-height: 1
+		font-size: 1em
+		font-weight: bold
+		padding: .12rem .25rem .12rem .25rem
+		background-color: rgba(0, 0, 0, .1)
+		border-radius: $border-radius $border-radius 0 0
+
+		mat-icon
+			height: auto
+			width: auto
+
+	&-content
+		padding: 0.12rem 0 0.12rem 0
+		background-color: rgba(255, 255, 255, .7)
+		border-radius: 0 0 $border-radius $border-radius
+
+.page
+	position: relative
+	page-break-after: always
+
+.vehicle-background-image
+	position: absolute
+	height: 875px
+	z-index: -1
+	display: none
+
+.page:not(:first-child) header
+	display: none
+
 @media print
 
 	.no-print
 		display: none !important
 
 	@page
-		margin: 0 $medium-gap
+		margin: $default-gap $medium-gap
+
+	.vehicle-background-image
+		display: block
 
 @media (max-width: $big-threshold)
 

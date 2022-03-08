@@ -13,6 +13,4 @@ abstract class Card extends IPdf {
         classes = ["card"]
     }
 
-//    String toHtml() { return "" }
-
 }

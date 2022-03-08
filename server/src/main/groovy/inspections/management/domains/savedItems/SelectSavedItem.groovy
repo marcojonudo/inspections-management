@@ -25,6 +25,10 @@ class SelectSavedItem extends SavedItem implements GormEntity<SelectSavedItem> {
 		return ((SelectItem) this.item).options.find { it.code == this.value }.printIcon
 	}
 
+	String findIcon() {
+		return ((SelectItem) this.item).options.find { it.code == this.value }.icon
+	}
+
 	enum Value {
 
 		P('#7b7979'),

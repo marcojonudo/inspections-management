@@ -11,6 +11,7 @@ import { Constants } from '../../utils/constants';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { SnackBarService } from '../../services/snack-bar.service';
 import { AllOrdersFilter } from '../../objects/filters/all-orders-filter';
+import { EmployeeService } from '../../services/employee.service';
 
 @Component({
 	selector: 'app-tools-bar',
@@ -84,13 +85,9 @@ export class ToolsBarComponent {
 	}
 
 	print(): void {
-		this.inspectionService.saveInspection().subscribe(
-			() => this.snackBarService.open(Constants.MESSAGE_CODE.SAVED_INSPECTION),
-			(error) => {
-				console.error(error);
-				this.snackBarService.open(Constants.MESSAGE_CODE.ERROR_SAVING_INSPECTION, Constants.SNACK_BAR.TYPE.ERROR);
-			}
-		);
+		if (!EmployeeService.checkAdminEmployee()) {
+			this.inspectionService.saveInspection().subscribe();
+		}
 		this.printService.openPrintDialog();
 	}
 

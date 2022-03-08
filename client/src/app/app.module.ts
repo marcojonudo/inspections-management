@@ -30,7 +30,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 import { EmployeeDialogComponent } from './components/employee-dialog/employee-dialog.component';
-import { ChartsModule } from 'ng2-charts';
 import { InspectionSheetComponent } from './components/inspection/inspection-sheet/inspection-sheet.component';
 import { InspectionHeaderComponent } from './components/inspection/inspection-header/inspection-header.component';
 import { InspectionComponent } from './components/inspection/inspection.component';
@@ -41,6 +40,8 @@ import { registerLocaleData } from '@angular/common';
 import { SeparatorInputComponent } from './components/separator-input/separator-input.component';
 import { SessionIdInterceptor } from './interceptors/session-id-interceptor';
 import { MatSelectModule } from '@angular/material/select';
+import { InspectionTyreSheetComponent } from './components/inspection/inspection-tyre-sheet/inspection-tyre-sheet.component';
+import { InspectionImagesSheetComponent } from './components/inspection/inspection-images-sheet/inspection-images-sheet.component';
 registerLocaleData(localeEs);
 
 @NgModule({
@@ -60,7 +61,9 @@ registerLocaleData(localeEs);
 		InspectionHeaderComponent,
 		InspectionComponent,
 		ImageDialogComponent,
-		SeparatorInputComponent
+		SeparatorInputComponent,
+		InspectionTyreSheetComponent,
+		InspectionImagesSheetComponent
 	],
 	imports: [
 		BrowserModule,
@@ -87,7 +90,6 @@ registerLocaleData(localeEs);
 		ReactiveFormsModule,
 		MatSnackBarModule,
 		MatDialogModule,
-		ChartsModule,
 		MatProgressSpinnerModule,
 		MatSelectModule
 	],

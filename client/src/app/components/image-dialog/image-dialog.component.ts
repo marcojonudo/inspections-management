@@ -24,7 +24,8 @@ export class ImageDialogComponent {
 		private http: HttpClient,
 		private cdRef: ChangeDetectorRef
 	) {
-		http.get(Url.image(), { params: { id: `${data.imageId}` } }).subscribe((image: Image) => {
+		const url = `${Url.images()}/${data.imageId}`;
+		http.get(url).subscribe((image: Image) => {
 			this.image = image;
 			this.cdRef.detectChanges();
 		});
