@@ -50,4 +50,8 @@ export class Url {
 		return `${environment.serverUrl}/images`;
 	}
 
+	static mails(orderNumber: number, to: string): string {
+		return `${environment.serverUrl}/mails?orderNumber=${orderNumber}&to=${to}`;
+	}
+
 }

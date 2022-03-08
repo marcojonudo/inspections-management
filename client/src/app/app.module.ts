@@ -42,6 +42,7 @@ import { SessionIdInterceptor } from './interceptors/session-id-interceptor';
 import { MatSelectModule } from '@angular/material/select';
 import { InspectionTyreSheetComponent } from './components/inspection/inspection-tyre-sheet/inspection-tyre-sheet.component';
 import { InspectionImagesSheetComponent } from './components/inspection/inspection-images-sheet/inspection-images-sheet.component';
+import { EmailDialogComponent } from './components/email-dialog/email-dialog.component';
 registerLocaleData(localeEs);
 
 @NgModule({
@@ -63,7 +64,8 @@ registerLocaleData(localeEs);
 		ImageDialogComponent,
 		SeparatorInputComponent,
 		InspectionTyreSheetComponent,
-		InspectionImagesSheetComponent
+		InspectionImagesSheetComponent,
+		EmailDialogComponent
 	],
 	imports: [
 		BrowserModule,

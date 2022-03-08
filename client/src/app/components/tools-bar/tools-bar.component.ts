@@ -12,6 +12,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { SnackBarService } from '../../services/snack-bar.service';
 import { AllOrdersFilter } from '../../objects/filters/all-orders-filter';
 import { EmployeeService } from '../../services/employee.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
 	selector: 'app-tools-bar',
@@ -52,6 +53,7 @@ export class ToolsBarComponent {
 		private printService: PrintService,
 		private snackBarService: SnackBarService,
 		private router: Router,
+		private http: HttpClient,
 		private cdRef: ChangeDetectorRef
 	) {
 		this.pendingFilter = new PendingOrdersFilter();
@@ -89,6 +91,10 @@ export class ToolsBarComponent {
 			this.inspectionService.saveInspection().subscribe();
 		}
 		this.printService.openPrintDialog();
+	}
+
+	sendMail(): void {
+		this.inspectionService.sendInspectionMail().subscribe();
 	}
 
 	goBack(): void {

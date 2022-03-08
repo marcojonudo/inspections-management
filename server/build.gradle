@@ -46,6 +46,8 @@ dependencies {
     implementation "com.itextpdf:html2pdf:4.0.1"
 
     implementation "org.apache.commons:commons-text:1.9"
+
+    compile "com.sun.mail:javax.mail:1.6.2"
 }
 
 mainClassName = "inspections.management.Application"

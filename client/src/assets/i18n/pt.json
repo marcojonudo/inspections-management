@@ -247,7 +247,11 @@
 	},
 	"dialog": {
 		"employeeCode": "Código de empleado",
-		"introduceEmployeeCode": "Introduce el código de empleado"
+		"introduceEmployeeCode": "Introduce el código de empleado",
+		"email": "Endereço de e-mail",
+		"introduceEmail": "Digite um endereço de e-mail",
+		"cancel": "Cancelar",
+		"accept": "Aceitar"
 	},
 	"validation": {
 		"requiredEmployeeCode": "Debes introducir un código de empleado"

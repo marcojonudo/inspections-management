@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, finalize, map, mergeMap, tap } from 'rxjs/operators';
+import { catchError, concatMap, filter, finalize, map, mergeMap, tap } from 'rxjs/operators';
 import { forkJoin, from, Observable, of, Subject } from 'rxjs';
 import { LocalStorageService } from './local-storage.service';
 import { OrdersFilter } from '../objects/filters/orders-filter';
@@ -37,6 +37,9 @@ import { InspectionsColumn } from '../components/inspections/inspections.compone
 import { InspectionDetailsColumn } from '../components/inspection-details/inspection-details.component';
 import { TextSavedItemField } from '../objects/inspections/saved-items/text-saved-item-field';
 import { CountryHandlerType } from '../objects/country-info/country-handler-type';
+import { EmployeeDialogComponent } from '../components/employee-dialog/employee-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+import { EmailDialogComponent } from '../components/email-dialog/email-dialog.component';
 
 @Injectable({
 	providedIn: 'root'
@@ -91,7 +94,7 @@ export class InspectionService {
 	budgetNotificationsSubject: Subject<BudgetNotification[]>;
 	budgetNotifications$: Observable<BudgetNotification[]>;
 
-	constructor(private http: HttpClient) {
+	constructor(private http: HttpClient, private dialog: MatDialog) {
 		this.filters = [new TodayOrdersFilter()];
 
 		this.selectedOrderInspectionSubject = new Subject<OrderInspectionVehicle>();
@@ -639,6 +642,22 @@ export class InspectionService {
 		body.saved = dayjs();
 		console.log('Saving inspection', body);
 		return this.http.patch(Url.savedInspection(), body);
+	}
+
+	sendInspectionMail(
+		savedInspection: SavedInspection = InspectionService.selectedSavedInspection,
+		order: Order = InspectionService.selectedOrderInspection.order
+	): Observable<any> {
+		console.log(order, order.client);
+
+		if (!order.client.email) {
+			const dialogRef = this.dialog.open(EmailDialogComponent);
+			return dialogRef.afterClosed().pipe(
+				filter(email => email),
+				concatMap(email => this.http.post(Url.mails(savedInspection.orderNumber, email), {}))
+			);
+		}
+		return this.http.post(Url.mails(savedInspection.orderNumber, order.client.email), {});
 	}
 
 }

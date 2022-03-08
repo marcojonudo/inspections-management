@@ -33,7 +33,6 @@ class PdfService {
 	private static final Logger LOG = LoggerFactory.getLogger(PdfService)
 
 	private static final String HTML_FILE_NAME = "inspection.html"
-	private static final String PDF_FILE_NAME = "inspection.pdf"
 	private static final int IMAGES_ROW_ITEMS = 3
 	private static final List<String> TYRE_ITEM_CODES = ['EN', 'FN', 'PN']
 
@@ -80,7 +79,7 @@ class PdfService {
 			options
 		)
 		File htmlFile = createTempFile(HTML_FILE_NAME, pdfInspection.toHtml())
-		File pdf = createTempFile(PDF_FILE_NAME)
+		File pdf = createTempFile("${savedInspection.numberPlate}.pdf")
 
 		LocalTime refTime = LocalTime.now()
 		ConverterProperties properties = new ConverterProperties()

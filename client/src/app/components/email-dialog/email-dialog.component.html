@@ -1,0 +1,15 @@
+<div mat-dialog-content translate>
+	dialog.introduceEmail
+	<mat-form-field>
+		<mat-label translate>dialog.email</mat-label>
+		<input
+			matInput
+			type="email"
+			[formControl]="emailControl"
+			autocomplete="off">
+	</mat-form-field>
+</div>
+<div mat-dialog-actions class="buttons">
+	<button mat-button mat-dialog-close translate><span translate>dialog.cancel</span></button>
+	<button mat-button (click)="accept()"><span translate>dialog.accept</span></button>
+</div>

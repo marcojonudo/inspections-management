@@ -8,7 +8,6 @@ import inspections.management.services.PdfService
 import inspections.management.services.data.CentreDataService
 import inspections.management.services.data.OrderDataService
 import inspections.management.services.data.SavedInspectionDataService
-import io.micronaut.core.io.ResourceLoader
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
@@ -19,8 +18,6 @@ import javax.inject.Inject
 @Controller("/savedInspections")
 @CompileStatic
 class SavedInspectionController {
-
-    @Inject ResourceLoader resourceLoader
 
     @Inject SavedInspectionDataService savedInspectionDataService
     @Inject OrderDataService orderDataService
