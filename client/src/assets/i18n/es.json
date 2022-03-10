@@ -351,7 +351,8 @@
 			"seller": "Vendedor",
 			"doneBudget": "Pto. realizado",
 			"acceptedBudget": "Pto. aceptado",
-			"item": "Item"
+			"item": "Item",
+			"sentMail": "Correo"
 		}
 	},
 	"print": {
@@ -421,6 +422,9 @@
 		"ERROR_SAVING_INSPECTION": "Error al guardar la revisión. Por favor, inténtalo de nuevo",
 		"SAVED_INSPECTION": "Revisión guardada correctamente",
 		"ORDER_WITHOUT_SAVED_INSPECTION": "La orden no tiene una revisión guardada asociada",
-		"noWrongItems": "¡Revisión sin items en mal estado!"
+		"noWrongItems": "¡Revisión sin items en mal estado!",
+		"SENDING_MAIL": "Enviando correo...",
+		"SUCCESS_SENDING_MAIL": "¡Correo enviado!",
+		"ERROR_SENDING_MAIL": "Error enviando correo. ¡Inténtalo de nuevo!"
 	}
 }

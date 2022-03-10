@@ -191,7 +191,8 @@
 			"clientContact": "Contato do cliente",
 			"doneBudget": "Pt. Feito",
 			"acceptedBudget": "Pto. Aceito",
-			"item": "Item"
+			"item": "Item",
+			"sentMail": "Mail"
 		}
 	},
 	"print": {
@@ -261,6 +262,9 @@
 		"ERROR_SAVING_INSPECTION": "Error al guardar la revisión. Por favor, inténtalo de nuevo",
 		"SAVED_INSPECTION": "Revisión guardada correctamente",
 		"ORDER_WITHOUT_SAVED_INSPECTION": "La orden no tiene una revisión guardada asociada",
-		"noWrongItems": "Revisão sem itens em mau estado!"
+		"noWrongItems": "Revisão sem itens em mau estado!",
+		"SENDING_MAIL": "Enviando email...",
+		"SUCCESS_SENDING_MAIL": "¡Email enviado!",
+		"ERROR_SENDING_MAIL": "Erro ao enviar e-mail. ¡Tenta de novo!"
 	}
 }

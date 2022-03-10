@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory
 import javax.inject.Inject
 import javax.inject.Singleton
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Singleton
 @CompileStatic
@@ -158,8 +159,9 @@ class InspectionService {
 	 * Envía un correo con la revisión
 	 * @param orderNumber Número de orden
 	 * @param to Destinatario
+	 * @param employeeCode Código de empleado
 	 */
-	void sendInspectionMail(int orderNumber, String to) {
+	SavedInspection sendInspectionMail(int orderNumber, String to, String employeeCode) {
 		SavedInspection savedInspection = savedInspectionDataService.find(orderNumber)
 		Centre centre = centreDataService.find()
 		Order order = orderDataService.find(savedInspection.orderNumber)
@@ -170,6 +172,7 @@ class InspectionService {
 		String subject = Builder.Mail.buildInspectionSubject(order)
 		String body = Builder.Mail.buildInspectionBody(centre, order.client, order.vehicle)
 		mailService.sendMail(mailData, sender, to, subject, body, pdfFile)
+		savedInspectionDataService.update(savedInspection.id, LocalDateTime.now(), employeeCode)
 	}
 
 }

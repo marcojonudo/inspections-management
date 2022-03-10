@@ -2,6 +2,7 @@ import { SavedItem } from './saved-items/saved-item';
 import { ItemBudget } from '../item-budget';
 import { Dayjs } from 'dayjs';
 import { RealTimeObject } from '../real-time/update/real-time-object';
+import * as dayjs from 'dayjs';
 
 export class SavedInspection implements RealTimeObject {
 
@@ -15,6 +16,7 @@ export class SavedInspection implements RealTimeObject {
 	itemBudgets: ItemBudget[];
 	orderInspection: boolean;
 	saved: Dayjs;
+	sent: Dayjs;
 
 	constructor(savedInspection: any, savedItems: SavedItem[], itemBudgets: ItemBudget[]) {
 		this.inspectionTypeCode = savedInspection.inspectionTypeCode;
@@ -25,6 +27,7 @@ export class SavedInspection implements RealTimeObject {
 		this.items = savedItems;
 		this.itemBudgets = itemBudgets;
 		this.orderInspection = savedInspection.orderInspection;
+		this.sent = savedInspection.sent ? dayjs(savedInspection.sent) : undefined;
 	}
 
 }

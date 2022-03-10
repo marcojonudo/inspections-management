@@ -74,7 +74,6 @@ export class InspectionDetailsComponent implements OnDestroy {
 					if (newRows.length) {
 						this.data = newRows;
 					}
-					console.log('details data', this.data);
 					this.cdRef.detectChanges();
 				}
 			}

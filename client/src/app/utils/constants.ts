@@ -29,7 +29,10 @@ export class Constants {
 		EMPLOYEE_NOT_FOUND: 'EMPLOYEE_NOT_FOUND',
 		ERROR_SAVING_INSPECTION: 'ERROR_SAVING_INSPECTION',
 		SAVED_INSPECTION: 'SAVED_INSPECTION',
-		ORDER_WITHOUT_SAVED_INSPECTION: 'ORDER_WITHOUT_SAVED_INSPECTION'
+		ORDER_WITHOUT_SAVED_INSPECTION: 'ORDER_WITHOUT_SAVED_INSPECTION',
+		SENDING_MAIL: 'SENDING_MAIL',
+		SUCCESS_SENDING_MAIL: 'SUCCESS_SENDING_MAIL',
+		ERROR_SENDING_MAIL: 'ERROR_SENDING_MAIL'
 	};
 
 	static readonly TRANSLATION_CODE: any = {
@@ -143,7 +146,9 @@ export class Constants {
 		mechanic: (o: Order, inspection: OrderInspectionVehicle, savedInspection: SavedInspection) =>
 			InspectionService.findMechanicCode(o, savedInspection),
 		budgets: (o: Order, inspection: OrderInspectionVehicle, savedInspection: SavedInspection) =>
-			savedInspection ? savedInspection.itemBudgets : []
+			savedInspection ? savedInspection.itemBudgets : [],
+		sentMail: (o: Order, inspection: OrderInspectionVehicle, savedInspection: SavedInspection) =>
+			savedInspection.sent
 	};
 
 	static readonly INSPECTION_DETAILS_COLUMN_DATA: any = {

@@ -37,7 +37,7 @@ export class SummaryComponent implements OnDestroy {
 
 		this.filters = this.todayFilter;
 
-		this.budgetNotificationsSubscription = this.inspectionService.budgetNotifications$.subscribe(() => {
+		this.budgetNotificationsSubscription = this.inspectionService.inspectionsTrigger$.subscribe(() => {
 			this.cdRef.detectChanges();
 		});
 

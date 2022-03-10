@@ -37,9 +37,9 @@ import { InspectionsColumn } from '../components/inspections/inspections.compone
 import { InspectionDetailsColumn } from '../components/inspection-details/inspection-details.component';
 import { TextSavedItemField } from '../objects/inspections/saved-items/text-saved-item-field';
 import { CountryHandlerType } from '../objects/country-info/country-handler-type';
-import { EmployeeDialogComponent } from '../components/employee-dialog/employee-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { EmailDialogComponent } from '../components/email-dialog/email-dialog.component';
+import { SnackBarService } from './snack-bar.service';
 
 @Injectable({
 	providedIn: 'root'
@@ -91,17 +91,17 @@ export class InspectionService {
 
 	selectedOrderInspectionSubject: Subject<OrderInspectionVehicle>;
 	selectedOrderInspection$: Observable<OrderInspectionVehicle>;
-	budgetNotificationsSubject: Subject<BudgetNotification[]>;
-	budgetNotifications$: Observable<BudgetNotification[]>;
+	inspectionsTriggerSubject: Subject<void>;
+	inspectionsTrigger$: Observable<void>;
 
-	constructor(private http: HttpClient, private dialog: MatDialog) {
+	constructor(private http: HttpClient, private dialog: MatDialog, private snackBarService: SnackBarService) {
 		this.filters = [new TodayOrdersFilter()];
 
 		this.selectedOrderInspectionSubject = new Subject<OrderInspectionVehicle>();
 		this.selectedOrderInspection$ = this.selectedOrderInspectionSubject.asObservable();
 
-		this.budgetNotificationsSubject = new Subject<BudgetNotification[]>();
-		this.budgetNotifications$ = this.budgetNotificationsSubject.asObservable();
+		this.inspectionsTriggerSubject = new Subject<void>();
+		this.inspectionsTrigger$ = this.inspectionsTriggerSubject.asObservable();
 
 		InspectionService.orderInspections = [];
 		InspectionService.savedInspections = [];
@@ -617,7 +617,7 @@ export class InspectionService {
 	createBudgetNotification(orderNumber: number, itemCodes: string[]): Observable<any> {
 		const budgetNotifications = itemCodes.map(itemCode => new BudgetNotification({ orderNumber, itemCode }));
 		InspectionService.budgetNotifications.push(...budgetNotifications);
-		this.budgetNotificationsSubject.next(InspectionService.budgetNotifications);
+		this.inspectionsTriggerSubject.next();
 		return this.http.post(Url.budgetNotification(), budgetNotifications);
 	}
 
@@ -627,7 +627,7 @@ export class InspectionService {
 				InspectionService.budgetNotifications = InspectionService.budgetNotifications.filter(budgetNotification =>
 					budgetNotification.orderNumber !== orderNumber
 				);
-				this.budgetNotificationsSubject.next(InspectionService.budgetNotifications);
+				this.inspectionsTriggerSubject.next();
 			})
 		);
 	}
@@ -648,16 +648,25 @@ export class InspectionService {
 		savedInspection: SavedInspection = InspectionService.selectedSavedInspection,
 		order: Order = InspectionService.selectedOrderInspection.order
 	): Observable<any> {
-		console.log(order, order.client);
-
+		let observable = undefined;
 		if (!order.client.email) {
 			const dialogRef = this.dialog.open(EmailDialogComponent);
-			return dialogRef.afterClosed().pipe(
+			observable = dialogRef.afterClosed().pipe(
 				filter(email => email),
-				concatMap(email => this.http.post(Url.mails(savedInspection.orderNumber, email), {}))
+				concatMap(email => this.sendMail(savedInspection, email))
 			);
 		}
-		return this.http.post(Url.mails(savedInspection.orderNumber, order.client.email), {});
+		return observable || this.sendMail(savedInspection, order.client.email);
+	}
+
+	sendMail(savedInspection: SavedInspection, to: string, employeeCode: string = EmployeeService.employee.code): Observable<any> {
+		this.snackBarService.open(Constants.MESSAGE_CODE.SENDING_MAIL, Constants.SNACK_BAR.TYPE.WARNING, 10000);
+		return this.http.post(Url.mails(savedInspection.orderNumber, to, employeeCode), {}).pipe(
+			tap(() => {
+				savedInspection.sent = dayjs();
+				this.inspectionsTriggerSubject.next();
+			})
+		);
 	}
 
 }
