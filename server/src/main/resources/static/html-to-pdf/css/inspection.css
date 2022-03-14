@@ -12,7 +12,7 @@ body {
     page-break-after: always;
 }
 
-.page > div {
+.content-wrapper {
     position: absolute;
     top: 0;
     left: 0;

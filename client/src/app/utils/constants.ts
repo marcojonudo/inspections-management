@@ -146,9 +146,7 @@ export class Constants {
 		mechanic: (o: Order, inspection: OrderInspectionVehicle, savedInspection: SavedInspection) =>
 			InspectionService.findMechanicCode(o, savedInspection),
 		budgets: (o: Order, inspection: OrderInspectionVehicle, savedInspection: SavedInspection) =>
-			savedInspection ? savedInspection.itemBudgets : [],
-		sentMail: (o: Order, inspection: OrderInspectionVehicle, savedInspection: SavedInspection) =>
-			savedInspection.sent
+			savedInspection ? savedInspection.itemBudgets : []
 	};
 
 	static readonly INSPECTION_DETAILS_COLUMN_DATA: any = {

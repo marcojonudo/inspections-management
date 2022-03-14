@@ -648,15 +648,11 @@ export class InspectionService {
 		savedInspection: SavedInspection = InspectionService.selectedSavedInspection,
 		order: Order = InspectionService.selectedOrderInspection.order
 	): Observable<any> {
-		let observable = undefined;
-		if (!order.client.email) {
-			const dialogRef = this.dialog.open(EmailDialogComponent);
-			observable = dialogRef.afterClosed().pipe(
-				filter(email => email),
-				concatMap(email => this.sendMail(savedInspection, email))
-			);
-		}
-		return observable || this.sendMail(savedInspection, order.client.email);
+		const dialogRef = this.dialog.open(EmailDialogComponent, { data: { email: order.client.email } });
+		return dialogRef.afterClosed().pipe(
+			filter(email => email),
+			concatMap(email => this.sendMail(savedInspection, email))
+		);
 	}
 
 	sendMail(savedInspection: SavedInspection, to: string, employeeCode: string = EmployeeService.employee.code): Observable<any> {

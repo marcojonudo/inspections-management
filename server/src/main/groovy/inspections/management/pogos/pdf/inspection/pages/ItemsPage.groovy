@@ -7,7 +7,6 @@ import inspections.management.pogos.pdf.CategoryItems
 import inspections.management.pogos.pdf.inspection.cards.CategoryCard
 import inspections.management.pogos.pdf.inspection.cards.ItemCategoryCard
 import inspections.management.pogos.pdf.inspection.header.PdfHeader
-import inspections.management.pogos.pdf.structure.cards.Card
 import inspections.management.utils.Constants
 
 @CompileStatic

@@ -6,7 +6,8 @@
 			matInput
 			type="email"
 			[formControl]="emailControl"
-			autocomplete="off">
+			autocomplete="off"
+			(keydown.enter)="accept()">
 	</mat-form-field>
 </div>
 <div mat-dialog-actions class="buttons">

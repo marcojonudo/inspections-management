@@ -143,12 +143,12 @@ export class InspectionsComponent implements OnDestroy {
 	}
 
 	findMailSent(orderNumber: number): Dayjs {
-		return InspectionService.findSavedInspection(orderNumber).sent;
+		return InspectionService.findSavedInspection(orderNumber)?.sent;
 	}
 
 	findDateFormat(orderNumber: number): string {
 		const order = InspectionService.findOrder(orderNumber);
-		return order.day.isSame(dayjs().startOf('d')) ? 'HH:mm:ss' :  'dd/MM/yy HH:mm:ss';
+		return order.day.isSame(dayjs().startOf('d')) ? 'HH:mm:ss' : 'dd/MM/yy HH:mm:ss';
 	}
 
 }

@@ -1,8 +1,10 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
-import { TranslateService } from '@ngx-translate/core';
-import { SnackBarService } from '../../services/snack-bar.service';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+
+export interface EmailData {
+	email: string;
+}
 
 @Component({
 	selector: 'app-email-dialog',
@@ -14,12 +16,8 @@ export class EmailDialogComponent {
 
 	emailControl: FormControl;
 
-	constructor(
-		private dialogRef: MatDialogRef<EmailDialogComponent>,
-		private translateService: TranslateService,
-		private snackBarService: SnackBarService
-	) {
-		this.emailControl = new FormControl('', Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$'));
+	constructor(@Inject(MAT_DIALOG_DATA) public data: EmailData, private dialogRef: MatDialogRef<EmailDialogComponent>) {
+		this.emailControl = new FormControl(data.email, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$'));
 	}
 
 	accept(emailControl: FormControl = this.emailControl): void {

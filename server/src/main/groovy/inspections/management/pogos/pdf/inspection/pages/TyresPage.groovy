@@ -28,9 +28,6 @@ class TyresPage extends PdfInspectionPage {
         this.categories = [
             (Card) new TyresCard(categories, visualControlSavedItem, measurementSavedItem, pressureSavedItem, options)
         ]
-        /* La hoja de imágenes de la revisión de neumáticos se muestra en la primera página junto con los items, por lo
-         * que en este caso no se pinta el cabecero */
-        this.printHeader = savedInspection.inspectionTypeCode != Constants.InspectionType.N
         this.tyrePage = true
     }
 
