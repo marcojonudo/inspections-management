@@ -33,7 +33,6 @@ class PdfService {
 	private static final Logger LOG = LoggerFactory.getLogger(PdfService)
 
 	private static final String HTML_FILE_NAME = "inspection.html"
-	private static final String PDF_FILE_NAME = "inspection.pdf"
 	private static final int IMAGES_ROW_ITEMS = 3
 	private static final List<String> TYRE_ITEM_CODES = ['EN', 'FN', 'PN']
 
@@ -51,18 +50,18 @@ class PdfService {
 		List<Image> images = imageDataService.getAll((List<Long>) savedInspection.items.findAll { it.imageId }*.imageId)
 		String inspectionName = inspectionTypeDataService.findInspectionTypeName(savedInspection.inspectionTypeCode)
 
-		Set<SavedItem> savedItems = savedInspection.items.findAll {
-			!it.item.header &&
-			(it.item.type == Item.Type.SELECT ? ((SelectSavedItem) it).value != Constants.SelectItemOption.NA : true)
-		}.each { SavedItem savedItem ->
-			savedItem.image = images.find { it.id == savedItem.imageId }
-		}
+		Set<SavedItem> savedItems = savedInspection.items
+			.findAll { !it.item.header }
+			.each { SavedItem savedItem -> savedItem.image = images.find { it.id == savedItem.imageId } }
 
 		Set<SavedItem> depthImageItems = findTyreDepthItems(savedItems).findAll { it.imageId }
 		List<CategoryItems> tyreCategories = depthImageItems ? buildTyreCategories(savedItems) : null
 		List<SelectItemOption> options = selectItemOptionDataService.findAll()
 
-		List<CategoryItems> categories = buildPrintCategories(savedItems)
+		Set<SavedItem> existentSavedItems = savedItems.findAll {
+			(it.item.type == Item.Type.SELECT ? ((SelectSavedItem) it).value != Constants.SelectItemOption.NA : true)
+		}
+		List<CategoryItems> categories = buildPrintCategories(existentSavedItems)
 		List<List<CategoryItems>> groupedCategories = buildGroupedCategories(categories)
 
 		Set<SavedItem> imageItems = findImageItems(savedItems)
@@ -80,7 +79,7 @@ class PdfService {
 			options
 		)
 		File htmlFile = createTempFile(HTML_FILE_NAME, pdfInspection.toHtml())
-		File pdf = createTempFile(PDF_FILE_NAME)
+		File pdf = createTempFile("${savedInspection.numberPlate}.pdf")
 
 		LocalTime refTime = LocalTime.now()
 		ConverterProperties properties = new ConverterProperties()

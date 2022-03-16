@@ -12,7 +12,7 @@ body {
     page-break-after: always;
 }
 
-.page > div {
+.content-wrapper {
     position: absolute;
     top: 0;
     left: 0;
@@ -373,8 +373,8 @@ body {
 }
 
 .no-image {
-    padding-bottom: 136%;
-    position: relative;
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -383,17 +383,8 @@ body {
 }
 
 .no-image img {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate3d(-50%, -50%, 0);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 3em;
-    color: #717171;
+    width: 30%;
+    height: 20%;
 }
 
 .tyre-state {
@@ -448,6 +439,10 @@ body {
     width: 12px;
     position: relative;
     top: 5px;
+}
+
+.indicator.hide {
+    opacity: 0;
 }
 
 .indicator > div {
@@ -550,4 +545,15 @@ body {
 .red-background {
     background-color: #ff0000;
     fill: #ff0000;
+}
+
+.white-background {
+    background-color: #fff;
+    fill: #fff;
+    color: #000 !important;
+}
+
+.black-background {
+    background-color: #000;
+    fill: #000;
 }

@@ -1,14 +1,13 @@
 package inspections.management.services.data
 
-import grails.gorm.services.Query
+
 import grails.gorm.services.Service
 import grails.gorm.services.Where
 import inspections.management.domains.SavedInspection
 import inspections.management.domains.savedItems.SavedItem
 
 import javax.inject.Inject
-import java.time.LocalDate
-import java.time.ZoneId
+import java.time.LocalDateTime
 
 @Service(SavedInspection)
 abstract class SavedInspectionDataService {
@@ -18,37 +17,14 @@ abstract class SavedInspectionDataService {
 
 	abstract SavedInspection find(int orderNumber)
 
-	abstract SavedInspection find(String numberPlate)
+	abstract int findSavedInspectionOrderNumber(String numberPlate, Map args)
 
 	@Where({ orderNumber in orderNumbers })
 	abstract List<SavedInspection> findAll(List<Integer> orderNumbers)
 
-	@Query("""
-		select $savedInspection.orderNumber
-		from ${SavedInspection savedInspection}
-		where date(savedInspection.saved) = $day
-	""")
-	abstract List<Integer> findOrderNumbers(Date day)
-
-	@Query("""
-		select $savedInspection.orderNumber
-		from ${SavedInspection savedInspection}
-		where date(savedInspection.saved) >= $from and date(savedInspection.saved) < $to
-	""")
-	abstract List<Integer> findOrderNumbers(Date from, Date to)
-
 	abstract SavedInspection update(Serializable id, SavedInspection.State state, String sellerCode)
 
-	List<Integer> findOrderNumbers(LocalDate day) {
-		return findOrderNumbers(Date.from(day.atStartOfDay(ZoneId.systemDefault()).toInstant()))
-	}
-
-	List<Integer> findOrderNumbers(LocalDate from, LocalDate to) {
-		return findOrderNumbers(
-			Date.from(from.atStartOfDay(ZoneId.systemDefault()).toInstant()),
-			Date.from(to.atStartOfDay(ZoneId.systemDefault()).toInstant())
-		)
-	}
+	abstract SavedInspection update(Serializable id, LocalDateTime sent, String sellerCode)
 
 	SavedInspection update(SavedInspection savedInspection, SavedInspection existentSavedInspection) {
 		savedInspection.items.each { SavedItem savedItem ->

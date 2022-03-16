@@ -4,11 +4,14 @@ import { Budget } from './budget';
 import { Vehicle } from './vehicles/vehicle';
 import { Builder } from '../../utils/builder';
 import { RealTimeObject } from '../real-time/update/real-time-object';
+import { Dayjs } from 'dayjs';
+import * as dayjs from 'dayjs';
 
 export class Order implements RealTimeObject {
 
 	number: number;
 	code: string;
+	day: Dayjs;
 	state: string;
 	vehicle: Vehicle;
 	client: Client;
@@ -21,6 +24,7 @@ export class Order implements RealTimeObject {
 	constructor(order: any) {
 		this.number = order.number;
 		this.code = order.code;
+		this.day = dayjs(order.day);
 		this.state = order.state;
 		this.vehicle = order.vehicle ? Builder.buildVehicle(order.vehicle) : undefined;
 		this.client = new Client(order.client);

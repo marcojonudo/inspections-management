@@ -111,3 +111,19 @@ dataSources:
             validationQuery: SELECT 1
             validationInterval: 15000
         logSql: true
+    hestia-fviberi:
+        dbCreate: validate
+        driverClassName: com.mysql.jdbc.Driver
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+        url: jdbc:mysql://${host.ip}:${host.local-mysql-port}/fviberi?useSSL=false
+        username: user1
+        password: password1
+        properties:
+            initialSize: 1
+            maxActive: 1
+            minIdle: 1
+            maxIdle: 1
+            testOnBorrow: true
+            validationQuery: SELECT 1
+            validationInterval: 15000
+        logSql: true

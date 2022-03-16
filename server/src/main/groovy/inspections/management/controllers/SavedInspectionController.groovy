@@ -8,7 +8,6 @@ import inspections.management.services.PdfService
 import inspections.management.services.data.CentreDataService
 import inspections.management.services.data.OrderDataService
 import inspections.management.services.data.SavedInspectionDataService
-import io.micronaut.core.io.ResourceLoader
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
@@ -20,8 +19,6 @@ import javax.inject.Inject
 @CompileStatic
 class SavedInspectionController {
 
-    @Inject ResourceLoader resourceLoader
-
     @Inject SavedInspectionDataService savedInspectionDataService
     @Inject OrderDataService orderDataService
     @Inject CentreDataService centreDataService
@@ -29,9 +26,12 @@ class SavedInspectionController {
 
     @Get(value = "/{numberPlate}", consumes = MediaType.MULTIPART_FORM_DATA)
     SystemFile getPdf(String numberPlate) {
-        SavedInspection savedInspection = savedInspectionDataService.find(numberPlate)
+        Integer orderNumber = savedInspectionDataService.findSavedInspectionOrderNumber(
+            numberPlate, [sort: 'saved', order: 'desc', max: 1]
+        )
         SystemFile pdf = null
-        if (savedInspection) {
+        if (orderNumber) {
+            SavedInspection savedInspection = savedInspectionDataService.find(orderNumber)
             Centre centre = centreDataService.find()
             Order order = orderDataService.find(savedInspection.orderNumber)
             File pdfFile = pdfService.buildPdf(centre, order, savedInspection)

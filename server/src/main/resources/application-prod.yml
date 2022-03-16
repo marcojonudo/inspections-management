@@ -8,3 +8,7 @@ cron:
 
 dataSource:
     logSql: false
+
+dataSources:
+    hestia-fviberi:
+        url: jdbc:mysql://hestia:3306/fviberi?useSSL=false

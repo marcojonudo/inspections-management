@@ -9,7 +9,8 @@ import { Employee } from '../../objects/employee';
 import { Constants } from '../../utils/constants';
 import { SnackBarService } from '../../services/snack-bar.service';
 import { RealTimeService } from '../../services/real-time.service';
-import { RealTimeOrder } from '../../objects/real-time/update/orders/real-time-order';
+import * as dayjs from 'dayjs';
+import { Dayjs } from 'dayjs';
 
 export interface InspectionsColumn {
 	order: string;
@@ -35,7 +36,7 @@ export class InspectionsComponent implements OnDestroy {
 	private readonly INSPECTION_NAME = 'Revisión';
 
 	private COLUMNS: string[] = [
-		'order', 'brand', 'model', 'inspectionType', 'inspectionState', 'mechanic', 'budgets', 'clientContact'
+		'order', 'brand', 'model', 'inspectionType', 'inspectionState', 'mechanic', 'budgets', 'clientContact', 'sentMail'
 	];
 
 	private budgetNotificationsSubscription: Subscription;
@@ -55,7 +56,7 @@ export class InspectionsComponent implements OnDestroy {
 		const orderInspections = this.filterInspections();
 		const rows = this.buildRows(orderInspections);
 		this.rows = InspectionService.sortInspectionsRows(rows);
-		this.budgetNotificationsSubscription = this.inspectionService.budgetNotifications$.subscribe(() => {
+		this.budgetNotificationsSubscription = this.inspectionService.inspectionsTrigger$.subscribe(() => {
 			/* La lista budgetNotifications ya se ha actualizado en el servicio. Aquí se consume el Observable para poder ejecutar un
 			 * ciclo de CD, y refrescar el contenido cuando se actualiza la notificación de cliente */
 			this.cdRef.detectChanges();
@@ -139,6 +140,15 @@ export class InspectionsComponent implements OnDestroy {
 
 	findMechanic(code: string): Employee {
 		return EmployeeService.findEmployee(code);
+	}
+
+	findMailSent(orderNumber: number): Dayjs {
+		return InspectionService.findSavedInspection(orderNumber)?.sent;
+	}
+
+	findDateFormat(orderNumber: number): string {
+		const order = InspectionService.findOrder(orderNumber);
+		return order.day.isSame(dayjs().startOf('d')) ? 'HH:mm:ss' : 'dd/MM/yy HH:mm:ss';
 	}
 
 }

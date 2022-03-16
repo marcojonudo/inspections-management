@@ -127,7 +127,7 @@ class TyresCard extends Card {
                     <div class="state-name">${options.find { it.code == stateItem.value}.name}</div>
                     <div class="state-graph-bar-wrapper">
                         <div
-                            class="indicator"
+                            class="indicator ${depthItem.findValue() ? '' : 'hide'}"
                             style="left: ${findIndicatorLeft(depthItem.findValue())}px">
                             <div>${depthItem.findValue()}mm</div>
                             <img src="img/indicators/${findDepthColorName(depthItem.findValue())}-indicator.png"/>
@@ -159,14 +159,14 @@ class TyresCard extends Card {
                 <div class="depth">
                     <div class="depth-section-title" translate>Profundidad neumático</div>
                     <div
-                        class="depth-section-value ${findDepthColorName(depthItem.findValue())}-background">
-                        ${depthItem.findValue()}mm
+                        class="depth-section-value ${depthItem.findValue() ? findDepthColorName(depthItem.findValue()) : 'white'}-background">
+                        ${depthItem.findValue() ? "${depthItem.findValue()}mm" : '-'}
                     </div>
                 </div>
                 <img src="img/tyres/${findDepthColorName(depthItem.findValue())}-tyre.jpg"/>
                 <div>
                     <div class="depth-section-title">Edad neumático</div>
-                    <div class="depth-section-value">${ageItem.findValue()}</div>
+                    <div class="depth-section-value">${ageItem.findValue() ?: '-'}</div>
                 </div>
             </div>
         """
@@ -175,13 +175,13 @@ class TyresCard extends Card {
     static String buildNoImageTemplate() {
         return """
             <div class="no-image">
-                <mat-icon>no_photography</mat-icon>
+                <img src="img/icons/no_photography.svg">
             </div>
         """
     }
 
     float findIndicatorLeft(String depth) {
-        float d = depth as float
+        float d = depth ? depth as float : 0
         d = d > BAR_WIDTH_MM ? BAR_WIDTH_MM : (d < 0 ? 0 : d)
         return DEPTH_BAR_MARGIN + (d * barWidth / BAR_WIDTH_MM) - 6
     }
@@ -191,7 +191,7 @@ class TyresCard extends Card {
     }
 
     static String findDepthColorName(String depth) {
-        float d = depth as float
+        float d = depth ? depth as float : 0
         return d >= 4.1 ? 'green' : (d <= 2.09 ? 'red' : 'orange');
     }
 

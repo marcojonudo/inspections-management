@@ -27,7 +27,7 @@ class PdfInspectionPage extends IPdf {
         return """
             <div class="${findClasses()}">
                 ${tyrePage ? '' : "<img class=\"background-image\" src=\"img/backgrounds/${vehicleType.backgroundImage}\"/>"}
-                <div>
+                <div class="content-wrapper">
                     ${printHeader ? header.toHtml() : ''}
                     <div class="categories-container">
                         ${categories.collect { it.toHtml() }.join("\n")}

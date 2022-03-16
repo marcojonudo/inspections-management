@@ -15,6 +15,7 @@ class Constants {
     static class DataSource {
 
         static final String FVIBERI = "fviberi"
+        static final String HESTIA_FVIBERI = "hestia-fviberi"
         static final String SCHEDULES = "schedules"
 
     }
@@ -22,6 +23,7 @@ class Constants {
     static class DateFormat {
 
         static final String yyyy_MM_dd = "yyyy-MM-dd"
+        static final String dd_MM_yyyy = "dd/MM/yyyy"
 
     }
 

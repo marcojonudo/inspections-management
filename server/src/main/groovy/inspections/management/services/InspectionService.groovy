@@ -4,15 +4,15 @@ import groovy.transform.CompileStatic
 import inspections.management.domains.InspectionType
 import inspections.management.domains.InspectionVehicle
 import inspections.management.domains.SavedInspection
+import inspections.management.domains.fviberi.Centre
+import inspections.management.domains.fviberi.MailData
 import inspections.management.domains.fviberi.Order
 import inspections.management.domains.fviberi.OrderLine
 import inspections.management.domains.items.Item
 import inspections.management.pogos.OrderInspection
 import inspections.management.pogos.logs.Log
-import inspections.management.services.data.InspectionVehicleDataService
-import inspections.management.services.data.ItemBudgetDataService
-import inspections.management.services.data.OrderDataService
-import inspections.management.services.data.SavedInspectionDataService
+import inspections.management.pogos.mails.MailSender
+import inspections.management.services.data.*
 import inspections.management.utils.Builder
 import inspections.management.utils.Constants
 import org.slf4j.Logger
@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory
 import javax.inject.Inject
 import javax.inject.Singleton
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Singleton
 @CompileStatic
@@ -34,6 +35,10 @@ class InspectionService {
 	@Inject private InspectionVehicleDataService inspectionVehicleDataService
 	@Inject private SavedInspectionDataService savedInspectionDataService
 	@Inject private OrderDataService orderDataService
+	@Inject private CentreDataService centreDataService
+	@Inject private MailDataDataService mailDataDataService
+	@Inject private PdfService pdfService
+	@Inject private MailService mailService
 
 	/**
 	 * Obtiene las órdenes según los parámetros recibidos
@@ -148,6 +153,26 @@ class InspectionService {
 			LOG.error(new Log((Map) [employeeCode: employeeCode, orderNumber: orderNumber, inspectionTypeCode: savedInspection.inspectionTypeCode, vehicle: savedInspection.vehicle, exceptionMessage: all.message, message: Constants.Message.ERROR_SAVING_INSPECTION]).toString())
 		}
 		return newSavedInspection
+	}
+
+	/**
+	 * Envía un correo con la revisión
+	 * @param orderNumber Número de orden
+	 * @param to Destinatario
+	 * @param employeeCode Código de empleado
+	 */
+	SavedInspection sendInspectionMail(int orderNumber, String to, String employeeCode) {
+		SavedInspection savedInspection = savedInspectionDataService.find(orderNumber)
+		Centre centre = centreDataService.find()
+		Order order = orderDataService.find(savedInspection.orderNumber)
+		MailData mailData = mailDataDataService.find(centre.code as int)
+		File pdfFile = pdfService.buildPdf(centre, order, savedInspection)
+
+		MailSender sender = Builder.Mail.buildInspectionSender(mailData.email, centre.name)
+		String subject = Builder.Mail.buildInspectionSubject(order)
+		String body = Builder.Mail.buildInspectionBody(centre, order.client, order.vehicle)
+		mailService.sendMail(mailData, sender, to, subject, body, pdfFile)
+		savedInspectionDataService.update(savedInspection.id, LocalDateTime.now(), employeeCode)
 	}
 
 }

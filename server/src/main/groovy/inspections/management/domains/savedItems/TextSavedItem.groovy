@@ -36,7 +36,7 @@ class TextSavedItem extends SavedItem implements GormEntity<TextSavedItem> {
 		Set<TextItemField> itemFields = ((TextItem) item).fields
 		return fields.sort { it.order }.collect { TextSavedItemField savedField ->
 			TextItemField itemField = itemFields.find { it.order == savedField.order }
-			return savedField.text ? "${itemField.prefix ?: ''}$savedField.text${itemField.separator ?: ''}" : '-'
+			return savedField.text ? "${itemField.prefix ?: ''}$savedField.text${itemField.separator ?: ''}" : ''
 		}.join("")
 	}
 

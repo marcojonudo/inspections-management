@@ -11,6 +11,7 @@ class Client implements GormEntity<Client> {
 	String name
 	String surnames
 	Integer phoneNumber
+	String email
 
 	static mapping = {
 		datasource Constants.DataSource.FVIBERI
@@ -20,6 +21,7 @@ class Client implements GormEntity<Client> {
 		name column: 'noclient'
 		surnames column: 'apellido'
 		phoneNumber column: 'nutelefo'
+		email column: 'emailcli'
 
 		id name: 'code', generator : 'assigned'
 		version false

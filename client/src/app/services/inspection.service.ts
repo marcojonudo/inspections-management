@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, finalize, map, mergeMap, tap } from 'rxjs/operators';
+import { catchError, concatMap, filter, finalize, map, mergeMap, tap } from 'rxjs/operators';
 import { forkJoin, from, Observable, of, Subject } from 'rxjs';
 import { LocalStorageService } from './local-storage.service';
 import { OrdersFilter } from '../objects/filters/orders-filter';
@@ -37,6 +37,9 @@ import { InspectionsColumn } from '../components/inspections/inspections.compone
 import { InspectionDetailsColumn } from '../components/inspection-details/inspection-details.component';
 import { TextSavedItemField } from '../objects/inspections/saved-items/text-saved-item-field';
 import { CountryHandlerType } from '../objects/country-info/country-handler-type';
+import { MatDialog } from '@angular/material/dialog';
+import { EmailDialogComponent } from '../components/email-dialog/email-dialog.component';
+import { SnackBarService } from './snack-bar.service';
 
 @Injectable({
 	providedIn: 'root'
@@ -67,7 +70,8 @@ export class InspectionService {
 		PS: '#ff6a00',
 		SN: '#d23636',
 		RA: '#3681d2',
-		RR: '#3681d2'
+		RR: '#3681d2',
+		NA: '#000'
 	};
 
 	private static readonly ITEM_RELATION_ACTION: any = {
@@ -88,17 +92,17 @@ export class InspectionService {
 
 	selectedOrderInspectionSubject: Subject<OrderInspectionVehicle>;
 	selectedOrderInspection$: Observable<OrderInspectionVehicle>;
-	budgetNotificationsSubject: Subject<BudgetNotification[]>;
-	budgetNotifications$: Observable<BudgetNotification[]>;
+	inspectionsTriggerSubject: Subject<void>;
+	inspectionsTrigger$: Observable<void>;
 
-	constructor(private http: HttpClient) {
+	constructor(private http: HttpClient, private dialog: MatDialog, private snackBarService: SnackBarService) {
 		this.filters = [new TodayOrdersFilter()];
 
 		this.selectedOrderInspectionSubject = new Subject<OrderInspectionVehicle>();
 		this.selectedOrderInspection$ = this.selectedOrderInspectionSubject.asObservable();
 
-		this.budgetNotificationsSubject = new Subject<BudgetNotification[]>();
-		this.budgetNotifications$ = this.budgetNotificationsSubject.asObservable();
+		this.inspectionsTriggerSubject = new Subject<void>();
+		this.inspectionsTrigger$ = this.inspectionsTriggerSubject.asObservable();
 
 		InspectionService.orderInspections = [];
 		InspectionService.savedInspections = [];
@@ -614,7 +618,7 @@ export class InspectionService {
 	createBudgetNotification(orderNumber: number, itemCodes: string[]): Observable<any> {
 		const budgetNotifications = itemCodes.map(itemCode => new BudgetNotification({ orderNumber, itemCode }));
 		InspectionService.budgetNotifications.push(...budgetNotifications);
-		this.budgetNotificationsSubject.next(InspectionService.budgetNotifications);
+		this.inspectionsTriggerSubject.next();
 		return this.http.post(Url.budgetNotification(), budgetNotifications);
 	}
 
@@ -624,7 +628,7 @@ export class InspectionService {
 				InspectionService.budgetNotifications = InspectionService.budgetNotifications.filter(budgetNotification =>
 					budgetNotification.orderNumber !== orderNumber
 				);
-				this.budgetNotificationsSubject.next(InspectionService.budgetNotifications);
+				this.inspectionsTriggerSubject.next();
 			})
 		);
 	}
@@ -639,6 +643,27 @@ export class InspectionService {
 		body.saved = dayjs();
 		console.log('Saving inspection', body);
 		return this.http.patch(Url.savedInspection(), body);
+	}
+
+	sendInspectionMail(
+		savedInspection: SavedInspection = InspectionService.selectedSavedInspection,
+		order: Order = InspectionService.selectedOrderInspection.order
+	): Observable<any> {
+		const dialogRef = this.dialog.open(EmailDialogComponent, { data: { email: order.client.email } });
+		return dialogRef.afterClosed().pipe(
+			filter(email => email),
+			concatMap(email => this.sendMail(savedInspection, email))
+		);
+	}
+
+	sendMail(savedInspection: SavedInspection, to: string, employeeCode: string = EmployeeService.employee.code): Observable<any> {
+		this.snackBarService.open(Constants.MESSAGE_CODE.SENDING_MAIL, Constants.SNACK_BAR.TYPE.WARNING, 10000);
+		return this.http.post(Url.mails(savedInspection.orderNumber, to, employeeCode), {}).pipe(
+			tap(() => {
+				savedInspection.sent = dayjs();
+				this.inspectionsTriggerSubject.next();
+			})
+		);
 	}
 
 }
