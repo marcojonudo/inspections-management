@@ -36,7 +36,8 @@ class SelectSavedItem extends SavedItem implements GormEntity<SelectSavedItem> {
 		PS('#ff6a00'),
 		SN('#d23636'),
 		RA('#3681d2'),
-		RR('#3681d2')
+		RR('#3681d2'),
+		NA('#000')
 
 		final String color
 

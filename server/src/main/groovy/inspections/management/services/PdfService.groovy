@@ -50,18 +50,18 @@ class PdfService {
 		List<Image> images = imageDataService.getAll((List<Long>) savedInspection.items.findAll { it.imageId }*.imageId)
 		String inspectionName = inspectionTypeDataService.findInspectionTypeName(savedInspection.inspectionTypeCode)
 
-		Set<SavedItem> savedItems = savedInspection.items.findAll {
-			!it.item.header &&
-			(it.item.type == Item.Type.SELECT ? ((SelectSavedItem) it).value != Constants.SelectItemOption.NA : true)
-		}.each { SavedItem savedItem ->
-			savedItem.image = images.find { it.id == savedItem.imageId }
-		}
+		Set<SavedItem> savedItems = savedInspection.items
+			.findAll { !it.item.header }
+			.each { SavedItem savedItem -> savedItem.image = images.find { it.id == savedItem.imageId } }
 
 		Set<SavedItem> depthImageItems = findTyreDepthItems(savedItems).findAll { it.imageId }
 		List<CategoryItems> tyreCategories = depthImageItems ? buildTyreCategories(savedItems) : null
 		List<SelectItemOption> options = selectItemOptionDataService.findAll()
 
-		List<CategoryItems> categories = buildPrintCategories(savedItems)
+		Set<SavedItem> existentSavedItems = savedItems.findAll {
+			(it.item.type == Item.Type.SELECT ? ((SelectSavedItem) it).value != Constants.SelectItemOption.NA : true)
+		}
+		List<CategoryItems> categories = buildPrintCategories(existentSavedItems)
 		List<List<CategoryItems>> groupedCategories = buildGroupedCategories(categories)
 
 		Set<SavedItem> imageItems = findImageItems(savedItems)

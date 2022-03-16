@@ -17,7 +17,7 @@ export class EmailDialogComponent {
 	emailControl: FormControl;
 
 	constructor(@Inject(MAT_DIALOG_DATA) public data: EmailData, private dialogRef: MatDialogRef<EmailDialogComponent>) {
-		this.emailControl = new FormControl(data.email, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$'));
+		this.emailControl = new FormControl(data.email.toLowerCase(), Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$'));
 	}
 
 	accept(emailControl: FormControl = this.emailControl): void {

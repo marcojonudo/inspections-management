@@ -59,12 +59,7 @@ export class InspectionComponent {
 
 		this.vehicleType = VehicleType.parse(this.savedInspection.vehicle);
 
-		const savedItems = this.savedInspection.items
-			.filter(i => i.item.header === undefined)
-			.filter(i => {
-				const selectItem = i.item.type === ItemType.SELECT.id;
-				return selectItem ? i.findValue() !== Constants.SELECT_ITEM_OPTION_CODE.NA : true;
-			});
+		const savedItems = this.savedInspection.items.filter(i => i.item.header === undefined);
 		this.tyreGroupedItems = this.findTyreItems(savedItems);
 		const depthCodes = this.CAR_TYRES.map(carTyre => `${Constants.DEPTH_ITEM_CODE}${carTyre}`);
 		const depthItems = savedItems.filter(i => depthCodes.find(c => c === i.item.code) !== undefined);
@@ -73,7 +68,11 @@ export class InspectionComponent {
 		this.pressureSavedItem = savedItems.find(i => i.item.code === 'PPN');
 		this.measurementSavedItem = savedItems.find(i => i.item.code === 'PN');
 
-		const categories = this.buildPrintCategories(savedItems);
+		const existentSavedItems = savedItems.filter(i => {
+			const selectItem = i.item.type === ItemType.SELECT.id;
+			return selectItem ? i.findValue() !== Constants.SELECT_ITEM_OPTION_CODE.NA : true;
+		});
+		const categories = this.buildPrintCategories(existentSavedItems);
 		this.groupedCategories = this.buildGroupedCategories(categories);
 
 		const imageSavedItems = this.savedInspection.items.filter(savedItem => savedItem.imageId);

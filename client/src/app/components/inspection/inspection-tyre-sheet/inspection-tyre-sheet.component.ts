@@ -21,7 +21,8 @@ export class InspectionTyreSheetComponent implements OnInit {
 	private readonly DEPTH_BAR_PADDING = 4;
 	private readonly VISUAL_CONTROL_COLOR = {
 		C: 'green',
-		SN: 'red'
+		SN: 'red',
+		NA: 'black'
 	};
 
 	@Input() tyreGroupedItems: { [key: string]: SavedItem[] };
@@ -47,6 +48,10 @@ export class InspectionTyreSheetComponent implements OnInit {
 		this.barWidth = this.BAR_WIDTH - (this.DEPTH_BAR_PADDING * 4) - (this.DEPTH_BAR_MARGIN * 2);
 	}
 
+	get selectItemOptions(): SelectItemOption[] {
+		return InspectionService.selectItemOptions;
+	}
+
 	defaultOrder(a, b) {
 		return 1;
 	}
@@ -64,7 +69,7 @@ export class InspectionTyreSheetComponent implements OnInit {
 	}
 
 	findOption(savedItem: SavedItem): SelectItemOption {
-		return (savedItem.item as SelectItem).options.find(option => option.code === savedItem.findValue());
+		return this.selectItemOptions.find(o => o.code === savedItem.findValue());
 	}
 
 	findIconColor(code: string): string {
@@ -76,7 +81,7 @@ export class InspectionTyreSheetComponent implements OnInit {
 	}
 
 	findIndicatorLeft(depth: string): number {
-		let d = parseFloat(depth);
+		let d = parseFloat(depth || '0');
 		d = d > this.BAR_WIDTH_MM ? this.BAR_WIDTH_MM : (d < 0 ? 0 : d);
 		return this.DEPTH_BAR_MARGIN + (d * this.barWidth / this.BAR_WIDTH_MM) - 6;
 	}
@@ -86,8 +91,12 @@ export class InspectionTyreSheetComponent implements OnInit {
 	}
 
 	findDepthColorName(depth: string): string {
-		const d = parseFloat(depth);
-		return d >= 4.1 ? 'green' : (d <= 2.09 ? 'red' : 'orange');
+		if (depth) {
+			const d = parseFloat(depth);
+			return d >= 4.1 ? 'green' : (d <= 2.09 ? 'red' : 'orange');
+		} else {
+			return '';
+		}
 	}
 
 	findImageUrl(imageId: number): string {
