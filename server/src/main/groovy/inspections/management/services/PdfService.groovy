@@ -59,7 +59,8 @@ class PdfService {
 		List<SelectItemOption> options = selectItemOptionDataService.findAll()
 
 		Set<SavedItem> existentSavedItems = savedItems.findAll {
-			(it.item.type == Item.Type.SELECT ? ((SelectSavedItem) it).value != Constants.SelectItemOption.NA : true)
+			!it.hidden &&
+				(it.item.type == Item.Type.SELECT ? ((SelectSavedItem) it).value != Constants.SelectItemOption.NA : true)
 		}
 		List<CategoryItems> categories = buildPrintCategories(existentSavedItems)
 		List<List<CategoryItems>> groupedCategories = buildGroupedCategories(categories)

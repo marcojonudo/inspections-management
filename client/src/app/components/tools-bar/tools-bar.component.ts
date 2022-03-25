@@ -95,14 +95,8 @@ export class ToolsBarComponent {
 
 	sendMail(): void {
 		this.inspectionService.sendInspectionMail().subscribe(
-			() => {
-				console.log(1);
-				this.snackBarService.open(Constants.MESSAGE_CODE.SUCCESS_SENDING_MAIL)
-			},
-			() => {
-				console.log(2);
-				this.snackBarService.open(Constants.MESSAGE_CODE.ERROR_SENDING_MAIL, Constants.SNACK_BAR.TYPE.ERROR)
-			}
+			() => this.snackBarService.open(Constants.MESSAGE_CODE.SUCCESS_SENDING_MAIL),
+			() => this.snackBarService.open(Constants.MESSAGE_CODE.ERROR_SENDING_MAIL, Constants.SNACK_BAR.TYPE.ERROR)
 		);
 	}
 

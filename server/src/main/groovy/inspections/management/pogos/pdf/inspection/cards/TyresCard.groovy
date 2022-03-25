@@ -181,7 +181,7 @@ class TyresCard extends Card {
     }
 
     float findIndicatorLeft(String depth) {
-        float d = depth ? depth as float : 0
+        float d = depth?.isNumber() ? depth as float : 0
         d = d > BAR_WIDTH_MM ? BAR_WIDTH_MM : (d < 0 ? 0 : d)
         return DEPTH_BAR_MARGIN + (d * barWidth / BAR_WIDTH_MM) - 6
     }
@@ -191,7 +191,7 @@ class TyresCard extends Card {
     }
 
     static String findDepthColorName(String depth) {
-        float d = depth ? depth as float : 0
+        float d = depth?.isNumber() ? depth as float : 0
         return d >= 4.1 ? 'green' : (d <= 2.09 ? 'red' : 'orange');
     }
 
