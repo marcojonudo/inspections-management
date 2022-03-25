@@ -4,7 +4,7 @@
 		<div class="card" *ngIf="cat.category; else elementTemplate">
 			<div class="card-header">
 				<mat-icon mat-card-avatar>navigate_next</mat-icon>
-				<div translate>inspection.category.{{cat.category.code}}</div>
+				<div>{{cat.category.name}}</div>
 			</div>
 			<div class="card-content">
 				<ng-container *ngTemplateOutlet="itemTemplate; context: { $implicit: cat }"></ng-container>
@@ -14,7 +14,7 @@
 			<div class="card text-area-card">
 				<div class="card-header">
 					<mat-icon mat-card-avatar>navigate_next</mat-icon>
-					<div translate>inspection.item.{{cat.items[0].item.code}}</div>
+					<div [innerHTML]="cat.items[0].item.name"></div>
 				</div>
 				<div class="card-content">
 					<div class="text-area-card-content">
@@ -41,7 +41,7 @@
 					*ngIf="checkItemType(item.item.type, selectType); else textItemText"
 					matRipple
 					(click)="toggleSelectOption(findSelectSavedItem(item))">
-					<div translate class="item-text">inspection.item.{{item.item.code}}</div>
+					<div class="item-text" [innerHTML]="item.item.name"></div>
 					<div class="item-data">
 						<mat-icon
 							*ngFor="let option of findSelectItem(item.item).options | order; let i = index"
@@ -58,7 +58,7 @@
 				</div>
 				<ng-template #textItemText>
 					<div class="text-item" [class.text-item-fields]="findTextSavedItem(item).fields.length > 2">
-						<div translate class="item-text">inspection.item.{{item.item.code}}</div>
+						<div class="item-text" [innerHTML]="item.item.name"></div>
 						<mat-form-field>
 							<span *ngIf="checkIndividualTextField(findTextItem(item))" matPrefix>
 								{{findTextItemField(item).prefix}}

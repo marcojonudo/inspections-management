@@ -7,6 +7,7 @@ export class Item {
 	type: string;
 	code: string;
 	name: string;
+	shortName: string;
 	order: number;
 	printOrder: number;
 	vehicleData: ItemVehicleData;
@@ -19,6 +20,7 @@ export class Item {
 		this.type = item.type;
 		this.code = item.code;
 		this.name = item.name;
+		this.shortName = item.shortName;
 		this.order = item.order;
 		this.printOrder = item.printOrder;
 		this.category = item.category ? new ItemCategory(item.category) : undefined;

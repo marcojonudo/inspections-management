@@ -3,12 +3,12 @@
 	<div class="card" *ngIf="cat.category; else elementTemplate">
 		<div class="card-header">
 			<mat-icon mat-card-avatar>navigate_next</mat-icon>
-			<div translate>print.category.{{cat.category.code}}</div>
+			<div>{{cat.category.name}}</div>
 		</div>
 		<div class="card-content">
 			<div class="image-category-content">
 				<div *ngFor="let item of cat.items | printOrder" class="image-item">
-					<div translate>inspection.item.{{item.item.code}}</div>
+					<div [innerHTML]="item.item.name"></div>
 					<div class="image-container">
 						<img [src]="findImageUrl(item.imageId)">
 					</div>
@@ -20,7 +20,7 @@
 		<div class="card">
 			<div class="card-header">
 				<mat-icon mat-card-avatar>navigate_next</mat-icon>
-				<div translate>inspection.item.{{cat.items[0].item.code}}</div>
+				<div [innerHTML]="cat.items[0].item.name"></div>
 			</div>
 			<div class="card-content">
 				<div class="image-category-content">

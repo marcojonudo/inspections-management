@@ -2,6 +2,7 @@ import { InspectionHandler } from './inspection-handler';
 import { SavedInspection } from '../inspections/saved-inspection';
 import { Builder } from '../../utils/builder';
 import { Constants } from '../../utils/constants';
+import { InspectionVehicle } from '../inspections/inspection-vehicle';
 
 export class DetectedFaultsHandler implements InspectionHandler {
 
@@ -19,4 +20,9 @@ export class DetectedFaultsHandler implements InspectionHandler {
 		);
 		return newSavedInspection;
 	}
+
+	findInspectionTitle(inspectionVehicle: InspectionVehicle): string {
+		return undefined;
+	}
+
 }

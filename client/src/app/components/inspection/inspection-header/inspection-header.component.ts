@@ -13,6 +13,9 @@ import { Centre } from '../../../objects/centre';
 import { SelectItemOption } from '../../../objects/inspections/items/select-item-option';
 import { Car } from '../../../objects/orders/vehicles/car';
 import { Vehicle } from '../../../objects/orders/vehicles/vehicle';
+import { InspectionVehicle } from '../../../objects/inspections/inspection-vehicle';
+import { TranslateService } from '@ngx-translate/core';
+import { Item } from '../../../objects/inspections/items/item';
 
 @Component({
 	selector: 'app-inspection-header',
@@ -40,7 +43,7 @@ export class InspectionHeaderComponent {
 		}
 	}
 
-	constructor(private orderPipe: OrderPipe, private router: Router) {
+	constructor(private orderPipe: OrderPipe, private router: Router, private translateService: TranslateService) {
 		this.GROUP_LABELS = {
 			'Realizado ajuste/cambio/relleno': [
 				Constants.SELECT_ITEM_OPTION_CODE.RA, Constants.SELECT_ITEM_OPTION_CODE.RR
@@ -50,6 +53,10 @@ export class InspectionHeaderComponent {
 	}
 
 	// region Getters / setters
+
+	get inspection(): InspectionVehicle {
+		return InspectionService.selectedOrderInspection.inspection;
+	}
 
 	get order(): Order {
 		return InspectionService.selectedOrderInspection.order;
@@ -117,6 +124,15 @@ export class InspectionHeaderComponent {
 			}
 		});
 		return groupedLabels;
+	}
+
+	findInspectionTitle(inspection: InspectionVehicle = this.inspection): string {
+		return InspectionService.inspectionHandler.findInspectionTitle(inspection) ||
+			this.translateService.instant(`inspection.type.${Constants.DETECTED_FAULTS_CODE}`);
+	}
+
+	findItemName(item: Item): string {
+		return item.shortName || item.name;
 	}
 
 }

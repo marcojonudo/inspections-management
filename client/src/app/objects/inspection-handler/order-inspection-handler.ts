@@ -1,5 +1,6 @@
 import { InspectionHandler } from './inspection-handler';
 import { SavedInspection } from '../inspections/saved-inspection';
+import { InspectionVehicle } from '../inspections/inspection-vehicle';
 
 export class OrderInspectionHandler implements InspectionHandler {
 
@@ -10,6 +11,10 @@ export class OrderInspectionHandler implements InspectionHandler {
 
 	findSavedInspection(savedInspection: SavedInspection): SavedInspection {
 		return savedInspection;
+	}
+
+	findInspectionTitle(inspectionVehicle: InspectionVehicle): string {
+		return inspectionVehicle.inspectionType.name;
 	}
 
 }
