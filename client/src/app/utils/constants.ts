@@ -15,6 +15,7 @@ export class Constants {
 	static readonly ROW_IMAGES = 4;
 	static readonly TYRE_ITEM_CODES = ['EN', 'FN', 'PN'];
 	static readonly DEPTH_ITEM_CODE = 'PN';
+	static readonly DETECTED_FAULTS_CODE = 'AD';
 
 	static readonly LOCAL_STORAGE: any = {
 		LANGUAGE: 'language',
@@ -139,8 +140,7 @@ export class Constants {
 		orderNumber: (o: Order) => o.number,
 		brand: (o: Order) => o.vehicle.brand,
 		model: (o: Order) => o.vehicle.model,
-		inspectionType: (o: Order, inspection: OrderInspectionVehicle) =>
-			inspection.inspection?.inspectionType?.code || Constants.DETECTED_ANOMALIES_CODE,
+		inspectionType: (o: Order, inspection: OrderInspectionVehicle) => inspection.inspection,
 		inspectionState: (o: Order, inspection: OrderInspectionVehicle, savedInspection: SavedInspection) =>
 			savedInspection ? savedInspection.state : Constants.INSPECTION_STATE.PENDING,
 		mechanic: (o: Order, inspection: OrderInspectionVehicle, savedInspection: SavedInspection) =>

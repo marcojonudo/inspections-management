@@ -15,6 +15,7 @@ import { EmployeeDialogComponent } from '../employee-dialog/employee-dialog.comp
 import { ImageDialogComponent } from '../image-dialog/image-dialog.component';
 import { Image } from '../../objects/inspections/image';
 import { RealTimeService } from '../../services/real-time.service';
+import { InspectionVehicle } from '../../objects/inspections/inspection-vehicle';
 
 export interface InspectionDetailsColumn {
 	item: ItemBudget;
@@ -104,8 +105,9 @@ export class InspectionDetailsComponent implements OnDestroy {
 		return this.translate.instant(`inspections.table.${code}`);
 	}
 
-	findItemName(code: string): string {
-		return this.translate.instant(`inspection.item.${code}`);
+	findItemName(code: string, inspection: InspectionVehicle = this.orderInspection.inspection): string {
+		const item = inspection.items.find(i => i.code === code);
+		return item.name;
 	}
 
 	findEmployee(code: string): Employee {

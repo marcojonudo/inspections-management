@@ -11,6 +11,7 @@ import { SnackBarService } from '../../services/snack-bar.service';
 import { RealTimeService } from '../../services/real-time.service';
 import * as dayjs from 'dayjs';
 import { Dayjs } from 'dayjs';
+import { InspectionVehicle } from '../../objects/inspections/inspection-vehicle';
 
 export interface InspectionsColumn {
 	order: string;
@@ -105,10 +106,11 @@ export class InspectionsComponent implements OnDestroy {
 		return this.translate.instant(`inspections.table.${code}`);
 	}
 
-	findInspectionTypeName(code: string): string {
-		const inspectionType = this.translate.instant(`inspection.type.${code}`);
+	findInspectionTypeName(inspection: InspectionVehicle): string {
+		const name = inspection ?
+			inspection.inspectionType.name : this.translate.instant(`inspection.type.${Constants.DETECTED_ANOMALIES_CODE}`);
 		/* Si el tipo es distinto a 'Anomalías detectadas', se elimina la palabra 'Revisión' por ser redundante */
-		return inspectionType.startsWith(this.INSPECTION_NAME) ? inspectionType.substring(this.INSPECTION_NAME.length + 1) : inspectionType;
+		return name.startsWith(this.INSPECTION_NAME) ? name.substring(this.INSPECTION_NAME.length + 1) : name;
 	}
 
 	findInspectionStateName(state: string): string {

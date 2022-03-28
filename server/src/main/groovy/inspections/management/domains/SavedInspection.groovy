@@ -40,6 +40,10 @@ class SavedInspection implements GormEntity<SavedInspection> {
 		items fetch: 'join'
 	}
 
+	static constraints = {
+		sent nullable: true
+	}
+
 	enum State {
 
 		PENDING({ Set<SavedItem> items -> false }),
