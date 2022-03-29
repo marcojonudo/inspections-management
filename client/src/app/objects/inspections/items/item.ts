@@ -15,6 +15,7 @@ export class Item {
 	header: string;
 	relations: ItemRelation[];
 	required: boolean;
+	print: boolean;
 
 	constructor(item: any) {
 		this.type = item.type;
@@ -26,6 +27,7 @@ export class Item {
 		this.category = item.category ? new ItemCategory(item.category) : undefined;
 		this.header = item.header;
 		this.required = item.required;
+		this.print = item.print;
 	}
 
 }
