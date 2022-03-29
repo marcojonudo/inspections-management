@@ -35,7 +35,7 @@
 		},
 		"table": {
 			"order": "OU",
-			"brand": "marca",
+			"brand": "Marca",
 			"model": "Modelo",
 			"inspectionType": "Revisão",
 			"inspectionState": "Estado",
@@ -96,6 +96,7 @@
 		"ERROR_SAVING_INSPECTION": "Error al guardar la revisión. Por favor, inténtalo de nuevo",
 		"SAVED_INSPECTION": "Revisión guardada correctamente",
 		"ORDER_WITHOUT_SAVED_INSPECTION": "La orden no tiene una revisión guardada asociada",
+		"NOT_FINISHED_SAVED_INSPECTION": "A revisão associada ainda está em andamento!",
 		"noWrongItems": "Revisão sem itens em mau estado!",
 		"SENDING_MAIL": "Enviando email...",
 		"SUCCESS_SENDING_MAIL": "¡Email enviado!",

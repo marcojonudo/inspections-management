@@ -133,10 +133,12 @@ export class InspectionsComponent implements OnDestroy {
 		return this.inspectionService.checkSelectedOrder(orderNumber);
 	}
 
-	selectOrder(orderNumber: number): void {
-		const existentSavedInspection = this.inspectionService.selectOrder(orderNumber);
-		if (!existentSavedInspection) {
-			this.snackBarService.open(Constants.MESSAGE_CODE.ORDER_WITHOUT_SAVED_INSPECTION, Constants.SNACK_BAR.TYPE.WARNING);
+	selectInspection(orderNumber: number): void {
+		const existentSavedInspection = this.inspectionService.selectInspection(orderNumber);
+		if (!existentSavedInspection?.items?.length) {
+			const messageCode = existentSavedInspection ?
+				Constants.MESSAGE_CODE.NOT_FINISHED_SAVED_INSPECTION : Constants.MESSAGE_CODE.ORDER_WITHOUT_SAVED_INSPECTION
+			this.snackBarService.open(messageCode, Constants.SNACK_BAR.TYPE.WARNING);
 		}
 	}
 

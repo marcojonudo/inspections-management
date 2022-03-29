@@ -96,6 +96,7 @@
 		"ERROR_SAVING_INSPECTION": "Error al guardar la revisión. Por favor, inténtalo de nuevo",
 		"SAVED_INSPECTION": "Revisión guardada correctamente",
 		"ORDER_WITHOUT_SAVED_INSPECTION": "La orden no tiene una revisión guardada asociada",
+		"NOT_FINISHED_SAVED_INSPECTION": "¡La revisión asociada todavía está en curso!",
 		"noWrongItems": "¡Revisión sin items en mal estado!",
 		"SENDING_MAIL": "Enviando correo...",
 		"SUCCESS_SENDING_MAIL": "¡Correo enviado!",

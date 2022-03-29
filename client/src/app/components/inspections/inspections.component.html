@@ -68,7 +68,7 @@
 				matRipple
 				*matRowDef="let row; columns: columnsToDisplay;"
 				[class.highlight]="checkSelectedOrder(row.orderNumber)"
-				(click)="selectOrder(row.orderNumber)"
+				(click)="selectInspection(row.orderNumber)"
 				[title]="row.orderNumber">
 			</tr>
 		</table>
