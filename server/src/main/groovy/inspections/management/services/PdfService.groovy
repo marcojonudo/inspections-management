@@ -51,7 +51,7 @@ class PdfService {
 		String inspectionName = inspectionTypeDataService.findInspectionTypeName(savedInspection.inspectionTypeCode)
 
 		Set<SavedItem> savedItems = savedInspection.items
-			.findAll { !it.item.header }
+			.findAll { !it.item.header && it.item.print }
 			.each { SavedItem savedItem -> savedItem.image = images.find { it.id == savedItem.imageId } }
 
 		Set<SavedItem> depthImageItems = findTyreDepthItems(savedItems).findAll { it.imageId }

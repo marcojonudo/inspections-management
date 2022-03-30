@@ -59,7 +59,7 @@ export class InspectionComponent {
 
 		this.vehicleType = VehicleType.parse(this.savedInspection.vehicle);
 
-		const savedItems = this.savedInspection.items.filter(i => i.item.header === undefined);
+		const savedItems = this.savedInspection.items.filter(i => i.item.header === undefined && i.item.print);
 		this.tyreGroupedItems = this.findTyreItems(savedItems);
 		const depthCodes = this.CAR_TYRES.map(carTyre => `${Constants.DEPTH_ITEM_CODE}${carTyre}`);
 		const depthItems = savedItems.filter(i => depthCodes.find(c => c === i.item.code) !== undefined);
