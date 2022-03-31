@@ -105,9 +105,9 @@ export class InspectionDetailsComponent implements OnDestroy {
 		return this.translate.instant(`inspections.table.${code}`);
 	}
 
-	findItemName(code: string, inspection: InspectionVehicle = this.orderInspection.inspection): string {
-		const item = inspection.items.find(i => i.code === code);
-		return item.name;
+	findItemName(code: string, savedInspection: SavedInspection = this.savedInspection): string {
+		const savedItem = savedInspection.items.find(i => i.item.code === code);
+		return savedItem.item.name;
 	}
 
 	findEmployee(code: string): Employee {
