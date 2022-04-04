@@ -19,6 +19,8 @@ abstract class SavedInspectionDataService {
 
 	abstract int findSavedInspectionOrderNumber(String numberPlate, Map args)
 
+	abstract SavedInspection find(int orderNumber, String numberPlate)
+
 	@Where({ orderNumber in orderNumbers })
 	abstract List<SavedInspection> findAll(List<Integer> orderNumbers)
 

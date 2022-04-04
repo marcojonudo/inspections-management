@@ -40,4 +40,17 @@ class SavedInspectionController {
         return pdf
     }
 
+    @Get(value = "/{orderNumber}/{numberPlate}", consumes = MediaType.MULTIPART_FORM_DATA)
+    SystemFile getPdf(int orderNumber, String numberPlate) {
+        SystemFile pdf = null
+        SavedInspection savedInspection = savedInspectionDataService.find(orderNumber, numberPlate)
+        if (savedInspection) {
+            Centre centre = centreDataService.find()
+            Order order = orderDataService.find(savedInspection.orderNumber)
+            File pdfFile = pdfService.buildPdf(centre, order, savedInspection)
+            pdf = new SystemFile(pdfFile).attach("${numberPlate}.pdf")
+        }
+        return pdf
+    }
+
 }

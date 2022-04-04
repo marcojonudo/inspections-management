@@ -12,6 +12,7 @@ import inspections.management.pogos.pdf.inspection.pages.ItemsPage
 import inspections.management.pogos.pdf.inspection.pages.PdfInspectionPage
 import inspections.management.pogos.pdf.inspection.pages.TyresPage
 import inspections.management.pogos.pdf.structure.IPdf
+import inspections.management.utils.Constants
 
 @CompileStatic
 class PdfInspection extends IPdf {
@@ -31,14 +32,19 @@ class PdfInspection extends IPdf {
         Order.VehicleType vehicleType = Order.VehicleType.values().find { it.type == order.vehicleType } ?:
             Order.VehicleType.CAR
         PdfHeader header = new PdfHeader(centre, order, inspectionName, savedInspection, vehicleType)
+
+        /* Si en una revisión de neumáticos no hay hoja de neumáticos, pero sí imágenes, debe haber una sola página */
+        boolean onePage = savedInspection.inspectionTypeCode ==
+            Constants.InspectionType.N && !tyreCategories && groupedImageCategories
+
         if (tyreCategories) {
             pages << new TyresPage(header, savedInspection, tyreCategories, vehicleType, options)
         }
         groupedCategories.each {
-            pages << (PdfInspectionPage) new ItemsPage(header, savedInspection, it, vehicleType)
+            pages << (PdfInspectionPage) new ItemsPage(header, savedInspection, it, vehicleType, onePage)
         }
         groupedImageCategories.each {
-            pages << (PdfInspectionPage) new ImagesPage(header, savedInspection, it, vehicleType)
+            pages << (PdfInspectionPage) new ImagesPage(header, savedInspection, it, vehicleType, onePage)
         }
     }
 

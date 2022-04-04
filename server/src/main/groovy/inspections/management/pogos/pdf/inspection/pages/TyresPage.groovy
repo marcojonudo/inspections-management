@@ -21,7 +21,7 @@ class TyresPage extends PdfInspectionPage {
         VehicleType vehicleType,
         List<SelectItemOption> options
     ) {
-        super(header, vehicleType)
+        super(header, vehicleType, false)
         SavedItem visualControlSavedItem = savedInspection.items.find { it.item.code == Constants.ItemCode.CVGN }
         SavedItem measurementSavedItem = savedInspection.items.find { it.item.code == Constants.ItemCode.PN }
         SavedItem pressureSavedItem = savedInspection.items.find { it.item.code == Constants.ItemCode.PPN }
