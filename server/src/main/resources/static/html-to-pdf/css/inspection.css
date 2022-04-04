@@ -18,6 +18,12 @@ body {
     left: 0;
 }
 
+.relative-content-wrapper {
+    position: relative;
+    top: 0;
+    left: 0;
+}
+
 .background-image {
     height: 875px;
     position: absolute;

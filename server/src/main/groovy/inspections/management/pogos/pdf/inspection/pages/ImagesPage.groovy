@@ -14,9 +14,13 @@ import inspections.management.utils.Constants
 class ImagesPage extends PdfInspectionPage {
 
     ImagesPage(
-        PdfHeader header, SavedInspection savedInspection, List<CategoryItems> categories, VehicleType vehicleType
+        PdfHeader header,
+        SavedInspection savedInspection,
+        List<CategoryItems> categories,
+        VehicleType vehicleType,
+        boolean onePage
     ) {
-        super(header, vehicleType)
+        super(header, vehicleType, onePage)
         this.categories = categories.collect {
             (Card) (it.category ? new ImageCategoryCard(it) : new ImageItemCategoryCard(it.items[0]))
         }

@@ -13,9 +13,13 @@ import inspections.management.utils.Constants
 class ItemsPage extends PdfInspectionPage {
 
     ItemsPage(
-        PdfHeader header, SavedInspection savedInspection, List<CategoryItems> categories, Order.VehicleType vehicleType
+        PdfHeader header,
+        SavedInspection savedInspection,
+        List<CategoryItems> categories,
+        Order.VehicleType vehicleType,
+        boolean onePage
     ) {
-        super(header, vehicleType)
+        super(header, vehicleType, onePage)
         /* Si la revisión es de neumáticos, no se hace un page-break para que las imágenes salgan en la misma hoja */
         this.classes = savedInspection.inspectionTypeCode == Constants.InspectionType.N ? (List<String>) [] : this.classes
         this.categories = categories.collect { it.category ? new CategoryCard(it) : new ItemCategoryCard(it.items[0])}

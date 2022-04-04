@@ -14,20 +14,22 @@ class PdfInspectionPage extends IPdf {
     Order.VehicleType vehicleType
     boolean printHeader
     boolean tyrePage
+    boolean onePage
 
-    PdfInspectionPage(PdfHeader header, Order.VehicleType vehicleType) {
+    PdfInspectionPage(PdfHeader header, Order.VehicleType vehicleType, boolean onePage) {
         this.classes = ["page"]
         this.header = header
         this.vehicleType = vehicleType
         this.printHeader = true
         this.tyrePage = false
+        this.onePage = onePage
     }
 
     String toHtml() {
         return """
             <div class="${findClasses()}">
-                ${tyrePage ? '' : "<img class=\"background-image\" src=\"img/backgrounds/${vehicleType.backgroundImage}\"/>"}
-                <div class="content-wrapper">
+                ${tyrePage || onePage ? '' : "<img class=\"background-image\" src=\"img/backgrounds/${vehicleType.backgroundImage}\"/>"}
+                <div class="${onePage ? 'relative-content-wrapper' : 'content-wrapper'}">
                     ${printHeader ? header.toHtml() : ''}
                     <div class="categories-container">
                         ${categories.collect { it.toHtml() }.join("\n")}
