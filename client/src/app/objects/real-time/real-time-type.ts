@@ -1,8 +1,7 @@
 import { RealTimeService } from '../../services/real-time.service';
-import { OrderInspectionVehicle } from '../order-inspection-vehicle';
+import { OrderInspection } from '../order-inspection';
 import { Builder } from '../../utils/builder';
 import { InspectionService } from '../../services/inspection.service';
-import { Order } from '../orders/order';
 import { RealTimeOrderCreate } from './update/orders/real-time-order-create';
 import { SavedInspection } from '../inspections/saved-inspection';
 import { RealTimeSavedInspectionCreate } from './update/saved-inspections/real-time-saved-inspection-create';
@@ -16,9 +15,11 @@ export class RealTimeType {
 	static readonly ORDER_INSPECTIONS = new RealTimeType(
 		'ORDER_INSPECTIONS',
 		(realTimeService: RealTimeService, info: any) =>
-			realTimeService.syncOrders(info.orderInspections.map(d => new OrderInspectionVehicle(d)).filter(o => o.inspection)),
-		(orders: Order[], syncedOrder: Order) => new RealTimeOrderCreate(orders, syncedOrder),
-		(orders: Order[], order: Order, syncedOrder: Order) => new RealTimeOrderUpdate(orders, order, syncedOrder)
+			realTimeService.syncOrders(info.orderInspections.map(d => new OrderInspection(d)).filter(o => o.inspection)),
+		(orderInspections: OrderInspection[], syncedOrderInspection: OrderInspection) =>
+			new RealTimeOrderCreate(orderInspections, syncedOrderInspection),
+		(orderInspections: OrderInspection[], orderInspection: OrderInspection, syncedOrderInspection: OrderInspection) =>
+			new RealTimeOrderUpdate(orderInspections, orderInspection, syncedOrderInspection)
 	);
 	static readonly SAVED_INSPECTION = new RealTimeType(
 		'SAVED_INSPECTION',

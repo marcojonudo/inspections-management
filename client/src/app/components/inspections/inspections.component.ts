@@ -3,7 +3,7 @@ import { InspectionService } from '../../services/inspection.service';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ItemBudget } from '../../objects/item-budget';
-import { OrderInspectionVehicle } from '../../objects/order-inspection-vehicle';
+import { OrderInspection } from '../../objects/order-inspection';
 import { EmployeeService } from '../../services/employee.service';
 import { Employee } from '../../objects/employee';
 import { Constants } from '../../utils/constants';
@@ -54,7 +54,7 @@ export class InspectionsComponent implements OnDestroy {
 		private snackBarService: SnackBarService
 	) {
 		this.columnsToDisplay = this.COLUMNS;
-		const orderInspections = this.filterInspections();
+		const orderInspections = InspectionService.filterOrderInspections();
 		const rows = this.buildRows(orderInspections);
 		this.rows = InspectionService.sortInspectionsRows(rows);
 		this.budgetNotificationsSubscription = this.inspectionService.inspectionsTrigger$.subscribe(() => {
@@ -64,20 +64,16 @@ export class InspectionsComponent implements OnDestroy {
 		});
 		this.realTimeActionsSubscription = this.realTimeService.realTimeActions$.subscribe(realTimeActions => {
 			if (realTimeActions.length) {
-				console.log('Inspections real time updates', realTimeActions);
-				let newRows = [];
-				this.rows.forEach(column => {
-					realTimeActions.forEach(realTimeUpdate => {
-						const existent = column.orderNumber === realTimeUpdate.findOrderNumber();
-						if (existent) {
-							newRows = realTimeUpdate.updateInspectionsLayout(column, this.rows);
-						}
-					});
+				console.log('Inspections real time actions', realTimeActions);
+				realTimeActions.forEach(action => {
+					const existentRow = this.rows.find(r => r.orderNumber === action.findOrderNumber());
+					action.updateInspectionsLayout(this.rows, existentRow);
 				});
-				if (newRows.length) {
-					this.rows = newRows;
+				if (realTimeActions.length) {
+					this.rows = InspectionService.sortInspectionsRows(this.rows).slice();
+					console.log('Updated rows', this.rows);
+					this.cdRef.detectChanges();
 				}
-				this.cdRef.detectChanges();
 			}
 		});
 	}
@@ -87,11 +83,7 @@ export class InspectionsComponent implements OnDestroy {
 		this.realTimeActionsSubscription.unsubscribe();
 	}
 
-	filterInspections(orderInspections: OrderInspectionVehicle[] = InspectionService.orderInspections): OrderInspectionVehicle[] {
-		return orderInspections.filter(o => o.order.keys && o.order.state !== Constants.ORDER_STATE.V);
-	}
-
-	buildRows(orderInspections: OrderInspectionVehicle[], columnsData: any = Constants.INSPECTIONS_COLUMN_DATA): InspectionsColumn[] {
+	buildRows(orderInspections: OrderInspection[], columnsData: any = Constants.INSPECTIONS_COLUMN_DATA): InspectionsColumn[] {
 		const rows = [];
 		orderInspections.forEach(orderInspection => {
 			const row = InspectionService.buildInspectionsRow(orderInspection.order, columnsData);
@@ -117,7 +109,7 @@ export class InspectionsComponent implements OnDestroy {
 		return this.translate.instant(`inspection.state.${state}`);
 	}
 
-	checkRecommendedBudget(itemBudgets: ItemBudget[], a, b): boolean {
+	checkRecommendedBudget(itemBudgets: ItemBudget[]): boolean {
 		return itemBudgets.length > 0;
 	}
 
@@ -137,7 +129,7 @@ export class InspectionsComponent implements OnDestroy {
 		const existentSavedInspection = this.inspectionService.selectInspection(orderNumber);
 		if (!existentSavedInspection?.items?.length) {
 			const messageCode = existentSavedInspection ?
-				Constants.MESSAGE_CODE.NOT_FINISHED_SAVED_INSPECTION : Constants.MESSAGE_CODE.ORDER_WITHOUT_SAVED_INSPECTION
+				Constants.MESSAGE_CODE.NOT_FINISHED_SAVED_INSPECTION : Constants.MESSAGE_CODE.ORDER_WITHOUT_SAVED_INSPECTION;
 			this.snackBarService.open(messageCode, Constants.SNACK_BAR.TYPE.WARNING);
 		}
 	}

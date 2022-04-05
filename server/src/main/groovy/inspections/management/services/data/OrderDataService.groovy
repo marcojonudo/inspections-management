@@ -1,5 +1,6 @@
 package inspections.management.services.data
 
+import grails.gorm.services.Query
 import grails.gorm.services.Service
 import grails.gorm.services.Where
 import grails.gorm.transactions.Transactional
@@ -28,7 +29,7 @@ abstract class OrderDataService {
 	@Where({ day == day && !(state in Constants.CLOSED_ORDER_STATES) })
 	abstract List<Order> findAllOrders(LocalDate day)
 
-	@Where({ day >= from && day < to && !(state in Constants.CLOSED_ORDER_STATES) })
+	@Where({ day >= from && day < to && state != Constants.CANCELED_ORDER_STATE })
 	abstract List<Order> findAllOrders(LocalDate from, LocalDate to)
 
 	@Where({ number in numbers })

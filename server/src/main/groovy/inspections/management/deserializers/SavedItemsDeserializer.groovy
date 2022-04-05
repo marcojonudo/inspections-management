@@ -12,7 +12,7 @@ import inspections.management.domains.savedItems.SavedItem
 import inspections.management.pogos.logs.Jackson
 
 @CompileStatic
-class SavedItemsDeserializer extends StdDeserializer<Set<SavedItem>> {
+class SavedItemsDeserializer extends StdDeserializer<List<SavedItem>> {
 
 	SavedItemsDeserializer() {
 		this(null)
@@ -23,14 +23,14 @@ class SavedItemsDeserializer extends StdDeserializer<Set<SavedItem>> {
 	}
 
 	@Override
-	Set<SavedItem> deserialize(JsonParser parser, DeserializationContext deserializationContext)
+	List<SavedItem> deserialize(JsonParser parser, DeserializationContext deserializationContext)
 		throws IOException, JsonProcessingException {
 		ArrayNode node = (ArrayNode) parser.getCodec().readTree(parser)
-		Set<SavedItem> savedItems = node.collect {
+		List<SavedItem> savedItems = node.collect {
 			JsonNode itemNode = it.get("item")
 			Item.Type type = Item.Type.valueOf(itemNode.get("type").asText())
 			return (SavedItem) Jackson.convertValue(it, type.savedItemClazz)
-		}.toSet()
+		}
 		return savedItems
 	}
 

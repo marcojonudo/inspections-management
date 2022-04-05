@@ -1,31 +1,37 @@
-import { Order } from '../../../orders/order';
 import { RealTimeAction } from '../real-time-action';
+import { OrderInspection } from '../../../order-inspection';
 
 export abstract class RealTimeOrder extends RealTimeAction {
 
-	protected orders: Order[];
-	protected syncedOrders: Order[];
-	order: Order;
-	syncedOrder: Order;
+	protected orderInspections: OrderInspection[];
+	protected syncedOrderInspections: OrderInspection[];
+	orderInspection: OrderInspection;
+	syncedOrderInspection: OrderInspection;
 
-	protected constructor(type: string, orders: Order[], syncedOrders: Order[], order: Order, syncedOrder: Order) {
+	protected constructor(
+		type: string,
+		orderInspections: OrderInspection[],
+		syncedOrderInspections: OrderInspection[],
+		orderInspection: OrderInspection,
+		syncedOrderInspection: OrderInspection
+	) {
 		super(type);
-		this.orders = orders;
-		this.syncedOrders = syncedOrders;
-		this.order = order;
-		this.syncedOrder = syncedOrder;
+		this.orderInspections = orderInspections;
+		this.syncedOrderInspections = syncedOrderInspections;
+		this.orderInspection = orderInspection;
+		this.syncedOrderInspection = syncedOrderInspection;
 	}
 
 	findOrderNumber(): number {
-		return (this.order || this.syncedOrder).number;
+		return (this.orderInspection || this.syncedOrderInspection).order.number;
 	}
 
-	findIndex(orders: Order[], order: Order): number {
-		return orders.findIndex(o => o.number === order.number);
+	findIndex(orders: OrderInspection[], orderInspection: OrderInspection): number {
+		return orders.findIndex(o => o.order.number === orderInspection.order.number);
 	}
 
-	find(order: Order): Order {
-		return this.orders.find(o => o.number === order.number);
+	find(orderInspection: OrderInspection): OrderInspection {
+		return this.orderInspections.find(o => o.order.number === orderInspection.order.number);
 	}
 
 }

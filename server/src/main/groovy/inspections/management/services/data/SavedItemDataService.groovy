@@ -2,6 +2,7 @@ package inspections.management.services.data
 
 
 import grails.gorm.services.Service
+import grails.gorm.services.Where
 import grails.gorm.transactions.Transactional
 import inspections.management.domains.savedItems.SavedItem
 
@@ -14,6 +15,11 @@ abstract class SavedItemDataService {
 	@Inject TextSavedItemDataService textSavedItemDataService
 	@Inject SelectSavedItemDataService selectSavedItemDataService
 	@Inject TextAreaSavedItemDataService textAreaSavedItemDataService
+
+	@Where({ savedInspectionId in savedInspectionIds })
+	abstract List<SavedItem> findAll(List<Integer> savedInspectionIds)
+
+	abstract List<SavedItem> findAll(long savedInspectionId)
 
 	abstract SavedItem update(Serializable id, String employeeCode, boolean hidden, LocalDateTime filled)
 

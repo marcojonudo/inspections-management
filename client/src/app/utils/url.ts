@@ -1,4 +1,6 @@
 import { environment } from '../../environments/environment';
+import { Dayjs } from 'dayjs';
+import { Constants } from './constants';
 
 export class Url {
 
@@ -15,7 +17,7 @@ export class Url {
 	}
 
 	static savedInspections(): string {
-		return `${environment.serverUrl}/inspection/savedInspections`;
+		return `${environment.serverUrl}/savedInspections`;
 	}
 
 	static savedInspection(): string {
@@ -28,6 +30,10 @@ export class Url {
 
 	static articleItems(): string {
 		return `${environment.serverUrl}/inspection/articleItems`;
+	}
+
+	static selectItemOptions(): string {
+		return `${environment.serverUrl}/selectItemOptions`;
 	}
 
 	static itemBudgets(): string {

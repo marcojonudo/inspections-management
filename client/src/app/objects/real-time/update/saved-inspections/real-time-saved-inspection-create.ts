@@ -19,12 +19,12 @@ export class RealTimeSavedInspectionCreate extends RealTimeSavedInspection {
 		this.savedInspections.push(this.syncedSavedInspection);
 	}
 
-	updateInspectionsLayout(column: InspectionsColumn, columns: InspectionsColumn[]): InspectionsColumn[] {
-		column.inspectionState = this.syncedSavedInspection.state;
+	updateInspectionsLayout(rows: InspectionsColumn[], row: InspectionsColumn): InspectionsColumn[] {
+		row.inspectionState = this.syncedSavedInspection.state;
 		const orderInspection = InspectionService.findOrderInspection(this.syncedSavedInspection.orderNumber);
-		column.mechanic = InspectionService.findMechanicCode(orderInspection.order, this.syncedSavedInspection);
-		column.budgets = this.syncedSavedInspection.itemBudgets;
-		return InspectionService.sortInspectionsRows(columns).slice();
+		row.mechanic = InspectionService.findMechanicCode(orderInspection.order, this.syncedSavedInspection);
+		row.budgets = this.syncedSavedInspection.itemBudgets;
+		return rows;
 	}
 
 	updateDetailsLayout(columns: InspectionDetailsColumn[]): InspectionDetailsColumn[] {

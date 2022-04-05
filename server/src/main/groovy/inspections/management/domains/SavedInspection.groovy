@@ -32,13 +32,9 @@ class SavedInspection implements GormEntity<SavedInspection> {
 	LocalDateTime sent
 
 	@JsonDeserialize(using = SavedItemsDeserializer)
-	Set<SavedItem> items
+	List<SavedItem> items
 
-	static hasMany = [items: SavedItem]
-
-	static mapping = {
-		items fetch: 'join'
-	}
+	static transients = ['items']
 
 	static constraints = {
 		sent nullable: true

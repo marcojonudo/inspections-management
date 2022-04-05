@@ -3,11 +3,10 @@ import { OrdersFilter } from '../../objects/filters/orders-filter';
 import { PendingOrdersFilter } from '../../objects/filters/pending-orders-filter';
 import { TodayOrdersFilter } from '../../objects/filters/today-orders-filter';
 import { InspectionService } from '../../services/inspection.service';
-import { OrderInspectionVehicle } from '../../objects/order-inspection-vehicle';
+import { OrderInspection } from '../../objects/order-inspection';
 import { Subscription } from 'rxjs';
 import { Constants } from '../../utils/constants';
 import { ItemBudget } from '../../objects/item-budget';
-import { SavedInspection } from '../../objects/inspections/saved-inspection';
 import { RealTimeService } from '../../services/real-time.service';
 
 @Component({
@@ -59,7 +58,7 @@ export class SummaryComponent implements OnDestroy {
 		return Constants.BUDGET_TYPE.SECONDARY;
 	}
 
-	get orderInspections(): OrderInspectionVehicle[] {
+	get orderInspections(): OrderInspection[] {
 		return InspectionService.orderInspections;
 	}
 
@@ -80,12 +79,16 @@ export class SummaryComponent implements OnDestroy {
 		return InspectionService.findBudgetsPrice(budgets);
 	}
 
-	findAcceptedBudgetsPrice(savedInspections: SavedInspection[] = InspectionService.savedInspections): number {
+	findAcceptedBudgetsPrice(orderInspections: OrderInspection[] = this.orderInspections): number {
 		const acceptedBudgets = [];
-		savedInspections.forEach(savedInspection => {
-			const orderInspection = InspectionService.findOrderInspection(savedInspection.orderNumber);
+		// TODO Ahora mismo orderiNspections contieen or sin revision. Valorar dejar sólo aquella que sí tienen
+		orderInspections.forEach(orderInspection => {
+			const savedInspection = orderInspection.inspection ?
+				InspectionService.findSavedInspection(orderInspection.order.number) : undefined;
+
+			// const orderInspection = InspectionService.findOrderInspection(savedInspection.orderNumber);
 			/* Si hay una revisión guardada, pero la orden no tiene código de revisión, no existe orderInspection */
-			if (orderInspection) {
+			if (savedInspection) {
 				savedInspection.itemBudgets.forEach(itemBudget => {
 					const budget = InspectionService.findExistentBudget(
 						itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
@@ -102,11 +105,12 @@ export class SummaryComponent implements OnDestroy {
 		return InspectionService.findBudgetsPrice(acceptedBudgets);
 	}
 
-	findDoneItemBudgets(savedInspections: SavedInspection[] = InspectionService.savedInspections): ItemBudget[] {
+	findDoneItemBudgets(orderInspections: OrderInspection[] = this.orderInspections): ItemBudget[] {
 		const doneBudgets = [];
-		savedInspections.forEach(savedInspection => {
-			const orderInspection = InspectionService.findOrderInspection(savedInspection.orderNumber);
-			if (orderInspection) {
+		orderInspections.forEach(orderInspection => {
+			const savedInspection = orderInspection.inspection ?
+				InspectionService.findSavedInspection(orderInspection.order.number) : undefined;
+			if (savedInspection) {
 				const doneOrderBudgets = savedInspection.itemBudgets.filter(itemBudget =>
 					InspectionService.findExistentBudget(
 						itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
@@ -118,11 +122,12 @@ export class SummaryComponent implements OnDestroy {
 		return doneBudgets;
 	}
 
-	findAcceptedItemBudgets(savedInspections: SavedInspection[] = InspectionService.savedInspections): ItemBudget[] {
+	findAcceptedItemBudgets(orderInspections: OrderInspection[] = this.orderInspections): ItemBudget[] {
 		const doneBudgets = [];
-		savedInspections.forEach(savedInspection => {
-			const orderInspection = InspectionService.findOrderInspection(savedInspection.orderNumber);
-			if (orderInspection) {
+		orderInspections.forEach(orderInspection => {
+			const savedInspection = orderInspection.inspection ?
+				InspectionService.findSavedInspection(orderInspection.order.number) : undefined;
+			if (savedInspection) {
 				const doneOrderBudgets = savedInspection.itemBudgets.filter(itemBudget => {
 					const budget = InspectionService.findExistentBudget(
 						itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
@@ -141,22 +146,27 @@ export class SummaryComponent implements OnDestroy {
 
 	findNotFinishedInspectionOrders(): number {
 		return this.orderInspections.filter(orderInspection => {
-			const savedInspection = InspectionService.findSavedInspection(orderInspection.order.number);
-			return Constants.NOT_FINISHED_ORDER_STATES.find(s => s === orderInspection.order.state) !== undefined &&
+			const savedInspection = orderInspection.inspection ?
+				InspectionService.findSavedInspection(orderInspection.order.number) : undefined;
+			return Constants.PENDING_INSPECTION_ORDER_STATES.find(s => s === orderInspection.order.state) !== undefined &&
 				savedInspection?.state !== Constants.INSPECTION_STATE.FINISHED;
 		}).length;
 	}
 
-	findFinishedInspections(): number {
-		return this.orderInspections.filter(orderInspection => {
+	findFinishedInspections(): OrderInspection[] {
+		return this.findPendingInspections().filter(orderInspection => {
 			const savedInspection = InspectionService.findSavedInspection(orderInspection.order.number);
 			return savedInspection?.state === Constants.INSPECTION_STATE.FINISHED;
-		}).length;
+		});
+	}
+
+	findPendingInspections(orderInspections: OrderInspection[] = this.orderInspections): OrderInspection[] {
+		return orderInspections.filter(o => o.inspection);
 	}
 
 	findWrongItemsPercentage(): number {
 		const savedInspections = [];
-		this.orderInspections.forEach(o => {
+		this.findPendingInspections().forEach(o => {
 			const savedInspection = InspectionService.findSavedInspection(o.order.number);
 			if (savedInspection) {
 				savedInspections.push(savedInspection);

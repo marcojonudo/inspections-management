@@ -1,7 +1,6 @@
 package inspections.management.domains.savedItems
 
 import com.fasterxml.jackson.annotation.JsonFormat
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import grails.gorm.annotation.Entity
@@ -18,8 +17,7 @@ import java.time.LocalDateTime
 @Entity
 abstract class SavedItem implements GormEntity<SavedItem> {
 
-	@JsonIgnore
-	SavedInspection savedInspection
+	long savedInspectionId
 
 	@JsonDeserialize(using = ItemDeserializer)
 	Item item

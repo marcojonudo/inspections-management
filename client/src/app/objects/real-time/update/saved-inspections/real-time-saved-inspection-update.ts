@@ -60,20 +60,23 @@ export class RealTimeSavedInspectionUpdate extends RealTimeSavedInspection {
 		}
 	}
 
-	updateInspectionsLayout(column: InspectionsColumn, columns: InspectionsColumn[]): InspectionsColumn[] {
+	updateInspectionsLayout(rows: InspectionsColumn[], row: InspectionsColumn): InspectionsColumn[] {
 		return [];
 	}
 
-	updateDetailsLayout(columns: InspectionDetailsColumn[]): InspectionDetailsColumn[] {
-		if (columns.length > this.savedInspection.itemBudgets.length) {
-			const i = columns.findIndex(c => !this.savedInspection.itemBudgets.find(b => b.itemCode === c.item.itemCode));
-			columns.splice(i, 1);
-		} else if (columns.length < this.savedInspection.itemBudgets.length) {
-			const newItemBudget = this.savedInspection.itemBudgets.find(b => !columns.find(c => c.item.itemCode === b.itemCode));
-			const newColumn = InspectionService.buildInspectionDetailsRow(newItemBudget);
-			columns.push(newColumn);
+	updateDetailsLayout(rows: InspectionDetailsColumn[]): InspectionDetailsColumn[] {
+		if (rows.length > this.savedInspection.itemBudgets.length) {
+			rows = rows.filter(row =>
+				!this.savedInspection.itemBudgets.findIndex(b => b.itemCode === row.item.itemCode)
+			);
+		} else if (rows.length < this.savedInspection.itemBudgets.length) {
+			const newItemBudgets = this.savedInspection.itemBudgets.filter(b => !rows.find(c => c.item.itemCode === b.itemCode));
+			newItemBudgets.forEach(itemBudget => {
+				const newRow = InspectionService.buildInspectionDetailsRow(itemBudget);
+				rows.push(newRow);
+			});
 		}
-		return columns.slice();
+		return rows.slice();
 	}
 
 }

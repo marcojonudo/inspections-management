@@ -6,7 +6,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Budget } from '../../objects/orders/budget';
 import { Employee } from '../../objects/employee';
 import { EmployeeService } from '../../services/employee.service';
-import { OrderInspectionVehicle } from '../../objects/order-inspection-vehicle';
+import { OrderInspection } from '../../objects/order-inspection';
 import { SavedInspection } from '../../objects/inspections/saved-inspection';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Constants } from '../../utils/constants';
@@ -37,7 +37,7 @@ export class InspectionDetailsComponent implements OnDestroy {
 	private realTimeActionsSubscription: Subscription;
 
 	columnsToDisplay: string[];
-	orderInspection: OrderInspectionVehicle;
+	orderInspection: OrderInspection;
 	savedInspection: SavedInspection;
 	mechanics: Employee[];
 	data: InspectionDetailsColumn[];
@@ -68,14 +68,15 @@ export class InspectionDetailsComponent implements OnDestroy {
 
 		this.realTimeActionsSubscription = this.realTimeService.realTimeActions$.subscribe(realTimeActions => {
 			if (realTimeActions.length && this.orderInspection) {
-				console.log('real time actions', realTimeActions);
+				console.log('Details real time actions', realTimeActions);
 				const selectedOrderUpdate = realTimeActions.find(update => update.findOrderNumber() === this.orderInspection.order.number);
 				if (selectedOrderUpdate) {
 					const newRows = selectedOrderUpdate.updateDetailsLayout(this.data);
-					if (newRows.length) {
+					if (newRows.length || newRows.length !== this.data.length) {
 						this.data = newRows;
+						console.log('Updated rows', this.data);
+						this.cdRef.detectChanges();
 					}
-					this.cdRef.detectChanges();
 				}
 			}
 		});
@@ -87,7 +88,7 @@ export class InspectionDetailsComponent implements OnDestroy {
 	}
 
 	buildData(
-		orderInspection: OrderInspectionVehicle,
+		orderInspection: OrderInspection,
 		savedInspection: SavedInspection,
 		columnsData: any = Constants.INSPECTION_DETAILS_COLUMN_DATA
 	): InspectionDetailsColumn[] {
@@ -114,11 +115,11 @@ export class InspectionDetailsComponent implements OnDestroy {
 		return EmployeeService.findEmployee(code);
 	}
 
-	checkNotifiedClient(orderInspection: OrderInspectionVehicle = this.orderInspection): boolean {
+	checkNotifiedClient(orderInspection: OrderInspection = this.orderInspection): boolean {
 		return orderInspection ? InspectionService.findBudgetNotifications(orderInspection.order.number).length > 0 : false;
 	}
 
-	checkExistentBudget(itemBudget: ItemBudget, orderInspection: OrderInspectionVehicle = this.orderInspection): boolean {
+	checkExistentBudget(itemBudget: ItemBudget, orderInspection: OrderInspection = this.orderInspection): boolean {
 		return InspectionService.findExistentBudget(
 			itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
 		) !== undefined;
@@ -134,7 +135,7 @@ export class InspectionDetailsComponent implements OnDestroy {
 
 	updateNotifiedClient(
 		notified: boolean,
-		orderInspection: OrderInspectionVehicle = this.orderInspection,
+		orderInspection: OrderInspection = this.orderInspection,
 		savedInspection: SavedInspection = this.savedInspection
 	): void {
 		let observable;

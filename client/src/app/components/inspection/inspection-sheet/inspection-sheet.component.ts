@@ -17,6 +17,7 @@ import { TextItemField } from '../../../objects/inspections/items/text-item-fiel
 import { TextSavedItemField } from '../../../objects/inspections/saved-items/text-saved-item-field';
 import { VehicleType } from '../../../objects/orders/vehicles/vehicle-type';
 import { CategoryItems } from '../../../objects/print/category-items';
+import { GroupedItemOptions } from '../../../objects/inspections/items/grouped-item-options';
 
 @Component({
 	selector: 'app-inspection-sheet',
@@ -57,11 +58,13 @@ export class InspectionSheetComponent {
 		return value === optionCode;
 	}
 
-	checkLeftOption(savedItem: SelectSavedItem, options: SelectItemOption[], i: number): boolean {
+	checkLeftOption(savedItem: SelectSavedItem, i: number): boolean {
+		const options = this.findSelectItemOptions(savedItem);
 		return i < this.findOptionIndex(savedItem, options);
 	}
 
-	checkRightOption(savedItem: SelectSavedItem, options: SelectItemOption[], i: number): boolean {
+	checkRightOption(savedItem: SelectSavedItem, i: number): boolean {
+		const options = this.findSelectItemOptions(savedItem);
 		return i > this.findOptionIndex(savedItem, options);
 	}
 
@@ -69,8 +72,10 @@ export class InspectionSheetComponent {
 		return optionType === type;
 	}
 
-	findSelectItem(item: Item): SelectItem {
-		return item as SelectItem;
+	findSelectItemOptions(
+		savedItem: SavedItem, groupedItemOptions: GroupedItemOptions[] = InspectionService.groupedItemOptions
+	): SelectItemOption[] {
+		return groupedItemOptions.find(o => o.itemCode === savedItem.item.code).options;
 	}
 
 	findTextItem(savedItem: SavedItem): TextItem {

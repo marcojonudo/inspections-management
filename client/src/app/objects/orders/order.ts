@@ -3,11 +3,10 @@ import { Client } from './client';
 import { Budget } from './budget';
 import { Vehicle } from './vehicles/vehicle';
 import { Builder } from '../../utils/builder';
-import { RealTimeObject } from '../real-time/update/real-time-object';
 import { Dayjs } from 'dayjs';
 import * as dayjs from 'dayjs';
 
-export class Order implements RealTimeObject {
+export class Order {
 
 	number: number;
 	code: string;

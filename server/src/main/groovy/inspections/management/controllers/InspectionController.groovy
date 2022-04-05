@@ -11,6 +11,7 @@ import inspections.management.domains.schedules.EmployeeData
 import inspections.management.pogos.OrderInspection
 import inspections.management.pogos.RealTimePublisher
 import inspections.management.pogos.realTime.RealTimeInfo
+import inspections.management.pogos.realTime.RealTimeOrders
 import inspections.management.pogos.realTime.RealTimeSavedInspection
 import inspections.management.services.InspectionService
 import inspections.management.services.data.*
@@ -126,25 +127,11 @@ class InspectionController {
         content = @Content(array = @ArraySchema(schema = @Schema(implementation = OrderInspection)))
     )
     List<OrderInspection> findInspections(@Body Map<String, List<Order>> orders) {
-        List<OrderInspection> orderInspections = inspectionService.findOrderInspections(orders.openedOrders)
+        List<OrderInspection> orderInspections = inspectionService.findOrderInspections(orders.orders)
         List<OrderInspection> detectedAnomaliesOrderInspections = inspectionService.findDetectedAnomaliesInspections(
             orders.detectedAnomaliesOrders
         )
         return orderInspections + detectedAnomaliesOrderInspections
-    }
-
-    @Post("/savedInspections")
-    @Operation(
-        summary = "Obtiene las revisiones guardadas",
-        description = "Obtiene las revisiones guardadas en base de datos"
-    )
-    @ApiResponse(
-        responseCode = "200",
-        description = "Lista de revisiones guardadas",
-        content = @Content(array = @ArraySchema(schema = @Schema(implementation = SavedInspection)))
-    )
-    List<SavedInspection> findSavedInspections(@Body List<Integer> orders) {
-        return savedInspectionDataService.findAll(orders)
     }
 
     @Get("/articleItems")
