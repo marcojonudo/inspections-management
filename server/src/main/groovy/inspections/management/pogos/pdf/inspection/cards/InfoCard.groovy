@@ -8,7 +8,6 @@ import inspections.management.pogos.pdf.inspection.cards.title.CardTitle
 import inspections.management.pogos.pdf.structure.cards.KeyValueCard
 import inspections.management.pogos.pdf.structure.elements.KeyValueSection
 
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @CompileStatic
@@ -19,7 +18,7 @@ class InfoCard extends KeyValueCard {
         this.title = new CardTitle("img/icons/info.svg", CustomMessageSource.getMessage("print.info.title"))
         this.sections = [
             new KeyValueSection(CustomMessageSource.getMessage("print.info.day"),
-            LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+            savedInspection.saved.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
         ]
         if (order.sellerCode) {
             this.sections << new KeyValueSection(CustomMessageSource.getMessage("print.info.seller"), order.sellerCode)

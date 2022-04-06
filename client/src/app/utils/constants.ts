@@ -157,10 +157,6 @@ export class Constants {
 		budget: (i: ItemBudget, savedItem: SavedItem, budget: Budget) => budget
 	};
 
-	static readonly INSPECTION_TYPE: any = {
-		N: 'N'
-	};
-
 	static readonly PENDING_INSPECTION_ORDER_STATES: string[] = [
 		Constants.ORDER_STATE.F,
 		Constants.ORDER_STATE.C,

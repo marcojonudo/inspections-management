@@ -9,12 +9,16 @@ import { RealTimeBudgetUpdate } from '../budgets/real-time-budget-update';
 import { InspectionDetailsColumn } from '../../../../components/inspection-details/inspection-details.component';
 import { OrderInspection } from '../../../order-inspection';
 import { Order } from '../../../orders/order';
+import { RealTimeOrderUpdateType } from './real-time-order-update-type';
+import { InspectionService } from '../../../../services/inspection.service';
 
 export class RealTimeOrderUpdate extends RealTimeOrder {
 
+	updateTypes: RealTimeOrderUpdateType[];
 	realTimeBudgets: RealTimeBudget[];
 
 	readonly ORDER_UPDATE_PROPERTIES: ((order: Order) => void)[] = [
+		(order: Order) => order.state,
 		(order: Order) => order.code,
 		(order: Order) => order.sellerCode,
 		(order: Order) => order.mechanicCode,
@@ -29,12 +33,14 @@ export class RealTimeOrderUpdate extends RealTimeOrder {
 		orderInspections: OrderInspection[], orderInspection: OrderInspection, syncedOrderInspection: OrderInspection
 	) {
 		super(Constants.REAL_TIME_UPDATE_TYPE.UPDATE, orderInspections, undefined, orderInspection, syncedOrderInspection);
+		this.updateTypes = [];
 	}
 
 	check(): boolean {
+		this.updateTypes = RealTimeOrderUpdateType.findAll(this.orderInspection.order, this.syncedOrderInspection.order);
 		const updated = this.ORDER_UPDATE_PROPERTIES.find(updateProperty =>
 			updateProperty(this.orderInspection.order) !== updateProperty(this.syncedOrderInspection.order)
-		) !== undefined;
+		);
 		/* Al comprobar si se debe actualizar la OR, también se rellena el array de actualizaciones de presupuestos (al formar estos
 		 * parte de la OR). De esta forma, cuando se ejecute el update, se llevarán a cabo todas las acciones pendientes */
 		const syncedUpdates = this.handleSyncedBudgets(this.syncedOrderInspection.order.budgets, this.orderInspection.order.budgets);
@@ -42,7 +48,7 @@ export class RealTimeOrderUpdate extends RealTimeOrder {
 		this.realTimeBudgets = syncedUpdates.concat(existentDataUpdates);
 
 		/* Una OR se considera actualizada cuando cambia algún campo, o cuando cambia algún presupuesto */
-		return updated || this.realTimeBudgets.length !== 0;
+		return this.updateTypes.length > 0 || this.realTimeBudgets.length !== 0;
 	}
 
 	handleSyncedBudgets(syncedBudgets: Budget[], budgets: Budget[]): RealTimeBudget[] {
@@ -75,21 +81,18 @@ export class RealTimeOrderUpdate extends RealTimeOrder {
 	}
 
 	update(): void {
-		this.orderInspection.order.code = this.syncedOrderInspection.order.code;
-		this.orderInspection.order.sellerCode = this.syncedOrderInspection.order.sellerCode;
-		this.orderInspection.order.mechanicCode = this.syncedOrderInspection.order.mechanicCode;
-		this.orderInspection.order.keys = this.syncedOrderInspection.order.keys;
-		this.orderInspection.order.vehicle.type = this.syncedOrderInspection.order.vehicle.type;
-		this.orderInspection.order.vehicle.identifier = this.syncedOrderInspection.order.vehicle.identifier;
-		this.orderInspection.order.vehicle.model = this.syncedOrderInspection.order.vehicle.model;
-		this.orderInspection.order.vehicle.brand = this.syncedOrderInspection.order.vehicle.brand;
-
+		this.updateTypes.forEach(updateType => updateType.update(this.orderInspection.order, this.syncedOrderInspection.order));
 		this.realTimeBudgets.forEach(realTimeBudget => realTimeBudget.update());
 	}
 
 	updateInspectionsLayout(rows: InspectionsColumn[], row: InspectionsColumn): InspectionsColumn[] {
 		row.brand = this.orderInspection.order.vehicle.brand;
 		row.model = this.orderInspection.order.vehicle.model;
+
+		if (!InspectionService.checkOpenedOrder(this.orderInspection.order)) {
+			const i = rows.findIndex(c => c.orderNumber === this.orderInspection.order.number);
+			rows.splice(i, 1);
+		}
 		return rows;
 	}
 

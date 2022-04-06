@@ -49,6 +49,7 @@ export class InspectionService {
 
 	static orders: Order[];
 	static openedOrders: Order[];
+	static detectedAnomaliesOrders: Order[];
 	static orderInspections: OrderInspection[];
 	static savedInspections: SavedInspection[];
 	static itemBudgets: ItemBudget[];
@@ -152,8 +153,16 @@ export class InspectionService {
 		console.log('Order inspections', InspectionService.orderInspections);
 	}
 
-	static filterOrderInspections(orderInspections: OrderInspection[] = this.orderInspections): OrderInspection[] {
-		return orderInspections.filter(o => o.inspection && this.checkOpenedOrder(o.order) && o.order.keys);
+	static filterOrderInspections(
+		orderInspections: OrderInspection[] = this.orderInspections, detectedAnomaliesOrders: Order[] = this.detectedAnomaliesOrders
+	): OrderInspection[] {
+		return orderInspections.filter(o => {
+			const correctOrder = this.checkOpenedOrder(o.order) && o.order.keys;
+			if (!correctOrder) { return false; }
+
+			const detectedAnomaliesOrder = detectedAnomaliesOrders.find(order => order.number === o.order.number);
+			return detectedAnomaliesOrder ? true : o.inspection !== undefined;
+		});
 	}
 
 	static checkOpenedOrder(order: Order): boolean {
@@ -574,10 +583,10 @@ export class InspectionService {
 					InspectionService.initData(data);
 					/* Una vez obtenidas las revisiones guardadas, se puede comprobar qué números de orden tienen asociada una revisión de
 					 * anomalías detectadas */
-					const detectedAnomaliesOrders = InspectionService.savedInspections.filter(i => !i.orderInspection).map(i =>
+					InspectionService.detectedAnomaliesOrders = InspectionService.savedInspections.filter(i => !i.orderInspection).map(i =>
 						InspectionService.orders.find(o => o.number === i.orderNumber)
 					);
-					const body = { orders: InspectionService.orders, detectedAnomaliesOrders };
+					const body = { orders: InspectionService.orders, detectedAnomaliesOrders: InspectionService.detectedAnomaliesOrders };
 					return this.http.post(Url.inspections(), body);
 				}
 				return of([]);

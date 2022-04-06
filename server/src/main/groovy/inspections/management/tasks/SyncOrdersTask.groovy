@@ -28,17 +28,19 @@ class SyncOrdersTask {
     @Scheduled(cron = "\${cron.sync-orders}")
     void execute() {
         LocalTime refTime = LocalTime.now()
-        List<Order> orders = inspectionService.findOrders(LocalDate.now())
-        List<SavedInspection> savedInspections = savedInspectionDataService.findAll(orders.collect { it.number })
+        List<Order> orders = inspectionService.findOrders(LocalDate.now(), false)
+        List<SavedInspection> savedInspections = savedInspectionDataService.findAllSavedInspections(
+            orders.number as List<Integer>
+        )
         List<Order> detectedAnomaliesOrders = savedInspections
             .findAll { !it.orderInspection }
             .collect { SavedInspection savedInspection ->
                 orders.find { it.number == savedInspection.orderNumber }
             }
-        List<Order> orderInspectionOrders = orders.findAll { !(it.number in detectedAnomaliesOrders.number) }
 
-        List<OrderInspection> orderInspections = inspectionService.findOrderInspections(orderInspectionOrders) +
-            inspectionService.findDetectedAnomaliesInspections(detectedAnomaliesOrders)
+        List<OrderInspection> orderInspections = inspectionService.findOrderInspections(orders).findAll {
+            it.inspectionVehicle
+        } + inspectionService.findDetectedAnomaliesInspections(detectedAnomaliesOrders)
         LOG.info("Sync JPDV task: ${ChronoUnit.MILLIS.between(refTime, LocalTime.now())}")
         RealTimePublisher.send(new RealTimeOrders(orderInspections))
     }
