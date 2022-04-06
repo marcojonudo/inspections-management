@@ -11,7 +11,7 @@ import org.apache.commons.text.WordUtils
 @CompileStatic
 class CarCard extends VehicleCard {
 
-    CarCard(CarVehicle car, Set<SavedItem> headerItems) {
+    CarCard(CarVehicle car, List<SavedItem> headerItems) {
         super()
         this.title = new CardTitle("img/icons/car.svg", CustomMessageSource.getMessage("print.car.title"))
         this.sections = [

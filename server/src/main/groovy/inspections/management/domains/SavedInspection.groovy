@@ -42,9 +42,9 @@ class SavedInspection implements GormEntity<SavedInspection> {
 
 	enum State {
 
-		PENDING({ Set<SavedItem> items -> false }),
-		STARTED({ Set<SavedItem> items -> items.find { it.item.required && !it.filled } as boolean }),
-		FINISHED({ Set<SavedItem> items -> !items.find { it.item.required && !it.filled } as boolean })
+		PENDING({ List<SavedItem> items -> false }),
+		STARTED({ List<SavedItem> items -> items.find { it.item.required && !it.filled } as boolean }),
+		FINISHED({ List<SavedItem> items -> !items.find { it.item.required && !it.filled } as boolean })
 
 		final Closure<Boolean> check
 

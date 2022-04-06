@@ -130,11 +130,11 @@ export class InspectionSheetComponent {
 	}
 
 	toggleSelectOption(savedItem: SelectSavedItem): void {
-		const item = savedItem.item as SelectItem;
-		const selectedIndex = this.findOptionIndex(savedItem, item.options);
-		const newIndex = this.inspectionHandler.findSelectOptionIndex(selectedIndex, item.options.length);
+		const options = this.findSelectItemOptions(savedItem);
+		const selectedIndex = this.findOptionIndex(savedItem, options);
+		const newIndex = this.inspectionHandler.findSelectOptionIndex(selectedIndex, options.length);
 
-		InspectionService.updateSelectItem(savedItem, item, item.options[newIndex].code, this.savedInspection).subscribe();
+		InspectionService.updateSelectItem(savedItem, savedItem.item, options[newIndex].code, this.savedInspection).subscribe();
 	}
 
 	findOptionIndex(savedItem: SelectSavedItem, options: SelectItemOption[]): number {

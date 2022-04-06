@@ -84,11 +84,11 @@ class TyresCard extends Card {
                     <img id="steering-wheel" src="img/steering-wheel/${findVisualControlColorName(visualControlSavedItem.findValue())}-steering-wheel.png"/>
                     <div id="visual-control-item" class="item">
                         <div>${CustomMessageSource.getMessage("print.tyres.geometryVisualControl")}</div>
-                        ${new ItemImage("img/icons/${visualControlSavedItem.findIcon()}.svg", SelectSavedItem.Value.valueOf(visualControlSavedItem.value).color).toHtml()}
+                        ${new ItemImage("img/icons/${visualControlSavedItem.findIcon(this.options)}.svg", SelectSavedItem.Value.valueOf(visualControlSavedItem.value).color).toHtml()}
                     </div>
                     <div id="pressure-item" class="item">
                         <div>${CustomMessageSource.getMessage("print.tyres.tyresPressure")}</div>
-                        ${new ItemImage("img/icons/${pressureSavedItem.findIcon()}.svg", SelectSavedItem.Value.valueOf(pressureSavedItem.value).color).toHtml()}
+                        ${new ItemImage("img/icons/${pressureSavedItem.findIcon(this.options)}.svg", SelectSavedItem.Value.valueOf(pressureSavedItem.value).color).toHtml()}
                     </div>
                 </div>
             </div>
@@ -122,7 +122,7 @@ class TyresCard extends Card {
                 </div>
                 <div class="tyre-state">
                     <div>${CustomMessageSource.getMessage("print.tyres.tyreState")}</div>
-                    ${new ItemImage("img/icons/${stateItem.findIcon()}.svg", SelectSavedItem.Value.valueOf(stateItem.value).color).toHtml()}
+                    ${new ItemImage("img/icons/${stateItem.findIcon(this.options)}.svg", SelectSavedItem.Value.valueOf(stateItem.value).color).toHtml()}
                 </div>
                 <div class="state-graph">
                     <div class="state-name">${options.find { it.code == stateItem.value}.name}</div>

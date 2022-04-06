@@ -17,7 +17,7 @@ abstract class SavedInspectionDataService {
 	@Inject SavedItemDataService savedItemDataService
 	@Inject ItemVehicleDataDataService itemVehicleDataDataService
 
-	abstract SavedInspection find(Integer orderNumber)
+	abstract SavedInspection findSavedInspection(Integer orderNumber)
 
 	abstract Integer findSavedInspectionOrderNumber(String numberPlate, Map args)
 
@@ -29,6 +29,12 @@ abstract class SavedInspectionDataService {
 	abstract SavedInspection update(Serializable id, SavedInspection.State state, String sellerCode)
 
 	abstract SavedInspection update(Serializable id, LocalDateTime sent, String sellerCode)
+
+	SavedInspection find(int orderNumber) {
+		SavedInspection savedInspection = findSavedInspection(orderNumber)
+		savedInspection.items = savedItemDataService.findAll(savedInspection.id)
+		return savedInspection
+	}
 
 	List<SavedInspection> findAll(List<Order> orders) {
 		List<SavedInspection> savedInspections = findAllSavedInspections(orders.number as List<Integer>)
@@ -45,7 +51,7 @@ abstract class SavedInspectionDataService {
 		savedInspection.items.each { SavedItem savedItem ->
 			SavedItem existentSavedItem = existentSavedInspection.items.find { it.item.code == savedItem.item.code }
 			if (!existentSavedItem) {
-				fillSavedItem(savedItem, existentSavedInspection)
+				fillSavedItem(savedItem, existentSavedInspection.id)
 				savedItemDataService.save(savedItem)
 			} else if (savedItem != existentSavedItem) {
 				savedItemDataService.update(existentSavedItem, savedItem)
@@ -57,9 +63,8 @@ abstract class SavedInspectionDataService {
 		return update(existentSavedInspection.id, state, savedInspection.sellerCode)
 	}
 
-	void fillSavedItem(SavedItem savedItem, SavedInspection savedInspection) {
-//		savedItem.savedInspection = savedInspection
-		//TODO
+	void fillSavedItem(SavedItem savedItem, long savedInspectionId) {
+		savedItem.savedInspectionId = savedInspectionId
 		savedItem.item = itemVehicleDataDataService.find(savedItem.item.code)
 	}
 

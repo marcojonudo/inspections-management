@@ -81,13 +81,10 @@ export class SummaryComponent implements OnDestroy {
 
 	findAcceptedBudgetsPrice(orderInspections: OrderInspection[] = this.orderInspections): number {
 		const acceptedBudgets = [];
-		// TODO Ahora mismo orderiNspections contieen or sin revision. Valorar dejar sólo aquella que sí tienen
 		orderInspections.forEach(orderInspection => {
 			const savedInspection = orderInspection.inspection ?
 				InspectionService.findSavedInspection(orderInspection.order.number) : undefined;
 
-			// const orderInspection = InspectionService.findOrderInspection(savedInspection.orderNumber);
-			/* Si hay una revisión guardada, pero la orden no tiene código de revisión, no existe orderInspection */
 			if (savedInspection) {
 				savedInspection.itemBudgets.forEach(itemBudget => {
 					const budget = InspectionService.findExistentBudget(
