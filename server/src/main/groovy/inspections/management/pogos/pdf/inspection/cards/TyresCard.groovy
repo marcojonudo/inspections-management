@@ -5,6 +5,7 @@ import groovy.transform.TupleConstructor
 import inspections.management.domains.items.SelectItemOption
 import inspections.management.domains.savedItems.SavedItem
 import inspections.management.domains.savedItems.SelectSavedItem
+import inspections.management.i18n.CustomMessageSource
 import inspections.management.pogos.pdf.CategoryItems
 import inspections.management.pogos.pdf.inspection.cards.title.CardTitle
 import inspections.management.pogos.pdf.inspection.elements.ItemImage
@@ -44,7 +45,7 @@ class TyresCard extends Card {
         List<SelectItemOption> options
     ) {
         super()
-        title = new CardTitle("img/icons/right-arrow.svg", "Neumáticos")
+        title = new CardTitle("img/icons/right-arrow.svg", CustomMessageSource.getMessage("print.tyres.title"))
         this.classes << "category"
         barWidth = (float) (BAR_WIDTH - (DEPTH_BAR_PADDING * 4) - (DEPTH_BAR_MARGIN * 2))
         groupedCategories = categories.collate(2)
@@ -82,11 +83,11 @@ class TyresCard extends Card {
                     <img id="car-axis" src="img/car-axis.png"/>
                     <img id="steering-wheel" src="img/steering-wheel/${findVisualControlColorName(visualControlSavedItem.findValue())}-steering-wheel.png"/>
                     <div id="visual-control-item" class="item">
-                        <div>Control visual geometría</div>
+                        <div>${CustomMessageSource.getMessage("print.tyres.geometryVisualControl")}</div>
                         ${new ItemImage("img/icons/${visualControlSavedItem.findIcon()}.svg", SelectSavedItem.Value.valueOf(visualControlSavedItem.value).color).toHtml()}
                     </div>
                     <div id="pressure-item" class="item">
-                        <div>Puesta a presión neumáticos</div>
+                        <div>${CustomMessageSource.getMessage("print.tyres.tyresPressure")}</div>
                         ${new ItemImage("img/icons/${pressureSavedItem.findIcon()}.svg", SelectSavedItem.Value.valueOf(pressureSavedItem.value).color).toHtml()}
                     </div>
                 </div>
@@ -113,14 +114,14 @@ class TyresCard extends Card {
             <div class="tyre-section-wrapper">
                 <div class="tyre-section-header">
                     <div class="measurement-name">
-                        <span>Neumático</span>&nbsp;$name</div>
+                        <span>${CustomMessageSource.getMessage("print.tyres.tyre")}</span>&nbsp;${CustomMessageSource.getMessage("print.tyres.$name")}</div>
                     <div class="measurement-value">${measurementSavedItem.findValue()}</div>
                 </div>
                 <div class="photo-wrapper">
                     ${depthItem.imageId ? new Image([], null, PdfService.buildImageUrl(depthItem)).toHtml() : buildNoImageTemplate()}
                 </div>
                 <div class="tyre-state">
-                    <div>Estado neumático</div>
+                    <div>${CustomMessageSource.getMessage("print.tyres.tyreState")}</div>
                     ${new ItemImage("img/icons/${stateItem.findIcon()}.svg", SelectSavedItem.Value.valueOf(stateItem.value).color).toHtml()}
                 </div>
                 <div class="state-graph">
@@ -147,7 +148,7 @@ class TyresCard extends Card {
                             <div class="threshold-indicator" style="left: ${findThresholdLeft()}px"></div>
                         </div>
                     </div>
-                    <div class="threshold-text">1.6mm mínimo legal</div>
+                    <div class="threshold-text">${CustomMessageSource.getMessage("print.tyres.legalMin")}</div>
                 </div>
             </div>
         """
@@ -157,7 +158,7 @@ class TyresCard extends Card {
         return """
             <div class="depth-section">
                 <div class="depth">
-                    <div class="depth-section-title" translate>Profundidad neumático</div>
+                    <div class="depth-section-title">${CustomMessageSource.getMessage("print.tyres.tyreDepth")}</div>
                     <div
                         class="depth-section-value ${depthItem.findValue() ? findDepthColorName(depthItem.findValue()) : 'white'}-background">
                         ${depthItem.findValue() ? "${depthItem.findValue()}mm" : '-'}
@@ -165,7 +166,7 @@ class TyresCard extends Card {
                 </div>
                 <img src="img/tyres/${findDepthColorName(depthItem.findValue())}-tyre.jpg"/>
                 <div>
-                    <div class="depth-section-title">Edad neumático</div>
+                    <div class="depth-section-title">${CustomMessageSource.getMessage("print.tyres.tyreAge")}</div>
                     <div class="depth-section-value">${ageItem.findValue() ?: '-'}</div>
                 </div>
             </div>

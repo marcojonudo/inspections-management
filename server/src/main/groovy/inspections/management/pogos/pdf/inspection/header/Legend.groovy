@@ -1,6 +1,7 @@
 package inspections.management.pogos.pdf.inspection.header
 
 import groovy.transform.CompileStatic
+import inspections.management.i18n.CustomMessageSource
 import inspections.management.pogos.pdf.structure.IPdf
 import inspections.management.pogos.pdf.structure.elements.Label
 
@@ -12,11 +13,31 @@ class Legend extends IPdf {
     Legend() {
         this.id = "legend"
         this.labels = [
-            new Label("Selección pendiente", "#7b7979"),
-            new Label("Correcto", "#36d23d"),
-            new Label("Planificar sustitución", "#ff6a00"),
-            new Label("Sustitución necesaria", "#d23636"),
-            new Label("Realizado ajuste/cambio", "#3681d2")
+            new Label(
+                CustomMessageSource.getMessage("print.labels.pendingSelection"),
+                "#7b7979",
+                CustomMessageSource.getMessage("print.labels.pendingSelection.width") as Integer
+            ),
+            new Label(
+                CustomMessageSource.getMessage("print.labels.correct"),
+                "#36d23d",
+                CustomMessageSource.getMessage("print.labels.correct.width") as Integer
+            ),
+            new Label(
+                CustomMessageSource.getMessage("print.labels.plannedReplacement"),
+                "#ff6a00",
+                CustomMessageSource.getMessage("print.labels.plannedReplacement.width") as Integer
+            ),
+            new Label(
+                CustomMessageSource.getMessage("print.labels.neededReplacement"),
+                "#d23636",
+                CustomMessageSource.getMessage("print.labels.neededReplacement.width") as Integer
+            ),
+            new Label(
+                CustomMessageSource.getMessage("print.labels.doneReplacement"),
+                "#3681d2",
+                CustomMessageSource.getMessage("print.labels.doneReplacement.width") as Integer
+            )
         ]
     }
 

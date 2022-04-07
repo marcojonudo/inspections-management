@@ -8,16 +8,18 @@ class Label extends IPdf {
 
     String name
     String color
+    Integer width
 
-    Label(String name, String color) {
+    Label(String name, String color, Integer width = null) {
         this.classes = ["label"]
         this.name = name
         this.color = color
+        this.width = width
     }
 
     String toHtml() {
         return """
-            <div class="${findClasses()}">
+            <div class="${findClasses()}" style="width: ${width ?: 20}%">
                 <div class="label-color" style="background-color: $color"></div>
                 <span>$name</span>
             </div>
