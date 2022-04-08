@@ -22,7 +22,7 @@ class ItemRelation implements GormEntity<ItemRelation> {
 	Action action
 
 	static mapping = {
-		targetItem fetch: 'join'
+		targetItem lazy: false
 	}
 
 	enum Action {
