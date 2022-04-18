@@ -8,16 +8,17 @@ import io.micronaut.context.MessageSource.MessageContext
 class CustomMessageSource {
 
     static MessageSource messageSource
-    static MessageContext messageContext
+    static Locale locale
 
     static void setMessageSource(MessageSource messageSource, String lang) {
         this.messageSource = messageSource
-        messageContext = MessageContext.of(new Locale(lang))
+        locale = new Locale(lang)
     }
 
-    static String getMessage(String key) {
-        return messageSource.getMessage(key, messageContext).isPresent() ?
-            messageSource.getMessage(key, messageContext).get() : null
+    static String getMessage(String key, Map variables = [:]) {
+        MessageContext messageContext = MessageContext.of(locale, variables)
+        String template = messageSource.getMessage(key, messageContext, "")
+        return messageSource.interpolate(template, messageContext)
     }
 
 }

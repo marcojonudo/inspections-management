@@ -16,27 +16,27 @@ class Legend extends IPdf {
             new Label(
                 CustomMessageSource.getMessage("print.labels.pendingSelection"),
                 "#7b7979",
-                CustomMessageSource.getMessage("print.labels.pendingSelection.width") as Integer
+                CustomMessageSource.getMessage("print.labels.pendingSelection.width") as int
             ),
             new Label(
                 CustomMessageSource.getMessage("print.labels.correct"),
                 "#36d23d",
-                CustomMessageSource.getMessage("print.labels.correct.width") as Integer
+                CustomMessageSource.getMessage("print.labels.correct.width") as int
             ),
             new Label(
                 CustomMessageSource.getMessage("print.labels.plannedReplacement"),
                 "#ff6a00",
-                CustomMessageSource.getMessage("print.labels.plannedReplacement.width") as Integer
+                CustomMessageSource.getMessage("print.labels.plannedReplacement.width") as int
             ),
             new Label(
                 CustomMessageSource.getMessage("print.labels.neededReplacement"),
                 "#d23636",
-                CustomMessageSource.getMessage("print.labels.neededReplacement.width") as Integer
+                CustomMessageSource.getMessage("print.labels.neededReplacement.width") as int
             ),
             new Label(
                 CustomMessageSource.getMessage("print.labels.doneReplacement"),
                 "#3681d2",
-                CustomMessageSource.getMessage("print.labels.doneReplacement.width") as Integer
+                CustomMessageSource.getMessage("print.labels.doneReplacement.width") as int
             )
         ]
     }

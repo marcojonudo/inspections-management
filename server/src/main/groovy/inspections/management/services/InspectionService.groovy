@@ -141,7 +141,7 @@ class InspectionService {
 	 * @param employeeCode Código del empleado que guarda la revisión
 	 * @return Revisión guardada
 	 */
-	SavedInspection saveInspection(SavedInspection savedInspection, int orderNumber, String employeeCode) {
+	SavedInspection saveInspection(SavedInspection savedInspection, Integer orderNumber, String employeeCode) {
 		LOG.info(new Log((Map) [sellerCode: employeeCode, orderNumber: orderNumber, inspectionTypeCode: savedInspection.inspectionTypeCode, vehicle: savedInspection.vehicle, message: Constants.Message.SAVING_INSPECTION]).toString())
 		SavedInspection newSavedInspection = null
 		try {
@@ -161,7 +161,7 @@ class InspectionService {
 	 * @param to Destinatario
 	 * @param employeeCode Código de empleado
 	 */
-	SavedInspection sendInspectionMail(int orderNumber, String to, String employeeCode) {
+	SavedInspection sendInspectionMail(Integer orderNumber, String to, String employeeCode) {
 		SavedInspection savedInspection = savedInspectionDataService.find(orderNumber)
 		Centre centre = centreDataService.find()
 		Order order = orderDataService.find(savedInspection.orderNumber)

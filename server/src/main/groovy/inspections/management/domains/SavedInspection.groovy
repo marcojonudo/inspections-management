@@ -16,7 +16,7 @@ import java.time.LocalDateTime
 class SavedInspection implements GormEntity<SavedInspection> {
 
 	String inspectionTypeCode
-	int orderNumber
+	Integer orderNumber
 	String vehicle
 	String employeeCode
 	String numberPlate

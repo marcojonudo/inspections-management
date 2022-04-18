@@ -1,7 +1,10 @@
 package inspections.management.controllers
 
 import groovy.transform.CompileStatic
-import inspections.management.domains.*
+import inspections.management.domains.BudgetNotification
+import inspections.management.domains.ItemBudget
+import inspections.management.domains.ItemVehicleArticleCode
+import inspections.management.domains.SavedInspection
 import inspections.management.domains.fviberi.Centre
 import inspections.management.domains.fviberi.Order
 import inspections.management.domains.schedules.EmployeeData

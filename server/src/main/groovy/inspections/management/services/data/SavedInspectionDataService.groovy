@@ -15,11 +15,11 @@ abstract class SavedInspectionDataService {
 	@Inject SavedItemDataService savedItemDataService
 	@Inject ItemVehicleDataDataService itemVehicleDataDataService
 
-	abstract SavedInspection find(int orderNumber)
+	abstract SavedInspection find(Integer orderNumber)
 
-	abstract int findSavedInspectionOrderNumber(String numberPlate, Map args)
+	abstract Integer findSavedInspectionOrderNumber(String numberPlate, Map args)
 
-	abstract SavedInspection find(int orderNumber, String numberPlate)
+	abstract SavedInspection find(Integer orderNumber, String numberPlate)
 
 	@Where({ orderNumber in orderNumbers })
 	abstract List<SavedInspection> findAll(List<Integer> orderNumbers)

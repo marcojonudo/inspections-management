@@ -13,7 +13,7 @@ stages:
 .gradle_template: &gradle_template
     image: gradle:6.1
     tags:
-        - sidesman2
+        - intranet
     variables:
         GRADLE_OPTS: "-Dorg.gradle.daemon=false"
     cache:
@@ -43,7 +43,7 @@ stages:
     stage: deploy
     image: registry.gitlab.com/marco_fv/ci-scripts:groovy
     tags:
-        - sidesman2
+        - intranet
     dependencies:
         - get-version:hash
         - get-version:semantic:push
@@ -91,7 +91,7 @@ build:frontend:
     stage: build
     image: gradle:6.1
     tags:
-        - sidesman2
+        - intranet
     script:
         - gradle --build-cache buildAndCopyClientResources
     artifacts:
