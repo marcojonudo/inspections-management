@@ -35,7 +35,11 @@ class Builder {
 
         static buildInspectionSubject(Order order) {
             String day = order.day.format(DateTimeFormatter.ofPattern(Constants.DateFormat.dd_MM_yyyy))
-            return "Revisión Feu Vert Nº orden $order.number del día $day"
+            Map<String, Object> variables = [
+                orderNumber: order.number,
+                day: day
+            ] as Map<String, Object>
+            return CustomMessageSource.getMessage("mail.subject", variables)
         }
 
         static buildInspectionBody(Centre centre, Client client, Vehicle vehicle) {
