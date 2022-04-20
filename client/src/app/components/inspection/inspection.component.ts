@@ -64,12 +64,12 @@ export class InspectionComponent {
 		const depthCodes = this.CAR_TYRES.map(carTyre => `${Constants.ITEM_CODE.PN}${carTyre}`);
 		const depthItems = savedItems.filter(i => depthCodes.find(c => c === i.code) !== undefined);
 		this.showTyreSheet = depthItems.find(i => i.imageId) !== undefined;
-		this.visualControlSavedItem = savedItems.find(i => i.item.code === 'CVGN');
-		this.pressureSavedItem = savedItems.find(i => i.item.code === 'PPN');
-		this.measurementSavedItem = savedItems.find(i => i.item.code === 'PN');
+		this.visualControlSavedItem = savedItems.find(i => i.code === 'CVGN');
+		this.pressureSavedItem = savedItems.find(i => i.code === 'PPN');
+		this.measurementSavedItem = savedItems.find(i => i.code === 'PN');
 
 		const existentSavedItems = savedItems.filter(i => {
-			const selectItem = i.item.type === ItemType.SELECT.id;
+			const selectItem = i.type === ItemType.SELECT.id;
 			return !i.hidden && (selectItem ? i.findValue() !== Constants.SELECT_ITEM_OPTION_CODE.NA : true);
 		});
 		const categories = this.buildPrintCategories(existentSavedItems);
@@ -80,7 +80,7 @@ export class InspectionComponent {
 			const imageIds = imageSavedItems.map(savedItem => savedItem.imageId);
 			this.http.get(Url.images(), { params: { ids: `${imageIds.join(',')}` } }).subscribe((images: Image[]) => {
 				this.images = images;
-				const noTyreImages = imageSavedItems.filter(i => depthCodes.find(c => c === i.item.code) === undefined);
+				const noTyreImages = imageSavedItems.filter(i => depthCodes.find(c => c === i.code) === undefined);
 				if (noTyreImages.length) {
 					const imageCategories = this.buildPrintCategories(noTyreImages);
 					this.groupedImageCategories = this.buildGroupedImageCategories(imageCategories);
@@ -112,7 +112,7 @@ export class InspectionComponent {
 			tyreSavedItems[carTyre] = [];
 			Constants.TYRE_ITEM_CODES.forEach(tyreCode =>
 				tyreSavedItems[carTyre].push(
-					savedItems.find(savedItem => savedItem.item.code === `${tyreCode}${carTyre}`)
+					savedItems.find(savedItem => savedItem.code === `${tyreCode}${carTyre}`)
 				)
 			);
 		});

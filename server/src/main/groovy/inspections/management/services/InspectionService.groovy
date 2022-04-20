@@ -162,7 +162,7 @@ class InspectionService {
 	 * @param employeeCode Código de empleado
 	 */
 	SavedInspection sendInspectionMail(Integer orderNumber, String to, String employeeCode) {
-		SavedInspection savedInspection = savedInspectionDataService.find(orderNumber)
+		SavedInspection savedInspection = savedInspectionDataService.find(orderNumber, true)
 		Centre centre = centreDataService.find()
 		Order order = orderDataService.find(savedInspection.orderNumber)
 		MailData mailData = mailDataDataService.find(centre.code as int)

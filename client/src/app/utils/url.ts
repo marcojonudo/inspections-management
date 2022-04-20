@@ -5,31 +5,27 @@ import { Constants } from './constants';
 export class Url {
 
 	static publisher(): string {
-		return `${environment.serverUrl}/inspection/publisher`;
+		return `${environment.serverUrl}/inspections/publisher`;
 	}
 
 	static orders(): string {
-		return `${environment.serverUrl}/inspection/orders`;
+		return `${environment.serverUrl}/orders`;
 	}
 
 	static inspections(): string {
-		return `${environment.serverUrl}/inspection/inspections`;
+		return `${environment.serverUrl}/inspections`;
 	}
 
 	static savedInspections(): string {
 		return `${environment.serverUrl}/savedInspections`;
 	}
 
-	static savedInspection(): string {
-		return `${environment.serverUrl}/inspection/savedInspection`;
-	}
-
-	static language(): string {
-		return `${environment.serverUrl}/inspection/language`;
+	static languages(): string {
+		return `${environment.serverUrl}/languages`;
 	}
 
 	static articleItems(): string {
-		return `${environment.serverUrl}/inspection/articleItems`;
+		return `${environment.serverUrl}/articleItems`;
 	}
 
 	static selectItemOptions(): string {
@@ -37,19 +33,27 @@ export class Url {
 	}
 
 	static itemBudgets(): string {
-		return `${environment.serverUrl}/inspection/itemBudgets`;
+		return `${environment.serverUrl}/itemBudgets`;
 	}
 
-	static budgetNotification(): string {
-		return `${environment.serverUrl}/inspection/budgetNotification`;
+	static budgetNotification(orderNumber: number = undefined): string {
+		return `${environment.serverUrl}/budgetNotifications/${orderNumber ? orderNumber : ''}`;
 	}
 
 	static employees(): string {
-		return `${environment.serverUrl}/inspection/employees`;
+		return `${environment.serverUrl}/employees`;
 	}
 
-	static centre(): string {
-		return `${environment.serverUrl}/inspection/centre`;
+	static centres(): string {
+		return `${environment.serverUrl}/centres`;
+	}
+
+	static itemRelations(): string {
+		return `${environment.serverUrl}/itemRelations`;
+	}
+
+	static items(): string {
+		return `${environment.serverUrl}/items`;
 	}
 
 	static images(): string {

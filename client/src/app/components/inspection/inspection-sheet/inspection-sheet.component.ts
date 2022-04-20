@@ -75,7 +75,7 @@ export class InspectionSheetComponent {
 	findSelectItemOptions(
 		savedItem: SavedItem, groupedItemOptions: GroupedItemOptions[] = InspectionService.groupedItemOptions
 	): SelectItemOption[] {
-		return groupedItemOptions.find(o => o.itemCode === savedItem.item.code).options;
+		return groupedItemOptions.find(o => o.itemCode === savedItem.code).options;
 	}
 
 	findTextItem(savedItem: SavedItem): TextItem {
@@ -123,7 +123,7 @@ export class InspectionSheetComponent {
 	}
 
 	checkWrongItem(savedItem: SavedItem): boolean {
-		if (savedItem.item.type !== Constants.ITEM_TYPE.SELECT) {
+		if (savedItem.type !== Constants.ITEM_TYPE.SELECT) {
 			return false;
 		}
 		return InspectionService.checkWrongSelectValue((savedItem as SelectSavedItem).value);

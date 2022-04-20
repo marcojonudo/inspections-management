@@ -16,13 +16,13 @@
 			<path fill="#fff" d="m 168,74 c 0,0 -138,0 -138,0 1.5,-7.99 7.51,-16.77 12.62,-23 28.41,-34.67 84.32,-34.69 112.76,0 5.11,6.22 11.12,15.02 12.62,23 z"/>
 		</svg>
 		<div id="visual-control-item" class="item">
-			<div translate>print.item.{{visualControlSavedItem.item.code}}</div>
+			<div translate>print.item.{{visualControlSavedItem.code}}</div>
 			<mat-icon [style.color]="findIconColor(visualControlSavedItem.findValue())">
 				{{findOption(visualControlSavedItem).icon}}
 			</mat-icon>
 		</div>
 		<div id="pressure-item" class="item">
-			<div translate>print.item.{{pressureSavedItem.item.code}}</div>
+			<div translate>print.item.{{pressureSavedItem.code}}</div>
 			<mat-icon [style.color]="findIconColor(pressureSavedItem.findValue())">
 				{{findOption(pressureSavedItem).icon}}
 			</mat-icon>

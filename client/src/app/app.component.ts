@@ -34,10 +34,12 @@ export class AppComponent {
 
 		forkJoin([
 			this.inspectionService.findLanguage(),
-			this.employeeService.findEmployees()
+			this.employeeService.findEmployees(),
+			this.inspectionService.findCentre(),
+			this.inspectionService.findRelations(),
+			this.inspectionService.findItems()
 		]).subscribe(data => {
 			this.translate.setDefaultLang(data[0]);
-			EmployeeService.setEmployees(data[1]);
 		});
 
 		this.loadingService.subscribe(loading => {

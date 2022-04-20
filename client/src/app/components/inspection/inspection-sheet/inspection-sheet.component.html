@@ -38,7 +38,7 @@
 		<div class="items-info">
 			<div *ngFor="let item of cat.items | printOrder" class="item" [class.highlight]="checkWrongItem(item)">
 				<div
-					*ngIf="checkItemType(item.item.type, selectType); else textItemText"
+					*ngIf="checkItemType(item.type, selectType); else textItemText"
 					matRipple
 					(click)="toggleSelectOption(findSelectSavedItem(item))">
 					<div class="item-text" [innerHTML]="item.item.name"></div>

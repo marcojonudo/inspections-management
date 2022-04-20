@@ -96,10 +96,10 @@ class TyresCard extends Card {
     }
     
     String buildSection(CategoryItems categoryItems, int order) {
-        SavedItem depthItem = categoryItems.items.find { it.item.code.startsWith(DEPTH_ITEM_PREFIX) }
-        SavedItem ageItem = categoryItems.items.find { it.item.code.startsWith(AGE_ITEM_PREFIX) }
+        SavedItem depthItem = categoryItems.items.find { it.code.startsWith(DEPTH_ITEM_PREFIX) }
+        SavedItem ageItem = categoryItems.items.find { it.code.startsWith(AGE_ITEM_PREFIX) }
         SelectSavedItem stateItem = (SelectSavedItem) categoryItems.items.find {
-            it.item.code.startsWith(STATE_ITEM_PREFIX)
+            it.code.startsWith(STATE_ITEM_PREFIX)
         }
         return """
             <div class="tyre-section">

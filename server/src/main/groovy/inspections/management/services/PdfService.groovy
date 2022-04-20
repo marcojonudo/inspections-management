@@ -60,7 +60,7 @@ class PdfService {
 
 		List<SavedItem> existentSavedItems = savedItems.findAll {
 			!it.hidden &&
-				(it.item.type == Item.Type.SELECT ? ((SelectSavedItem) it).value != Constants.SelectItemOption.NA : true)
+				(it.type == Item.Type.SELECT ? ((SelectSavedItem) it).value != Constants.SelectItemOption.NA : true)
 		}
 		List<CategoryItems> categories = buildPrintCategories(existentSavedItems)
 		List<List<CategoryItems>> groupedCategories = buildGroupedCategories(categories)
@@ -95,7 +95,7 @@ class PdfService {
 	static List<CategoryItems> buildTyreCategories(List<SavedItem> savedItems) {
 		return Constants.CAR_POSITION.collect { String position ->
 			List<SavedItem> positionSavedItems = savedItems.findAll {
-				it.item.code in TYRE_ITEM_CODES.collect { (String) "$it$position" }
+				it.code in TYRE_ITEM_CODES.collect { (String) "$it$position" }
 			}.toList()
 			return new CategoryItems(positionSavedItems, new ItemCategory(name: position))
 		}
@@ -128,12 +128,12 @@ class PdfService {
 
 	static List<SavedItem> findImageItems(List<SavedItem> savedItems) {
 		List<SavedItem> depthImageItems = findTyreDepthItems(savedItems).findAll { it.imageId }
-		return savedItems.findAll { it.image && !(it.item.code in depthImageItems*.item.code) }
+		return savedItems.findAll { it.image && !(it.code in depthImageItems*.code) }
 	}
 
 	static List<SavedItem> findTyreDepthItems(List<SavedItem> savedItems) {
 		List<String> depthCodes = Constants.CAR_POSITION.collect { (String) "$Constants.DEPTH_ITEM_PREFIX$it" }
-		return savedItems.findAll { it.item.code in depthCodes }
+		return savedItems.findAll { it.code in depthCodes }
 	}
 
 	static List<List<CategoryItems>> buildGroupedImageCategories(List<CategoryItems> categories) {

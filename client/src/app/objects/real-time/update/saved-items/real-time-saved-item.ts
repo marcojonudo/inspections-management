@@ -23,11 +23,11 @@ export abstract class RealTimeSavedItem {
 	abstract update(): void;
 
 	findIndex(savedItems: SavedItem[], savedItem: SavedItem): number {
-		return savedItems.findIndex(i => i.item.code === savedItem.item.code);
+		return savedItems.findIndex(i => i.code === savedItem.code);
 	}
 
 	find(savedItem: SavedItem): SavedItem {
-		return this.savedItems.find(i => i.item.code === savedItem.item.code);
+		return this.savedItems.find(i => i.code === savedItem.code);
 	}
 
 }

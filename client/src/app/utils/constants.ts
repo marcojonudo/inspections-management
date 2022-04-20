@@ -31,7 +31,9 @@ export class Constants {
 		SELECT_ITEM_OPTIONS: 'selectItemOptions',
 		ITEM_BUDGETS: 'itemBudgets',
 		ITEM_VEHICLE_ARTICLE_CODES: 'itemVehicleArticleCodes',
-		CENTRE: 'centre'
+		CENTRE: 'centre',
+		RELATIONS: 'relations',
+		ITEMS: 'items'
 	};
 
 	static readonly MESSAGE_CODE: any = {

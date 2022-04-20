@@ -3,7 +3,6 @@ package inspections.management.deserializers
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.ArrayNode
 import groovy.transform.CompileStatic
@@ -27,8 +26,7 @@ class SavedItemsDeserializer extends StdDeserializer<List<SavedItem>> {
 		throws IOException, JsonProcessingException {
 		ArrayNode node = (ArrayNode) parser.getCodec().readTree(parser)
 		List<SavedItem> savedItems = node.collect {
-			JsonNode itemNode = it.get("item")
-			Item.Type type = Item.Type.valueOf(itemNode.get("type").asText())
+			Item.Type type = Item.Type.valueOf(it.get("type").asText())
 			return (SavedItem) Jackson.convertValue(it, type.savedItemClazz)
 		}
 		return savedItems

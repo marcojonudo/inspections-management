@@ -1,14 +1,14 @@
-import { Item } from './items/item';
-
 export class ItemRelation {
 
+	itemCode: string;
 	matchText: string;
-	targetItem: Item;
+	targetItemCode: string;
 	action: string;
 
-	constructor(itemRelation: any, targetItem: Item) {
+	constructor(itemRelation: any) {
+		this.itemCode = itemRelation.itemCode;
 		this.matchText = itemRelation.matchText;
-		this.targetItem = targetItem;
+		this.targetItemCode = itemRelation.targetItemCode;
 		this.action = itemRelation.action;
 	}
 

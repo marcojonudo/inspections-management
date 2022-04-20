@@ -41,6 +41,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { EmailDialogComponent } from '../components/email-dialog/email-dialog.component';
 import { SnackBarService } from './snack-bar.service';
 import { GroupedItemOptions } from '../objects/inspections/items/grouped-item-options';
+import { ItemType } from '../objects/inspections/items/item-type';
 
 @Injectable({
 	providedIn: 'root'
@@ -62,6 +63,8 @@ export class InspectionService {
 	static selectItemOptions: SelectItemOption[];
 	static groupedItemOptions: GroupedItemOptions[];
 	static inspectionHandler: InspectionHandler;
+	static relations: ItemRelation[];
+	static items: Item[];
 
 	private static readonly LEVEL_ELEMENTS: ((item: Item) => NameElement)[] = [
 		(item: Item) => item.vehicleData.garagePosition,
@@ -182,7 +185,7 @@ export class InspectionService {
 	static filterItemBudgets(savedItems: SavedItem[], itemBudgets: ItemBudget[] = this.itemBudgets): ItemBudget[] {
 		return itemBudgets.filter(itemBudget => {
 			const item = savedItems.find(savedItem =>
-				savedItem.item.type === Constants.ITEM_TYPE.SELECT && savedItem.item.code === itemBudget.itemCode
+				savedItem.type === Constants.ITEM_TYPE.SELECT && savedItem.code === itemBudget.itemCode
 			);
 			return item && item.filled && InspectionService.checkWrongSelectValue(item.findValue());
 		});
@@ -295,7 +298,7 @@ export class InspectionService {
 					return true;
 				}
 				/* Si los items están bien, pero la revisión tiene comentarios, también debe contar */
-				const comments = s.items.find(i => i.code === Constants.ITEM_CODE.C).findValue();
+				const comments = s.items.find(i => i.code === Constants.ITEM_CODE.C)?.findValue();
 				return comments !== undefined && comments !== '';
 			})
 			.forEach(savedInspection => {
@@ -381,17 +384,20 @@ export class InspectionService {
 			) !== undefined
 		);
 	}
-
-	static checkAcceptedBudget(budget: Budget): boolean {
-		return budget && budget.state === Constants.BUDGET_STATE.O;
-	}
-
 	static findSelectItems(savedInspections: SavedInspection[] = this.savedInspections): SelectItem[] {
 		const items = [];
 		savedInspections.forEach(savedInspection =>
-			items.push(...savedInspection.items.filter(i => i.item.type === Constants.ITEM_TYPE.SELECT).map(i => i.item))
+			items.push(...savedInspection.items.filter(i => i.type === Constants.ITEM_TYPE.SELECT).map(i => i.item))
 		);
 		return items;
+	}
+
+	static findRelations(itemCode: string, relations: ItemRelation[] = InspectionService.relations): ItemRelation[] {
+		return relations.filter(r => r.itemCode === itemCode);
+	}
+
+	static checkAcceptedBudget(budget: Budget): boolean {
+		return budget && budget.state === Constants.BUDGET_STATE.O;
 	}
 
 	static checkWrongSelectValue(value: string): boolean {
@@ -469,7 +475,7 @@ export class InspectionService {
 	): InspectionDetailsColumn {
 		let row = undefined;
 		const allColumns = Object.keys(columnsData);
-		const savedItem = savedItems.find(i => i.item.code === itemBudget.itemCode);
+		const savedItem = savedItems.find(i => i.code === itemBudget.itemCode);
 		const budget = InspectionService.findBudget(
 			itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
 		);
@@ -501,15 +507,16 @@ export class InspectionService {
 		savedInspection: SavedInspection,
 		employee: Employee = EmployeeService.employee
 	): Observable<ItemRelation> {
+		const relations = this.findRelations(item.code);
 		/* Antes de actualizar el valor, se debe comprobar si hay alguna relación que deshacer. Por ejemplo, al tener
 		 * 'Pastilla de freno' el valor 'No aplica', el espesor está oculto; sin embargo, en cuanto se actualiza el
 		 * valor de la primera, el segundo debe volver a aparecer (se está deshaciendo la relación) */
 		this.updateRelations(
-			savedItem, savedItem.findValue(), item.relations, this.ITEM_RELATION_RESTORE_ACTION, savedInspection
+			savedItem, savedItem.findValue(), relations, this.ITEM_RELATION_RESTORE_ACTION, savedInspection
 		).subscribe();
 		savedItem.update(value, employee.code);
 
-		return this.updateRelations(savedItem, savedItem.findValue(), item.relations, this.ITEM_RELATION_ACTION, savedInspection).pipe(
+		return this.updateRelations(savedItem, savedItem.findValue(), relations, this.ITEM_RELATION_ACTION, savedInspection).pipe(
 			finalize(() => {
 				LocalStorageService.setItem(Constants.LOCAL_STORAGE.SAVED_INSPECTION, savedInspection);
 			})
@@ -533,7 +540,7 @@ export class InspectionService {
 		employee: Employee = EmployeeService.employee
 	): void {
 		if (value === itemRelation.matchText) {
-			const targetSavedItem = savedInspection.items.find(i => i.item.code === itemRelation.targetItem.code);
+			const targetSavedItem = savedInspection.items.find(i => i.code === itemRelation.targetItemCode);
 			actions[itemRelation.action](targetSavedItem, savedItem.findValue(), employee.code);
 		}
 	}
@@ -560,7 +567,7 @@ export class InspectionService {
 
 	findLanguage(): Observable<string> {
 		const language = LocalStorageService.getItem(Constants.LOCAL_STORAGE.LANGUAGE);
-		return (language ? of(language) : this.http.get(Url.language(), { responseType: 'text' })).pipe(
+		return (language ? of(language) : this.http.get(Url.languages(), { responseType: 'text' })).pipe(
 			catchError(() => of(Constants.DEFAULT_LANGUAGE)),
 			tap((lang: string) => {
 				InspectionService.countryHandler = CountryHandlerType.parse(lang).handler;
@@ -615,9 +622,37 @@ export class InspectionService {
 		);
 	}
 
-	findCentre(): Observable<any> {
-		const savedCentre = LocalStorageService.getItem(Constants.LOCAL_STORAGE.CENTRE);
-		return savedCentre ? of(savedCentre) : this.http.get(Url.centre());
+	findCentre(): Observable<string> {
+		const centre = LocalStorageService.getItem(Constants.LOCAL_STORAGE.CENTRE);
+		return (centre ? of(centre) : this.http.get(Url.centres())).pipe(
+			tap(c => {
+				InspectionService.centre = new Centre(c);
+				LocalStorageService.setItem(Constants.LOCAL_STORAGE.CENTRE, InspectionService.centre);
+				console.log('Centre', InspectionService.centre);
+			})
+		);
+	}
+
+	findRelations(): Observable<string> {
+		const rel = LocalStorageService.getItem(Constants.LOCAL_STORAGE.RELATIONS);
+		return (rel ? of(rel) : this.http.get(Url.itemRelations())).pipe(
+			tap(relations => {
+				InspectionService.relations = relations.map(r => new ItemRelation(r));
+				LocalStorageService.setItem(Constants.LOCAL_STORAGE.RELATIONS, InspectionService.relations);
+				console.log('Item relations', InspectionService.relations);
+			})
+		);
+	}
+
+	findItems(): Observable<string> {
+		const items = LocalStorageService.getItem(Constants.LOCAL_STORAGE.ITEMS);
+		return (items ? of(items) : this.http.get(Url.items())).pipe(
+			tap(i => {
+				InspectionService.items = i.map(item => ItemType.parse(item.type).buildItem(item));
+				LocalStorageService.setItem(Constants.LOCAL_STORAGE.ITEMS, InspectionService.items);
+				console.log('Items', InspectionService.items);
+			})
+		);
 	}
 
 	findSelectItemOptions(): Observable<any> {
@@ -672,7 +707,7 @@ export class InspectionService {
 	}
 
 	deleteBudgetNotification(orderNumber: number): Observable<any> {
-		return this.http.delete(Url.budgetNotification(), { params: { orderNumber: `${orderNumber}` } }).pipe(
+		return this.http.delete(Url.budgetNotification(orderNumber)).pipe(
 			tap(() => {
 				InspectionService.budgetNotifications = InspectionService.budgetNotifications.filter(budgetNotification =>
 					budgetNotification.orderNumber !== orderNumber
@@ -691,7 +726,7 @@ export class InspectionService {
 		body.sellerCode = employee.code;
 		body.saved = dayjs();
 		console.log('Saving inspection', body);
-		return this.http.patch(Url.savedInspection(), body);
+		return this.http.patch(Url.savedInspections(), body);
 	}
 
 	sendInspectionMail(

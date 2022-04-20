@@ -6,6 +6,8 @@ import { Image } from '../image';
 export abstract class SavedItem {
 
 	item: Item;
+	type: string;
+	code: string;
 	filled: Dayjs;
 	hidden: boolean;
 	employeeCode: string;
@@ -13,8 +15,10 @@ export abstract class SavedItem {
 	image: Image;
 	imageId: number;
 
-	protected constructor(savedItem: SavedItem) {
-		this.item = savedItem.item;
+	protected constructor(savedItem: SavedItem, item: Item) {
+		this.item = item;
+		this.type = savedItem.type;
+		this.code = savedItem.code;
 		this.employeeCode = savedItem.employeeCode;
 		if (savedItem) {
 			this.filled = savedItem.filled ? dayjs(savedItem.filled) : undefined;

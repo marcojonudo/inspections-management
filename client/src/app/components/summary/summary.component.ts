@@ -172,14 +172,16 @@ export class SummaryComponent implements OnDestroy {
 				savedInspections.push(savedInspection);
 			}
 		});
-		const totalItems = [].concat(...savedInspections.map(s => s.items.filter(i => i.item.type === Constants.ITEM_TYPE.SELECT)));
+		const totalItems = [].concat(...savedInspections.map(s => s.items.filter(i => i.type === Constants.ITEM_TYPE.SELECT)));
 		const wrongItems = totalItems.filter(i => i.filled && InspectionService.checkWrongSelectValue(i.findValue()));
 		return totalItems.length ? wrongItems.length / totalItems.length : 0;
 	}
 
 	showPendingClientContacts(): void {
 		const pendingContactOrders = InspectionService.findPendingClientContactOrders();
-		this.dialog.open(PendingContactsDialogComponent, { data: { orders: pendingContactOrders } });
+		if (pendingContactOrders.length) {
+			this.dialog.open(PendingContactsDialogComponent, { data: { orders: pendingContactOrders } });
+		}
 	}
 
 }

@@ -4,6 +4,7 @@ package inspections.management.services.data
 import grails.gorm.services.Service
 import grails.gorm.services.Where
 import grails.gorm.transactions.Transactional
+import inspections.management.domains.items.Item
 import inspections.management.domains.savedItems.SavedItem
 
 import javax.inject.Inject
@@ -26,9 +27,9 @@ abstract class SavedItemDataService {
 	abstract SavedItem save(SavedItem savedItem)
 
 	@Transactional
-	SavedItem update(SavedItem existent, SavedItem savedItem) {
+	SavedItem update(SavedItem existent, SavedItem savedItem, Item item) {
 		update(existent.id, savedItem.employeeCode, savedItem.hidden, savedItem.filled)
-		return ((Closure<SavedItem>) savedItem.item.type.updateSavedItem)(existent, savedItem, this)
+		return ((Closure<SavedItem>) item.type.updateSavedItem)(existent, savedItem, this)
 	}
 
 }

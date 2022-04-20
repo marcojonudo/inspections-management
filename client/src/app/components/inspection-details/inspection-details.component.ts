@@ -110,7 +110,7 @@ export class InspectionDetailsComponent implements OnDestroy {
 	}
 
 	findItemName(code: string, savedInspection: SavedInspection = this.savedInspection): string {
-		const savedItem = savedInspection.items.find(i => i.item.code === code);
+		const savedItem = savedInspection.items.find(i => i.code === code);
 		return savedItem.item.name;
 	}
 

@@ -1,13 +1,16 @@
 package inspections.management.domains
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import grails.gorm.annotation.Entity
 import inspections.management.deserializers.SavedItemsDeserializer
+import inspections.management.domains.items.Item
 import inspections.management.domains.savedItems.SavedItem
 import inspections.management.utils.Constants
+import inspections.management.utils.Utils
 import org.grails.datastore.gorm.GormEntity
 
 import java.time.LocalDateTime
@@ -32,6 +35,7 @@ class SavedInspection implements GormEntity<SavedInspection> {
 	LocalDateTime sent
 
 	@JsonDeserialize(using = SavedItemsDeserializer)
+	@JsonInclude
 	List<SavedItem> items
 
 	static transients = ['items']
@@ -42,9 +46,13 @@ class SavedInspection implements GormEntity<SavedInspection> {
 
 	enum State {
 
-		PENDING({ List<SavedItem> items -> false }),
-		STARTED({ List<SavedItem> items -> items.find { it.item.required && !it.filled } as boolean }),
-		FINISHED({ List<SavedItem> items -> !items.find { it.item.required && !it.filled } as boolean })
+		PENDING({ List<SavedItem> savedItems, List<Item> items -> false }),
+		STARTED({ List<SavedItem> savedItems, List<Item> items ->
+			savedItems.find { Utils.findItem(it.code, items).required && !it.filled } as boolean
+		}),
+		FINISHED({ List<SavedItem> savedItems, List<Item> items ->
+			!savedItems.find { Utils.findItem(it.code, items).required && !it.filled } as boolean
+		})
 
 		final Closure<Boolean> check
 

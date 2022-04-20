@@ -5,8 +5,10 @@ import grails.gorm.services.Service
 import grails.gorm.services.Where
 import inspections.management.domains.SavedInspection
 import inspections.management.domains.fviberi.Order
+import inspections.management.domains.items.Item
 import inspections.management.domains.savedItems.SavedItem
 import inspections.management.utils.Constants
+import inspections.management.utils.Utils
 
 import javax.inject.Inject
 import java.time.LocalDateTime
@@ -16,12 +18,13 @@ abstract class SavedInspectionDataService {
 
 	@Inject SavedItemDataService savedItemDataService
 	@Inject ItemVehicleDataDataService itemVehicleDataDataService
+	@Inject ItemDataService itemDataService
 
 	abstract SavedInspection findSavedInspection(Integer orderNumber)
 
 	abstract Integer findSavedInspectionOrderNumber(String numberPlate, Map args)
 
-	abstract SavedInspection find(Integer orderNumber, String numberPlate)
+	abstract SavedInspection findSavedInspection(Integer orderNumber, String numberPlate)
 
 	@Where({ orderNumber in orderNumbers })
 	abstract List<SavedInspection> findAllSavedInspections(List<Integer> orderNumbers)
@@ -37,7 +40,17 @@ abstract class SavedInspectionDataService {
 
 	SavedInspection find(int orderNumber, boolean fillItem = false) {
 		SavedInspection savedInspection = findSavedInspection(orderNumber)
+		return fillSavedInspection(savedInspection, fillItem)
+	}
+
+	SavedInspection fillSavedInspection(SavedInspection savedInspection, boolean fillItem) {
 		savedInspection.items = savedItemDataService.findAll(savedInspection.id)
+		if (fillItem) {
+			List<Item> items = itemDataService.findAll((List<String>) savedInspection.items.code)
+			savedInspection.items.each { SavedItem savedItem ->
+				savedItem.item = items.find { it.code == savedItem.code }
+			}
+		}
 		return savedInspection
 	}
 
@@ -45,32 +58,28 @@ abstract class SavedInspectionDataService {
 		List<SavedInspection> savedInspections = findAllSavedInspections(orders.number as List<Integer>)
 		savedInspections.each { SavedInspection savedInspection ->
 			String orderState = orders.find { it.number == savedInspection.orderNumber }.state
-			if (!(orderState in Constants.CLOSED_ORDER_STATES)) {
-				savedInspection.items = savedItemDataService.findAll(savedInspection.id)
-			}
+			savedInspection.items = orderState in Constants.CLOSED_ORDER_STATES ?
+				[] : savedItemDataService.findAll(savedInspection.id)
 		}
 		return savedInspections
 	}
 
 	SavedInspection update(SavedInspection savedInspection, SavedInspection existentSavedInspection) {
+		List<Item> items = itemDataService.findAll((List<String>) savedInspection.items.code)
 		savedInspection.items.each { SavedItem savedItem ->
-			SavedItem existentSavedItem = existentSavedInspection.items.find { it.item.code == savedItem.item.code }
+			SavedItem existentSavedItem = existentSavedInspection.items.find { it.code == savedItem.code }
 			if (!existentSavedItem) {
-				fillSavedItem(savedItem, existentSavedInspection.id)
+				savedItem.savedInspectionId = existentSavedInspection.id
 				savedItemDataService.save(savedItem)
 			} else if (savedItem != existentSavedItem) {
-				savedItemDataService.update(existentSavedItem, savedItem)
+				Item item = Utils.findItem(savedItem.code, items)
+				savedItemDataService.update(existentSavedItem, savedItem, item)
 			}
 		}
 		SavedInspection.State state = SavedInspection.State.values().find {
-			((Closure<Boolean>) it.check)(savedInspection.items)
+			((Closure<Boolean>) it.check)(savedInspection.items, items)
 		}
 		return update(existentSavedInspection.id, state, savedInspection.sellerCode)
-	}
-
-	void fillSavedItem(SavedItem savedItem, long savedInspectionId) {
-		savedItem.savedInspectionId = savedInspectionId
-		savedItem.item = itemVehicleDataDataService.find(savedItem.item.code)
 	}
 
 }

@@ -57,19 +57,19 @@ export class InspectionTyreSheetComponent implements OnInit {
 	}
 
 	findStateItem(savedItems: SavedItem[]): SavedItem {
-		return savedItems.find(savedItem => savedItem.item.code.startsWith(Constants.TYRE_ITEM_CODES[0]));
+		return savedItems.find(savedItem => savedItem.code.startsWith(Constants.TYRE_ITEM_CODES[0]));
 	}
 
 	findAgeItem(savedItems: SavedItem[]): SavedItem {
-		return savedItems.find(savedItem => savedItem.item.code.startsWith(Constants.TYRE_ITEM_CODES[1]));
+		return savedItems.find(savedItem => savedItem.code.startsWith(Constants.TYRE_ITEM_CODES[1]));
 	}
 
 	findDepthItem(savedItems: SavedItem[]): SavedItem {
-		return savedItems.find(savedItem => savedItem.item.code.startsWith(Constants.TYRE_ITEM_CODES[2]));
+		return savedItems.find(savedItem => savedItem.code.startsWith(Constants.TYRE_ITEM_CODES[2]));
 	}
 
 	findSelectOptions(savedItem: SavedItem): SelectItemOption[] {
-		return this.groupedItemOptions.find(o => o.itemCode === savedItem.item.code).options;
+		return this.groupedItemOptions.find(o => o.itemCode === savedItem.code).options;
 	}
 
 	findOption(savedItem: SavedItem): SelectItemOption {
