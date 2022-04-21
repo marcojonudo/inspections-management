@@ -286,11 +286,18 @@ export class InspectionService {
 
 	static findPendingClientContactOrders(savedInspections: SavedInspection[] = this.savedInspections): number[] {
 		const pendingContactOrders = [];
-		savedInspections.forEach(savedInspection => {
-			const pending = InspectionService.findBudgetNotifications(savedInspection.orderNumber).length === 0;
-			if (pending) {
-				pendingContactOrders.push(savedInspection.orderNumber);
-			}
+		/* Se obtienen sólo aquellas revisiones que estén finalizadas y tengan algún item mal */
+		savedInspections
+			.filter(s => s.state === Constants.INSPECTION_STATE.FINISHED && s.itemBudgets.length)
+			.forEach(savedInspection => {
+				const order = this.findOrder(savedInspection.orderNumber);
+				/* Si no existe order, significa que ya está vendida, por lo que no se debe contar */
+				if (order) {
+					const pending = InspectionService.findBudgetNotifications(savedInspection.orderNumber).length === 0;
+					if (pending) {
+						pendingContactOrders.push(savedInspection.orderNumber);
+					}
+				}
 		});
 		return pendingContactOrders;
 	}
