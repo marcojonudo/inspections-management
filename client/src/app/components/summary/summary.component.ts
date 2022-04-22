@@ -8,6 +8,8 @@ import { Subscription } from 'rxjs';
 import { Constants } from '../../utils/constants';
 import { ItemBudget } from '../../objects/item-budget';
 import { RealTimeService } from '../../services/real-time.service';
+import { MatDialog } from '@angular/material/dialog';
+import { PendingContactsDialogComponent } from '../pending-contacts-dialog/pending-contacts-dialog.component';
 
 @Component({
 	selector: 'app-summary',
@@ -28,6 +30,7 @@ export class SummaryComponent implements OnDestroy {
 	constructor(
 		private inspectionService: InspectionService,
 		private realTimeService: RealTimeService,
+		private dialog: MatDialog,
 		private cdRef: ChangeDetectorRef
 	) {
 		this.todayFilter = [new TodayOrdersFilter()];
@@ -172,6 +175,11 @@ export class SummaryComponent implements OnDestroy {
 		const totalItems = [].concat(...savedInspections.map(s => s.items.filter(i => i.item.type === Constants.ITEM_TYPE.SELECT)));
 		const wrongItems = totalItems.filter(i => i.filled && InspectionService.checkWrongSelectValue(i.findValue()));
 		return totalItems.length ? wrongItems.length / totalItems.length : 0;
+	}
+
+	showPendingClientContacts(): void {
+		const pendingContactOrders = InspectionService.findPendingClientContactOrders();
+		this.dialog.open(PendingContactsDialogComponent, { data: { orders: pendingContactOrders } });
 	}
 
 }

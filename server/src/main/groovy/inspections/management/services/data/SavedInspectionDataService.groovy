@@ -30,7 +30,12 @@ abstract class SavedInspectionDataService {
 
 	abstract SavedInspection update(Serializable id, LocalDateTime sent, String sellerCode)
 
-	SavedInspection find(int orderNumber) {
+	SavedInspection find(Integer orderNumber, String numberPlate, boolean fillItem = false) {
+		SavedInspection savedInspection = findSavedInspection(orderNumber, numberPlate)
+		return savedInspection ? fillSavedInspection(savedInspection, fillItem) : null
+	}
+
+	SavedInspection find(int orderNumber, boolean fillItem = false) {
 		SavedInspection savedInspection = findSavedInspection(orderNumber)
 		savedInspection.items = savedItemDataService.findAll(savedInspection.id)
 		return savedInspection

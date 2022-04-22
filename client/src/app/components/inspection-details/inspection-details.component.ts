@@ -15,7 +15,6 @@ import { EmployeeDialogComponent } from '../employee-dialog/employee-dialog.comp
 import { ImageDialogComponent } from '../image-dialog/image-dialog.component';
 import { Image } from '../../objects/inspections/image';
 import { RealTimeService } from '../../services/real-time.service';
-import { InspectionVehicle } from '../../objects/inspections/inspection-vehicle';
 
 export interface InspectionDetailsColumn {
 	item: ItemBudget;
@@ -87,6 +86,10 @@ export class InspectionDetailsComponent implements OnDestroy {
 		this.realTimeActionsSubscription.unsubscribe();
 	}
 
+	get commentsItemCode(): string {
+		return Constants.ITEM_CODE.C;
+	}
+
 	buildData(
 		orderInspection: OrderInspection,
 		savedInspection: SavedInspection,
@@ -135,12 +138,13 @@ export class InspectionDetailsComponent implements OnDestroy {
 
 	updateNotifiedClient(
 		notified: boolean,
+		itemCodes: string[] = undefined,
 		orderInspection: OrderInspection = this.orderInspection,
 		savedInspection: SavedInspection = this.savedInspection
 	): void {
 		let observable;
 		if (notified) {
-			const itemCodes = savedInspection.itemBudgets.map(i => i.itemCode);
+			itemCodes = itemCodes ? itemCodes : savedInspection.itemBudgets.map(i => i.itemCode);
 			observable = this.inspectionService.createBudgetNotification(orderInspection.order.number, itemCodes);
 		} else {
 			observable = this.inspectionService.deleteBudgetNotification(orderInspection.order.number);

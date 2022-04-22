@@ -46,8 +46,9 @@
 				</td>
 			</ng-container>
 			<ng-container matColumnDef="clientContact">
-				<th mat-header-cell *matHeaderCellDef class="indicator-column client-contact-header">
+				<th mat-header-cell *matHeaderCellDef class="indicator-column">
 					<span
+						class="client-contact"
 						[ngClass]="{'notified': checkNotifiedClient(), 'disabled': !data}"
 						(click)="updateNotifiedClient(!checkNotifiedClient())"
 						matRipple>
@@ -71,9 +72,18 @@
 		<ng-template #emptyTemplate>
 			<div *ngIf="orderInspection" id="correct-inspection">
 				<p translate>message.noWrongItems</p>
-				<button mat-icon-button (click)="openInspection()">
-					<mat-icon>visibility</mat-icon>
-				</button>
+				<div>
+					<button mat-icon-button (click)="openInspection()">
+						<mat-icon>visibility</mat-icon>
+					</button>
+					<span
+						class="client-contact"
+						[ngClass]="{'notified': checkNotifiedClient(), 'disabled': !data}"
+						(click)="updateNotifiedClient(!checkNotifiedClient(), [commentsItemCode])"
+						matRipple>
+						{{findColumnName(columnsToDisplay[5])}}
+					</span>
+				</div>
 			</div>
 		</ng-template>
 	</div>

@@ -10,6 +10,9 @@
 	<mat-icon>date_range</mat-icon>
 </button>
 <span class="label">Todas</span>
+<button mat-icon-button (click)="refresh()">
+	<mat-icon>refresh</mat-icon>
+</button>
 <div *ngIf="checkUrl(inspectionPath)">
 	<button mat-icon-button [@buttonAnimation] (click)="print()">
 		<mat-icon>print</mat-icon>

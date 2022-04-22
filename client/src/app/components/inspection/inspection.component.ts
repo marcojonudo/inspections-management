@@ -61,8 +61,8 @@ export class InspectionComponent {
 
 		const savedItems = this.savedInspection.items.filter(i => i.item.header === undefined && i.item.print);
 		this.tyreGroupedItems = this.findTyreItems(savedItems);
-		const depthCodes = this.CAR_TYRES.map(carTyre => `${Constants.DEPTH_ITEM_CODE}${carTyre}`);
-		const depthItems = savedItems.filter(i => depthCodes.find(c => c === i.item.code) !== undefined);
+		const depthCodes = this.CAR_TYRES.map(carTyre => `${Constants.ITEM_CODE.PN}${carTyre}`);
+		const depthItems = savedItems.filter(i => depthCodes.find(c => c === i.code) !== undefined);
 		this.showTyreSheet = depthItems.find(i => i.imageId) !== undefined;
 		this.visualControlSavedItem = savedItems.find(i => i.item.code === 'CVGN');
 		this.pressureSavedItem = savedItems.find(i => i.item.code === 'PPN');

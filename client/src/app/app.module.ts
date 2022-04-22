@@ -43,6 +43,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { InspectionTyreSheetComponent } from './components/inspection/inspection-tyre-sheet/inspection-tyre-sheet.component';
 import { InspectionImagesSheetComponent } from './components/inspection/inspection-images-sheet/inspection-images-sheet.component';
 import { EmailDialogComponent } from './components/email-dialog/email-dialog.component';
+import { PendingContactsDialogComponent } from './components/pending-contacts-dialog/pending-contacts-dialog.component';
 registerLocaleData(localeEs);
 
 @NgModule({
@@ -65,7 +66,8 @@ registerLocaleData(localeEs);
 		SeparatorInputComponent,
 		InspectionTyreSheetComponent,
 		InspectionImagesSheetComponent,
-		EmailDialogComponent
+		EmailDialogComponent,
+		PendingContactsDialogComponent
 	],
 	imports: [
 		BrowserModule,

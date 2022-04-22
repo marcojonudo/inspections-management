@@ -284,18 +284,27 @@ export class InspectionService {
 		return itemBudgets;
 	}
 
-	static findPendingClientContactOrders(savedInspections: SavedInspection[] = this.savedInspections): number[] {
+	static findPendingClientContactOrders(savedInspections: SavedInspection[] = this.savedInspections): Order[] {
 		const pendingContactOrders = [];
 		/* Se obtienen sólo aquellas revisiones que estén finalizadas y tengan algún item mal */
 		savedInspections
-			.filter(s => s.state === Constants.INSPECTION_STATE.FINISHED && s.itemBudgets.length)
+			.filter(s => s.state === Constants.INSPECTION_STATE.FINISHED)
+			.filter(s => {
+				/* Si hay algún item mal, la revisión debe contar */
+				if (s.itemBudgets.length > 0) {
+					return true;
+				}
+				/* Si los items están bien, pero la revisión tiene comentarios, también debe contar */
+				const comments = s.items.find(i => i.code === Constants.ITEM_CODE.C).findValue();
+				return comments !== undefined && comments !== '';
+			})
 			.forEach(savedInspection => {
 				const order = this.findOrder(savedInspection.orderNumber);
 				/* Si no existe order, significa que ya está vendida, por lo que no se debe contar */
 				if (order) {
 					const pending = InspectionService.findBudgetNotifications(savedInspection.orderNumber).length === 0;
 					if (pending) {
-						pendingContactOrders.push(savedInspection.orderNumber);
+						pendingContactOrders.push(order);
 					}
 				}
 		});

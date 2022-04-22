@@ -13,9 +13,16 @@ export class Constants {
 	static readonly EMPLOYEE_CODE_MAX_LENGTH: number = 7;
 	static readonly TEXT_ITEM_MAX_LENGTH = 10;
 	static readonly ROW_IMAGES = 4;
-	static readonly TYRE_ITEM_CODES = ['EN', 'FN', 'PN'];
-	static readonly DEPTH_ITEM_CODE = 'PN';
 	static readonly DETECTED_FAULTS_CODE = 'AD';
+
+	static readonly ITEM_CODE: any = {
+		C: 'C',
+		PN: 'PN',
+		EN: 'EN',
+		FN: 'FN'
+	};
+
+	static readonly TYRE_ITEM_CODES = [Constants.ITEM_CODE.EN, Constants.ITEM_CODE.FN, Constants.ITEM_CODE.PN];
 
 	static readonly LOCAL_STORAGE: any = {
 		LANGUAGE: 'language',

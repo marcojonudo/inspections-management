@@ -13,6 +13,7 @@ import { SnackBarService } from '../../services/snack-bar.service';
 import { AllOrdersFilter } from '../../objects/filters/all-orders-filter';
 import { EmployeeService } from '../../services/employee.service';
 import { HttpClient } from '@angular/common/http';
+import { LocalStorageService } from '../../services/local-storage.service';
 
 @Component({
 	selector: 'app-tools-bar',
@@ -118,6 +119,11 @@ export class ToolsBarComponent {
 				this.snackBarService.open(Constants.MESSAGE_CODE.ERROR_SAVING_INSPECTION, Constants.SNACK_BAR.TYPE.ERROR);
 			}
 		);
+	}
+
+	refresh(): void {
+		LocalStorageService.clear();
+		window.location.reload();
 	}
 
 }
