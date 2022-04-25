@@ -3,7 +3,7 @@ import { InspectionDetailsColumn } from '../../../components/inspection-details/
 
 export abstract class RealTimeAction {
 
-	private type: string;
+	type: string;
 
 	protected constructor(type: string) {
 		this.type = type;
@@ -15,7 +15,7 @@ export abstract class RealTimeAction {
 
 	abstract update(): void;
 
-	abstract updateInspectionsLayout(column: InspectionsColumn, columns: InspectionsColumn[]): InspectionsColumn[];
+	abstract updateInspectionsLayout(rows: InspectionsColumn[], row: InspectionsColumn): InspectionsColumn[];
 
 	abstract updateDetailsLayout(columns: InspectionDetailsColumn[]): InspectionDetailsColumn[];
 

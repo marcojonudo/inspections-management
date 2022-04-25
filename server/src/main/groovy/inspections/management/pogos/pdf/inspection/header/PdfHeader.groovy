@@ -29,7 +29,7 @@ class PdfHeader extends IPdf {
     ) {
         id = "header"
         title = new Title([], "title", new Image([], "logo", "img/feuvert-logo.png"), inspectionName)
-        Set<SavedItem> headerItems = savedInspection.items.findAll { it.item.header }
+        List<SavedItem> headerItems = savedInspection.items.findAll { it.item.header }
         cards = [
             (Card) new InfoCard(order, savedInspection),
             (Card) new CentreCard(centre),

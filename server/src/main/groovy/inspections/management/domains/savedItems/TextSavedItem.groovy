@@ -2,6 +2,7 @@ package inspections.management.domains.savedItems
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import grails.gorm.annotation.Entity
+import inspections.management.domains.items.SelectItemOption
 import inspections.management.domains.items.TextItem
 import inspections.management.domains.items.TextItemField
 import inspections.management.pogos.pdf.inspection.items.PdfTextItem
@@ -44,7 +45,7 @@ class TextSavedItem extends SavedItem implements GormEntity<TextSavedItem> {
 		return findValue() ? ((TextItem) this.item).unit ?: "" : ""
 	}
 
-	PdfItem buildPdfItem() {
+	PdfItem buildPdfItem(List<SelectItemOption> options) {
 		return new PdfTextItem(this)
 	}
 

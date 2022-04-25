@@ -22,9 +22,9 @@ class TyresPage extends PdfInspectionPage {
         List<SelectItemOption> options
     ) {
         super(header, vehicleType, false)
-        SavedItem visualControlSavedItem = savedInspection.items.find { it.item.code == Constants.ItemCode.CVGN }
-        SavedItem measurementSavedItem = savedInspection.items.find { it.item.code == Constants.ItemCode.PN }
-        SavedItem pressureSavedItem = savedInspection.items.find { it.item.code == Constants.ItemCode.PPN }
+        SavedItem visualControlSavedItem = savedInspection.items.find { it.code == Constants.ItemCode.CVGN }
+        SavedItem measurementSavedItem = savedInspection.items.find { it.code == Constants.ItemCode.PN }
+        SavedItem pressureSavedItem = savedInspection.items.find { it.code == Constants.ItemCode.PPN }
         this.categories = [
             (Card) new TyresCard(categories, visualControlSavedItem, measurementSavedItem, pressureSavedItem, options)
         ]

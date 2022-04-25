@@ -41,7 +41,7 @@ class PdfInspection extends IPdf {
             pages << new TyresPage(header, savedInspection, tyreCategories, vehicleType, options)
         }
         groupedCategories.each {
-            pages << (PdfInspectionPage) new ItemsPage(header, savedInspection, it, vehicleType, onePage)
+            pages << (PdfInspectionPage) new ItemsPage(header, savedInspection, it, vehicleType, options, onePage)
         }
         groupedImageCategories.each {
             pages << (PdfInspectionPage) new ImagesPage(header, savedInspection, it, vehicleType, onePage)

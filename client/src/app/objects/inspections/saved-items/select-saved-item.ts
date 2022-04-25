@@ -1,12 +1,13 @@
-import {SavedItem} from './saved-item';
+import { SavedItem } from './saved-item';
 import { Constants } from '../../../utils/constants';
+import { SelectItem } from '../items/select-item';
 
 export class SelectSavedItem extends SavedItem {
 
 	value: string;
 
-	constructor(savedItem: SelectSavedItem) {
-		super(savedItem);
+	constructor(savedItem: SelectSavedItem, item: SelectItem) {
+		super(savedItem, item);
 		this.value = savedItem.value;
 	}
 

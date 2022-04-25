@@ -51,22 +51,22 @@
 		}
 	},
 	"print": {
-		"info": "Información",
-		"adviser": "Asesor",
-		"mechanic": "Mecánico",
-		"mechanics": "Mecánicos",
-		"day": "Día",
-		"orderNumber": "Nº orden",
+		"info": "Em formação",
+		"adviser": "Assessor",
+		"mechanic": "Mecânico",
+		"mechanics": "Mecânica",
+		"day": "Dia",
+		"orderNumber": "Nº pedido",
 		"centre": "Centro",
-		"vehicle": "Vehículo",
+		"vehicle": "Veículo",
 		"client": "Cliente",
-		"summary": "Resumen",
-		"numberPlate": "Matrícula",
+		"summary": "Resumo",
+		"numberPlate": "Registro carro",
 		"model": "Modelo",
 		"cylinder": "Cilindrada",
 		"engine": "Motor",
-		"power": "Potencia",
-		"registration": "Matriculación",
+		"power": "Potência",
+		"registration": "Ano",
 		"tyre": "Pneu",
 		"tyreState": "Estado pneu",
 		"tyreMin": "1.6mm mínimo legal",
@@ -81,25 +81,25 @@
 		}
 	},
 	"dialog": {
-		"employeeCode": "Código de empleado",
-		"introduceEmployeeCode": "Introduce el código de empleado",
+		"employeeCode": "Código de funcionário",
+		"introduceEmployeeCode": "Digite o código de funcionário",
 		"email": "Endereço de e-mail",
 		"introduceEmail": "Digite um endereço de e-mail",
 		"cancel": "Cancelar",
 		"accept": "Aceitar"
 	},
 	"validation": {
-		"requiredEmployeeCode": "Debes introducir un código de empleado"
+		"requiredEmployeeCode": "Deve inserir o código de funcionário"
 	},
 	"message": {
-		"EMPLOYEE_NOT_FOUND": "Empleado no encontrado. Accede a la aplicación de horarios para sincronizarlos y prueba de nuevo",
-		"ERROR_SAVING_INSPECTION": "Error al guardar la revisión. Por favor, inténtalo de nuevo",
-		"SAVED_INSPECTION": "Revisión guardada correctamente",
-		"ORDER_WITHOUT_SAVED_INSPECTION": "La orden no tiene una revisión guardada asociada",
+		"EMPLOYEE_NOT_FOUND": "Funcionário não encontrado. Aceda a aplicação de agendamento para sincronizar e tente novamente",
+		"ERROR_SAVING_INSPECTION": "Falha ao guardar a revisão. Por favor, tente novamente",
+		"SAVED_INSPECTION": "Revisão guardada com sucesso",
+		"ORDER_WITHOUT_SAVED_INSPECTION": "O pedido não tem uma revisão guardada associada",
 		"NOT_FINISHED_SAVED_INSPECTION": "A revisão associada ainda está em andamento!",
 		"noWrongItems": "Revisão sem itens em mau estado!",
 		"SENDING_MAIL": "Enviando email...",
-		"SUCCESS_SENDING_MAIL": "¡Email enviado!",
-		"ERROR_SENDING_MAIL": "Erro ao enviar e-mail. ¡Tenta de novo!"
+		"SUCCESS_SENDING_MAIL": "Email enviado!",
+		"ERROR_SENDING_MAIL": "Erro ao enviar e-mail. Tenta de novo!"
 	}
 }

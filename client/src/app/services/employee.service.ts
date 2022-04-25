@@ -3,7 +3,7 @@ import { Employee } from '../objects/employee';
 import { HttpClient } from '@angular/common/http';
 import { LocalStorageService } from './local-storage.service';
 import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { Constants } from '../utils/constants';
 import { Url } from '../utils/url';
 
@@ -40,8 +40,8 @@ export class EmployeeService {
 	}
 
 	findEmployees(): Observable<any> {
-		const employees = LocalStorageService.getItem(Constants.LOCAL_STORAGE.EMPLOYEES);
-		return employees ? of(employees) : this.http.get(Url.employees()).pipe(
+		return this.http.get(Url.employees()).pipe(
+			tap(e => EmployeeService.setEmployees(e)),
 			catchError(() => of([]))
 		);
 	}

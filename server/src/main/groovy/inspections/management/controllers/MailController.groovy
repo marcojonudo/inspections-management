@@ -29,7 +29,7 @@ class MailController {
         description = "Correo enviado",
         content = @Content(mediaType = "application/json", schema = @Schema(type = "string"))
     )
-    HttpResponse sendMail(@QueryValue int orderNumber, @QueryValue String to, @QueryValue String employeeCode) {
+    HttpResponse sendMail(@QueryValue Integer orderNumber, @QueryValue String to, @QueryValue String employeeCode) {
         inspectionService.sendInspectionMail(orderNumber, to, employeeCode)
         return HttpResponse.ok()
     }

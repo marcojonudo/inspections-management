@@ -2,6 +2,7 @@ package inspections.management.pogos.pdf.inspection.cards
 
 import groovy.transform.CompileStatic
 import groovy.transform.TupleConstructor
+import inspections.management.domains.items.SelectItemOption
 import inspections.management.pogos.pdf.CategoryItems
 import inspections.management.pogos.pdf.inspection.cards.title.CardTitle
 import inspections.management.pogos.pdf.structure.cards.RowsCard
@@ -10,10 +11,10 @@ import inspections.management.pogos.pdf.structure.cards.RowsCard
 @TupleConstructor
 class CategoryCard extends RowsCard {
 
-    CategoryCard(CategoryItems categoryItems) {
+    CategoryCard(CategoryItems categoryItems, List<SelectItemOption> options) {
         super(
             new CardTitle("img/icons/right-arrow.svg", categoryItems.category.name),
-            categoryItems.items.sort { it.item.printOrder }.collect { it.buildPdfItem() }
+            categoryItems.items.sort { it.item.printOrder }.collect { it.buildPdfItem(options) }
         )
         this.classes << "category"
     }

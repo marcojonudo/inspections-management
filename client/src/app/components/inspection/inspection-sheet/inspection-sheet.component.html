@@ -38,18 +38,18 @@
 		<div class="items-info">
 			<div *ngFor="let item of cat.items | printOrder" class="item" [class.highlight]="checkWrongItem(item)">
 				<div
-					*ngIf="checkItemType(item.item.type, selectType); else textItemText"
+					*ngIf="checkItemType(item.type, selectType); else textItemText"
 					matRipple
 					(click)="toggleSelectOption(findSelectSavedItem(item))">
 					<div class="item-text" [innerHTML]="item.item.name"></div>
 					<div class="item-data">
 						<mat-icon
-							*ngFor="let option of findSelectItem(item.item).options | order; let i = index"
+							*ngFor="let option of findSelectItemOptions(item) | order; let i = index"
 							class="select-item-icon"
 							[ngClass]="{
 								'front': checkSelectedOption(item.findValue(), option.code, item, i),
-								'left': checkLeftOption(findSelectSavedItem(item), findSelectItem(item.item).options, i),
-								'right': checkRightOption(findSelectSavedItem(item), findSelectItem(item.item).options, i)
+								'left': checkLeftOption(findSelectSavedItem(item), i),
+								'right': checkRightOption(findSelectSavedItem(item), i)
 							}"
 							[style.color]="findIconColor(findSelectSavedItem(item).value)">
 							{{option.printIcon}}

@@ -27,8 +27,8 @@
 			right: 0
 
 	.item-column
-		@include flex-2
-		min-width: 125px
+		min-width: 29%
+		max-width: 29%
 
 	.image-column, .inspection-button-column
 		width: 40px
@@ -37,19 +37,17 @@
 	.inspection-button-column mat-icon
 		font-size: 2.25em
 
-	.client-contact-header
+	.client-contact
+		border: 1px solid $grey
+		cursor: pointer
+		transition: background-color $fast-transition
+		border-radius: $border-radius
 
-		& > span
-			border: 1px solid $grey
-			cursor: pointer
-			transition: background-color $fast-transition
-			border-radius: $border-radius
+		&:hover, &.notified
+			background-color: $grey
 
-			&:hover, &.notified
-				background-color: $grey
-
-			&.disabled
-				pointer-events: none
+		&.disabled
+			pointer-events: none
 
 	#correct-inspection
 		height: 100%
@@ -57,10 +55,18 @@
 		text-align: center
 		background-color: $light-grey
 		color: rgba(0, 0, 0, .54)
-		font-size: $medium-font
-		font-weight: 500
 
-		mat-icon
-			height: 100%
-			width: 100%
-			font-size: 2.25em
+		p
+			font-size: $medium-font
+			font-weight: 500
+
+		& > div
+			@include flex-center
+
+			mat-icon
+				height: 100%
+				width: 100%
+				font-size: 2.25em
+
+			.client-contact
+				width: 6rem

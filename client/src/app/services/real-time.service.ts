@@ -2,9 +2,8 @@ import { Injectable } from '@angular/core';
 import { InspectionService } from './inspection.service';
 import { Url } from '../utils/url';
 import { RealTimeType } from '../objects/real-time/real-time-type';
-import { OrderInspectionVehicle } from '../objects/order-inspection-vehicle';
+import { OrderInspection } from '../objects/order-inspection';
 import { Observable, Subject } from 'rxjs';
-import { Order } from '../objects/orders/order';
 import { SavedInspection } from '../objects/inspections/saved-inspection';
 import { RealTimeAction } from '../objects/real-time/update/real-time-action';
 import { RealTimeObject } from '../objects/real-time/update/real-time-object';
@@ -45,40 +44,38 @@ export class RealTimeService {
 	}
 
 	syncOrders(
-		syncedOrderInspections: OrderInspectionVehicle[], orderInspections: OrderInspectionVehicle[] = InspectionService.orderInspections
+		syncedOrderInspections: OrderInspection[], orderInspections: OrderInspection[] = InspectionService.orderInspections
 	): void {
-		const syncedOrders = syncedOrderInspections.map(o => o.order);
-		const orders = orderInspections.map(o => o.order);
 		/* Se obtienen las actualizaciones en tiempo real (creación, actualización y borrado de OR) */
-		const updates = this.findOrdersUpdates(RealTimeType.ORDER_INSPECTIONS, syncedOrders, orders);
+		const updates = this.findOrdersUpdates(RealTimeType.ORDER_INSPECTIONS, syncedOrderInspections, orderInspections);
 
 		if (updates.length) {
-			console.log('orders', orders);
-			console.log('updates', updates);
 			updates.forEach(update => update.update());
 			this.realTimeActionsSubject.next(updates);
 		}
 	}
 
-	findOrdersUpdates(type: RealTimeType, syncedOrders: Order[], orders: Order[]): RealTimeAction[] {
+	findOrdersUpdates(
+		type: RealTimeType, syncedOrderInspections: OrderInspection[], orderInspections: OrderInspection[]
+	): RealTimeAction[] {
 		const updates = [];
 		/* Se recorre la lista de órdenes sincronizadas para comprobar si hay creaciones o actualizaciones */
-		syncedOrders.forEach(syncedOrder => {
-			const update = this.handleCreateOrUpdateAction(type, orders, syncedOrder);
+		syncedOrderInspections.forEach(syncedOrderInspection => {
+			const update = this.handleCreateOrUpdateAction(type, orderInspections, syncedOrderInspection);
 			if (update) {
 				updates.push(update);
 			}
 		});
 		/* Para comprobar si se ha borrado una orden, es necesario recorrer la lista de órdenes ya existentes (ya que una OR eliminada
 		 * no aparecerá en el nuevo array sincronizado) */
-		const deleteUpdates = this.findDeletedOrdersUpdates(syncedOrders, orders);
+		const deleteUpdates = this.findDeletedOrdersUpdates(syncedOrderInspections, orderInspections);
 		return updates.concat(deleteUpdates);
 	}
 
-	findDeletedOrdersUpdates(syncedOrders: Order[], orders: Order[]): RealTimeOrder[] {
+	findDeletedOrdersUpdates(syncedOrderInspections: OrderInspection[], orderInspections: OrderInspection[]): RealTimeOrder[] {
 		const updates = [];
-		orders.forEach(order => {
-			const realTimeDelete = new RealTimeOrderDelete(orders, syncedOrders, order);
+		orderInspections.forEach(orderInspection => {
+			const realTimeDelete = new RealTimeOrderDelete(orderInspections, syncedOrderInspections, orderInspection);
 			/* Si no se encuentra la orden entre las obtenidas para la sincronización, es que se ha borrado */
 			if (realTimeDelete.check()) {
 				updates.push(realTimeDelete);

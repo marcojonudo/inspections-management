@@ -1,5 +1,5 @@
 import { Order } from '../objects/orders/order';
-import { OrderInspectionVehicle } from '../objects/order-inspection-vehicle';
+import { OrderInspection } from '../objects/order-inspection';
 import { SavedInspection } from '../objects/inspections/saved-inspection';
 import { InspectionService } from '../services/inspection.service';
 import { ItemBudget } from '../objects/item-budget';
@@ -13,17 +13,27 @@ export class Constants {
 	static readonly EMPLOYEE_CODE_MAX_LENGTH: number = 7;
 	static readonly TEXT_ITEM_MAX_LENGTH = 10;
 	static readonly ROW_IMAGES = 4;
-	static readonly TYRE_ITEM_CODES = ['EN', 'FN', 'PN'];
-	static readonly DEPTH_ITEM_CODE = 'PN';
 	static readonly DETECTED_FAULTS_CODE = 'AD';
+
+	static readonly ITEM_CODE: any = {
+		C: 'C',
+		PN: 'PN',
+		EN: 'EN',
+		FN: 'FN'
+	};
+
+	static readonly TYRE_ITEM_CODES = [Constants.ITEM_CODE.EN, Constants.ITEM_CODE.FN, Constants.ITEM_CODE.PN];
 
 	static readonly LOCAL_STORAGE: any = {
 		LANGUAGE: 'language',
 		EMPLOYEES: 'employees',
 		EMPLOYEE: 'employee',
+		SELECT_ITEM_OPTIONS: 'selectItemOptions',
 		ITEM_BUDGETS: 'itemBudgets',
 		ITEM_VEHICLE_ARTICLE_CODES: 'itemVehicleArticleCodes',
-		CENTRE: 'centre'
+		CENTRE: 'centre',
+		RELATIONS: 'relations',
+		ITEMS: 'items'
 	};
 
 	static readonly MESSAGE_CODE: any = {
@@ -141,12 +151,12 @@ export class Constants {
 		orderNumber: (o: Order) => o.number,
 		brand: (o: Order) => o.vehicle.brand,
 		model: (o: Order) => o.vehicle.model,
-		inspectionType: (o: Order, inspection: OrderInspectionVehicle) => inspection.inspection,
-		inspectionState: (o: Order, inspection: OrderInspectionVehicle, savedInspection: SavedInspection) =>
+		inspectionType: (o: Order, inspection: OrderInspection) => inspection.inspection,
+		inspectionState: (o: Order, inspection: OrderInspection, savedInspection: SavedInspection) =>
 			savedInspection ? savedInspection.state : Constants.INSPECTION_STATE.PENDING,
-		mechanic: (o: Order, inspection: OrderInspectionVehicle, savedInspection: SavedInspection) =>
+		mechanic: (o: Order, inspection: OrderInspection, savedInspection: SavedInspection) =>
 			InspectionService.findMechanicCode(o, savedInspection),
-		budgets: (o: Order, inspection: OrderInspectionVehicle, savedInspection: SavedInspection) =>
+		budgets: (o: Order, inspection: OrderInspection, savedInspection: SavedInspection) =>
 			savedInspection ? savedInspection.itemBudgets : []
 	};
 
@@ -156,10 +166,16 @@ export class Constants {
 		budget: (i: ItemBudget, savedItem: SavedItem, budget: Budget) => budget
 	};
 
-	static readonly INSPECTION_TYPE: any = {
-		N: 'N'
-	};
+	static readonly PENDING_INSPECTION_ORDER_STATES: string[] = [
+		Constants.ORDER_STATE.F,
+		Constants.ORDER_STATE.C,
+		Constants.ORDER_STATE.E
+	];
 
-	static readonly NOT_FINISHED_ORDER_STATES: string[] = [Constants.ORDER_STATE.F, Constants.ORDER_STATE.C, Constants.ORDER_STATE.E];
+	static readonly CLOSED_ORDER_STATES: string[] = [
+		Constants.ORDER_STATE.V,
+		Constants.ORDER_STATE.F,
+		Constants.ORDER_STATE.X
+	];
 
 }

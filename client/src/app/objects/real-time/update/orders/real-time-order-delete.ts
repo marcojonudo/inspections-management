@@ -1,28 +1,28 @@
 import { Constants } from '../../../../utils/constants';
 import { RealTimeOrder } from './real-time-order';
-import { Order } from '../../../orders/order';
 import { InspectionsColumn } from '../../../../components/inspections/inspections.component';
 import { InspectionDetailsColumn } from '../../../../components/inspection-details/inspection-details.component';
+import { OrderInspection } from '../../../order-inspection';
 
 export class RealTimeOrderDelete extends RealTimeOrder {
 
-	constructor(orders: Order[], syncedOrders: Order[], order: Order) {
-		super(Constants.REAL_TIME_UPDATE_TYPE.DELETE, orders, syncedOrders, order, undefined);
+	constructor(orderInspections: OrderInspection[], syncedOrderInspections: OrderInspection[], orderInspection: OrderInspection) {
+		super(Constants.REAL_TIME_UPDATE_TYPE.DELETE, orderInspections, syncedOrderInspections, orderInspection, undefined);
 	}
 
 	check(): boolean {
-		return this.findIndex(this.syncedOrders, this.order) === -1;
+		return this.findIndex(this.syncedOrderInspections, this.orderInspection) === -1;
 	}
 
 	update(): void {
-		const i = this.findIndex(this.orders, this.order);
-		this.orders.splice(i, 1);
+		const i = this.findIndex(this.orderInspections, this.orderInspection);
+		this.orderInspections.splice(i, 1);
 	}
 
-	updateInspectionsLayout(column: InspectionsColumn, columns: InspectionsColumn[]): InspectionsColumn[] {
-		const i = columns.findIndex(c => c.orderNumber === this.order.number);
-		columns.splice(i, 1);
-		return [];
+	updateInspectionsLayout(rows: InspectionsColumn[], row: InspectionsColumn): InspectionsColumn[] {
+		const i = rows.findIndex(c => c.orderNumber === this.orderInspection.order.number);
+		rows.splice(i, 1);
+		return rows;
 	}
 
 	updateDetailsLayout(columns: InspectionDetailsColumn[]): InspectionDetailsColumn[] {

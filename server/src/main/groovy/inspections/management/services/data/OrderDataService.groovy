@@ -25,10 +25,10 @@ abstract class OrderDataService {
 
 	abstract Order findOrder(int number)
 
-	@Where({ day == day && !(state in Constants.CLOSED_ORDER_STATES) })
+	@Where({ day == day && state != Constants.CANCELED_ORDER_STATE })
 	abstract List<Order> findAllOrders(LocalDate day)
 
-	@Where({ day >= from && day < to && !(state in Constants.CLOSED_ORDER_STATES) })
+	@Where({ day >= from && day < to && state != Constants.CANCELED_ORDER_STATE })
 	abstract List<Order> findAllOrders(LocalDate from, LocalDate to)
 
 	@Where({ number in numbers })

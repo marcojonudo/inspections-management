@@ -7,8 +7,8 @@ export class TextSavedItem extends SavedItem {
 
 	fields: TextSavedItemField[];
 
-	constructor(savedItem: TextSavedItem) {
-		super(savedItem);
+	constructor(savedItem: TextSavedItem, item: TextItem) {
+		super(savedItem, item);
 		this.fields = savedItem.fields.map(field => new TextSavedItemField(field));
 	}
 

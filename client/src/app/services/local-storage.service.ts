@@ -14,4 +14,8 @@ export class LocalStorageService {
 		return item ? JSON.parse(item) : undefined;
 	}
 
+	static clear(): void {
+		localStorage.clear();
+	}
+
 }

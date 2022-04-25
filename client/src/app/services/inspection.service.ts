@@ -10,7 +10,7 @@ import { ItemVehicleArticleCode } from '../objects/orders/item-vehicle-article-c
 import { ItemBudget } from '../objects/item-budget';
 import { BudgetNotification } from '../objects/budget-notification';
 import { Budget } from '../objects/orders/budget';
-import { OrderInspectionVehicle } from '../objects/order-inspection-vehicle';
+import { OrderInspection } from '../objects/order-inspection';
 import { SavedInspection } from '../objects/inspections/saved-inspection';
 import { ListElement } from '../objects/list-elements/list-element';
 import { NameElement } from '../objects/list-elements/name-element';
@@ -40,6 +40,8 @@ import { CountryHandlerType } from '../objects/country-info/country-handler-type
 import { MatDialog } from '@angular/material/dialog';
 import { EmailDialogComponent } from '../components/email-dialog/email-dialog.component';
 import { SnackBarService } from './snack-bar.service';
+import { GroupedItemOptions } from '../objects/inspections/items/grouped-item-options';
+import { ItemType } from '../objects/inspections/items/item-type';
 
 @Injectable({
 	providedIn: 'root'
@@ -47,17 +49,22 @@ import { SnackBarService } from './snack-bar.service';
 export class InspectionService {
 
 	static orders: Order[];
-	static orderInspections: OrderInspectionVehicle[];
+	static openedOrders: Order[];
+	static detectedAnomaliesOrders: Order[];
+	static orderInspections: OrderInspection[];
 	static savedInspections: SavedInspection[];
 	static itemBudgets: ItemBudget[];
 	static itemVehicleArticleCodes: ItemVehicleArticleCode[];
 	static budgetNotifications: BudgetNotification[];
-	static selectedOrderInspection: OrderInspectionVehicle;
+	static selectedOrderInspection: OrderInspection;
 	static selectedSavedInspection: SavedInspection;
 	static countryHandler: CountryHandler;
 	static centre: Centre;
 	static selectItemOptions: SelectItemOption[];
+	static groupedItemOptions: GroupedItemOptions[];
 	static inspectionHandler: InspectionHandler;
+	static relations: ItemRelation[];
+	static items: Item[];
 
 	private static readonly LEVEL_ELEMENTS: ((item: Item) => NameElement)[] = [
 		(item: Item) => item.vehicleData.garagePosition,
@@ -90,15 +97,15 @@ export class InspectionService {
 
 	filters: OrdersFilter[];
 
-	selectedOrderInspectionSubject: Subject<OrderInspectionVehicle>;
-	selectedOrderInspection$: Observable<OrderInspectionVehicle>;
+	selectedOrderInspectionSubject: Subject<OrderInspection>;
+	selectedOrderInspection$: Observable<OrderInspection>;
 	inspectionsTriggerSubject: Subject<void>;
 	inspectionsTrigger$: Observable<void>;
 
 	constructor(private http: HttpClient, private dialog: MatDialog, private snackBarService: SnackBarService) {
 		this.filters = [new TodayOrdersFilter()];
 
-		this.selectedOrderInspectionSubject = new Subject<OrderInspectionVehicle>();
+		this.selectedOrderInspectionSubject = new Subject<OrderInspection>();
 		this.selectedOrderInspection$ = this.selectedOrderInspectionSubject.asObservable();
 
 		this.inspectionsTriggerSubject = new Subject<void>();
@@ -111,13 +118,13 @@ export class InspectionService {
 	}
 
 	static initData(data: any[]): void {
-		InspectionService.itemBudgets = this.buildItemBudgets(data[0]);
+		this.buildSelectItemOptions(data[0]);
+		InspectionService.itemBudgets = this.buildItemBudgets(data[1]);
 		InspectionService.itemVehicleArticleCodes = InspectionService.itemVehicleArticleCodes.length ?
-			InspectionService.itemVehicleArticleCodes : data[1].map(i => new ItemVehicleArticleCode(i));
-		InspectionService.savedInspections = data[2].map(d => Builder.buildSavedInspection(d, InspectionService.itemBudgets));
-		InspectionService.budgetNotifications = data[3].map(b => new BudgetNotification(b));
-		InspectionService.centre = new Centre(data[4]);
-		InspectionService.selectItemOptions = InspectionService.findSelectItemOptions();
+			InspectionService.itemVehicleArticleCodes : data[2].map(i => new ItemVehicleArticleCode(i));
+		InspectionService.savedInspections = data[3].map(d => Builder.buildSavedInspection(d, InspectionService.itemBudgets));
+		InspectionService.budgetNotifications = data[4].map(b => new BudgetNotification(b));
+		InspectionService.centre = new Centre(data[5]);
 
 		console.log('Item budgets', InspectionService.itemBudgets);
 		console.log('Item vehicle article codes', InspectionService.itemVehicleArticleCodes);
@@ -126,9 +133,43 @@ export class InspectionService {
 		console.log('Centre', InspectionService.centre);
 	}
 
+	static buildSelectItemOptions(options: any[]): void {
+		this.selectItemOptions = [];
+		this.groupedItemOptions = [];
+		options.forEach(option => {
+			const existent = this.groupedItemOptions.find(o => o.itemCode === option.itemCode);
+			if (existent) {
+				existent.add(new SelectItemOption(option.option));
+			} else {
+				this.groupedItemOptions.push(new GroupedItemOptions(option.itemCode, option.option));
+			}
+
+			const existentOption = this.selectItemOptions.find(o => o.code === option.option.code);
+			if (!existentOption) {
+				this.selectItemOptions.push(new SelectItemOption(option.option));
+			}
+		});
+	}
+
 	static initOrderInspections(orderInspections: any[]): void {
-		InspectionService.orderInspections = orderInspections.map(d => new OrderInspectionVehicle(d)).filter(o => o.inspection);
+		InspectionService.orderInspections = orderInspections.map(d => new OrderInspection(d)).filter(o => o.inspection);
 		console.log('Order inspections', InspectionService.orderInspections);
+	}
+
+	static filterOrderInspections(
+		orderInspections: OrderInspection[] = this.orderInspections, detectedAnomaliesOrders: Order[] = this.detectedAnomaliesOrders
+	): OrderInspection[] {
+		return orderInspections.filter(o => {
+			const correctOrder = this.checkOpenedOrder(o.order) && o.order.keys;
+			if (!correctOrder) { return false; }
+
+			const detectedAnomaliesOrder = detectedAnomaliesOrders.find(order => order.number === o.order.number);
+			return detectedAnomaliesOrder ? true : o.inspection !== undefined;
+		});
+	}
+
+	static checkOpenedOrder(order: Order): boolean {
+		return Constants.CLOSED_ORDER_STATES.find(s => s === order.state) === undefined;
 	}
 
 	static buildItemBudgets(itemBudgets: any[]): ItemBudget[] {
@@ -144,19 +185,19 @@ export class InspectionService {
 	static filterItemBudgets(savedItems: SavedItem[], itemBudgets: ItemBudget[] = this.itemBudgets): ItemBudget[] {
 		return itemBudgets.filter(itemBudget => {
 			const item = savedItems.find(savedItem =>
-				savedItem.item.type === Constants.ITEM_TYPE.SELECT && savedItem.item.code === itemBudget.itemCode
+				savedItem.type === Constants.ITEM_TYPE.SELECT && savedItem.code === itemBudget.itemCode
 			);
 			return item && item.filled && InspectionService.checkWrongSelectValue(item.findValue());
 		});
 	}
 
-	static findOrder(orderNumber: number, orders: Order[] = this.orders): Order {
+	static findOrder(orderNumber: number, orders: Order[] = this.openedOrders): Order {
 		return orders.find(o => o.number === orderNumber);
 	}
 
 	static findOrderInspection(
-		orderNumber: number, orderInspections: OrderInspectionVehicle[] = this.orderInspections
-	): OrderInspectionVehicle {
+		orderNumber: number, orderInspections: OrderInspection[] = this.orderInspections
+	): OrderInspection {
 		return orderInspections.find(o => o.order.number === orderNumber);
 	}
 
@@ -216,13 +257,17 @@ export class InspectionService {
 		return budgetNotifications.filter(c => c.orderNumber === orderNumber);
 	}
 
-	static findAllItemBudgets(type: string = undefined, savedInspections: SavedInspection[] = this.savedInspections): ItemBudget[] {
+	static findAllItemBudgets(type: string = undefined, orderInspections: OrderInspection[] = this.orderInspections): ItemBudget[] {
 		const itemBudgets = [];
-		savedInspections.forEach(savedInspection => {
-			const foundItemBudgets = type ?
-				savedInspection.itemBudgets.filter(itemBudget => itemBudget.budgetType === type) :
-				savedInspection.itemBudgets;
-			itemBudgets.push(...foundItemBudgets);
+		orderInspections.forEach(orderInspection => {
+			const savedInspection = orderInspection.inspection ?
+				InspectionService.findSavedInspection(orderInspection.order.number) : undefined;
+			if (savedInspection) {
+				const foundItemBudgets = type ?
+					savedInspection.itemBudgets.filter(itemBudget => itemBudget.budgetType === type) :
+					savedInspection.itemBudgets;
+				itemBudgets.push(...foundItemBudgets);
+			}
 		});
 		return itemBudgets;
 	}
@@ -242,24 +287,38 @@ export class InspectionService {
 		return itemBudgets;
 	}
 
-	static findPendingClientContactOrders(savedInspections: SavedInspection[] = this.savedInspections): number[] {
+	static findPendingClientContactOrders(savedInspections: SavedInspection[] = this.savedInspections): Order[] {
 		const pendingContactOrders = [];
-		savedInspections.forEach(savedInspection => {
-			const pending = InspectionService.findBudgetNotifications(savedInspection.orderNumber).length === 0;
-			if (pending) {
-				pendingContactOrders.push(savedInspection.orderNumber);
-			}
+		/* Se obtienen sólo aquellas revisiones que estén finalizadas y tengan algún item mal */
+		savedInspections
+			.filter(s => s.state === Constants.INSPECTION_STATE.FINISHED)
+			.filter(s => {
+				/* Si hay algún item mal, la revisión debe contar */
+				if (s.itemBudgets.length > 0) {
+					return true;
+				}
+				/* Si los items están bien, pero la revisión tiene comentarios, también debe contar */
+				const comments = s.items.find(i => i.code === Constants.ITEM_CODE.C)?.findValue();
+				return comments !== undefined && comments !== '';
+			})
+			.forEach(savedInspection => {
+				const order = this.findOrder(savedInspection.orderNumber);
+				/* Si no existe order, significa que ya está vendida, por lo que no se debe contar */
+				if (order) {
+					const pending = InspectionService.findBudgetNotifications(savedInspection.orderNumber).length === 0;
+					if (pending) {
+						pendingContactOrders.push(order);
+					}
+				}
 		});
 		return pendingContactOrders;
 	}
 
-	static findOrdersBudgets(savedInspections: SavedInspection[] = this.savedInspections): Budget[] {
-		/* Si hay una revisión guardada, pero la orden no tiene código de revisión (por algún fallo de JPDV o porque lo hayan quitado),
-		 * el elemento de la lista será undefined. Por tanto, se filtra para eliminar estos casos */
-		const orderInspections = savedInspections
-			.map(i => InspectionService.findOrderInspection(i.orderNumber))
-			.filter(o => o !== undefined);
-		return [].concat(...orderInspections.map(o => o.order).map(o => o.budgets));
+	static findOrdersBudgets(orderInspections: OrderInspection[] = this.orderInspections): Budget[] {
+		const filteredOrderInspections = orderInspections.filter(orderInspection =>
+			orderInspection.inspection ? InspectionService.findSavedInspection(orderInspection.order.number) : undefined
+		);
+		return [].concat(...filteredOrderInspections.map(o => o.order).map(o => o.budgets));
 	}
 
 	static findBudgetsPrice(budgets: Budget[]): number {
@@ -325,30 +384,20 @@ export class InspectionService {
 			) !== undefined
 		);
 	}
-
-	static checkAcceptedBudget(budget: Budget): boolean {
-		return budget && budget.state === Constants.BUDGET_STATE.O;
-	}
-
 	static findSelectItems(savedInspections: SavedInspection[] = this.savedInspections): SelectItem[] {
 		const items = [];
 		savedInspections.forEach(savedInspection =>
-			items.push(...savedInspection.items.filter(i => i.item.type === Constants.ITEM_TYPE.SELECT).map(i => i.item))
+			items.push(...savedInspection.items.filter(i => i.type === Constants.ITEM_TYPE.SELECT).map(i => i.item))
 		);
 		return items;
 	}
 
-	static findSelectItemOptions(): SelectItemOption[] {
-		const options = [];
-		this.findSelectItems().forEach((item: SelectItem) => {
-			item.options.forEach((option: SelectItemOption) => {
-				const existent = options.find(o => o.code === option.code);
-				if (!existent) {
-					options.push(option);
-				}
-			});
-		});
-		return options;
+	static findRelations(itemCode: string, relations: ItemRelation[] = InspectionService.relations): ItemRelation[] {
+		return relations.filter(r => r.itemCode === itemCode);
+	}
+
+	static checkAcceptedBudget(budget: Budget): boolean {
+		return budget && budget.state === Constants.BUDGET_STATE.O;
 	}
 
 	static checkWrongSelectValue(value: string): boolean {
@@ -420,13 +469,13 @@ export class InspectionService {
 
 	static buildInspectionDetailsRow(
 		itemBudget: ItemBudget,
-		orderInspection: OrderInspectionVehicle = this.selectedOrderInspection,
+		orderInspection: OrderInspection = this.selectedOrderInspection,
 		savedItems: SavedItem[] = this.selectedSavedInspection.items,
 		columnsData: any = Constants.INSPECTION_DETAILS_COLUMN_DATA
 	): InspectionDetailsColumn {
 		let row = undefined;
 		const allColumns = Object.keys(columnsData);
-		const savedItem = savedItems.find(i => i.item.code === itemBudget.itemCode);
+		const savedItem = savedItems.find(i => i.code === itemBudget.itemCode);
 		const budget = InspectionService.findBudget(
 			itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
 		);
@@ -458,15 +507,16 @@ export class InspectionService {
 		savedInspection: SavedInspection,
 		employee: Employee = EmployeeService.employee
 	): Observable<ItemRelation> {
+		const relations = this.findRelations(item.code);
 		/* Antes de actualizar el valor, se debe comprobar si hay alguna relación que deshacer. Por ejemplo, al tener
 		 * 'Pastilla de freno' el valor 'No aplica', el espesor está oculto; sin embargo, en cuanto se actualiza el
 		 * valor de la primera, el segundo debe volver a aparecer (se está deshaciendo la relación) */
 		this.updateRelations(
-			savedItem, savedItem.findValue(), item.relations, this.ITEM_RELATION_RESTORE_ACTION, savedInspection
+			savedItem, savedItem.findValue(), relations, this.ITEM_RELATION_RESTORE_ACTION, savedInspection
 		).subscribe();
 		savedItem.update(value, employee.code);
 
-		return this.updateRelations(savedItem, savedItem.findValue(), item.relations, this.ITEM_RELATION_ACTION, savedInspection).pipe(
+		return this.updateRelations(savedItem, savedItem.findValue(), relations, this.ITEM_RELATION_ACTION, savedInspection).pipe(
 			finalize(() => {
 				LocalStorageService.setItem(Constants.LOCAL_STORAGE.SAVED_INSPECTION, savedInspection);
 			})
@@ -490,7 +540,7 @@ export class InspectionService {
 		employee: Employee = EmployeeService.employee
 	): void {
 		if (value === itemRelation.matchText) {
-			const targetSavedItem = savedInspection.items.find(i => i.item.code === itemRelation.targetItem.code);
+			const targetSavedItem = savedInspection.items.find(i => i.code === itemRelation.targetItemCode);
 			actions[itemRelation.action](targetSavedItem, savedItem.findValue(), employee.code);
 		}
 	}
@@ -517,7 +567,7 @@ export class InspectionService {
 
 	findLanguage(): Observable<string> {
 		const language = LocalStorageService.getItem(Constants.LOCAL_STORAGE.LANGUAGE);
-		return (language ? of(language) : this.http.get(Url.language(), { responseType: 'text' })).pipe(
+		return (language ? of(language) : this.http.get(Url.languages(), { responseType: 'text' })).pipe(
 			catchError(() => of(Constants.DEFAULT_LANGUAGE)),
 			tap((lang: string) => {
 				InspectionService.countryHandler = CountryHandlerType.parse(lang).handler;
@@ -530,16 +580,19 @@ export class InspectionService {
 	loadMainInfo(filters: OrdersFilter[] = this.filters): Observable<any> {
 		return this.findOrders(filters).pipe(
 			mergeMap(orders => {
-				InspectionService.orders = orders.filter(o => o.state !== Constants.ORDER_STATE.F);
-				console.log('Opened orders', InspectionService.orders);
+				InspectionService.orders = orders;
+				InspectionService.openedOrders = orders.filter(o => Constants.CLOSED_ORDER_STATES.find(s => s === o.state) === undefined);
+				console.log('All orders', InspectionService.orders);
+				console.log('Opened orders', InspectionService.openedOrders);
 
 				if (InspectionService.orders.length) {
 					const orderNumbers = InspectionService.orders.map(o => o.number);
 					const budgetNotificationsUrl = `${Url.budgetNotification()}?orderNumbers=${orderNumbers.join('&orderNumbers=')}`;
 					return forkJoin([
+						this.findSelectItemOptions(),
 						this.findItemBudgets(),
 						this.findItemVehicleArticleCodes(),
-						this.http.post(Url.savedInspections(), orderNumbers),
+						this.http.post(Url.savedInspections(), InspectionService.orders),
 						this.http.get(budgetNotificationsUrl),
 						this.findCentre()
 					]);
@@ -553,10 +606,10 @@ export class InspectionService {
 					InspectionService.initData(data);
 					/* Una vez obtenidas las revisiones guardadas, se puede comprobar qué números de orden tienen asociada una revisión de
 					 * anomalías detectadas */
-					const detectedAnomaliesOrders = InspectionService.savedInspections.filter(i => !i.orderInspection).map(i =>
+					InspectionService.detectedAnomaliesOrders = InspectionService.savedInspections.filter(i => !i.orderInspection).map(i =>
 						InspectionService.orders.find(o => o.number === i.orderNumber)
 					);
-					const body = { openedOrders: InspectionService.orders, detectedAnomaliesOrders };
+					const body = { orders: InspectionService.orders, detectedAnomaliesOrders: InspectionService.detectedAnomaliesOrders };
 					return this.http.post(Url.inspections(), body);
 				}
 				return of([]);
@@ -569,9 +622,42 @@ export class InspectionService {
 		);
 	}
 
-	findCentre(): Observable<any> {
-		const savedCentre = LocalStorageService.getItem(Constants.LOCAL_STORAGE.CENTRE);
-		return savedCentre ? of(savedCentre) : this.http.get(Url.centre());
+	findCentre(): Observable<string> {
+		const centre = LocalStorageService.getItem(Constants.LOCAL_STORAGE.CENTRE);
+		return (centre ? of(centre) : this.http.get(Url.centres())).pipe(
+			tap(c => {
+				InspectionService.centre = new Centre(c);
+				LocalStorageService.setItem(Constants.LOCAL_STORAGE.CENTRE, InspectionService.centre);
+				console.log('Centre', InspectionService.centre);
+			})
+		);
+	}
+
+	findRelations(): Observable<string> {
+		const rel = LocalStorageService.getItem(Constants.LOCAL_STORAGE.RELATIONS);
+		return (rel ? of(rel) : this.http.get(Url.itemRelations())).pipe(
+			tap(relations => {
+				InspectionService.relations = relations.map(r => new ItemRelation(r));
+				LocalStorageService.setItem(Constants.LOCAL_STORAGE.RELATIONS, InspectionService.relations);
+				console.log('Item relations', InspectionService.relations);
+			})
+		);
+	}
+
+	findItems(): Observable<string> {
+		const items = LocalStorageService.getItem(Constants.LOCAL_STORAGE.ITEMS);
+		return (items ? of(items) : this.http.get(Url.items())).pipe(
+			tap(i => {
+				InspectionService.items = i.map(item => ItemType.parse(item.type).buildItem(item));
+				LocalStorageService.setItem(Constants.LOCAL_STORAGE.ITEMS, InspectionService.items);
+				console.log('Items', InspectionService.items);
+			})
+		);
+	}
+
+	findSelectItemOptions(): Observable<any> {
+		const options = LocalStorageService.getItem(Constants.LOCAL_STORAGE.SELECT_ITEM_OPTIONS);
+		return options ? of(options) : this.http.get(Url.selectItemOptions());
 	}
 
 	findItemBudgets(): Observable<any> {
@@ -598,7 +684,7 @@ export class InspectionService {
 		);
 	}
 
-	checkSelectedOrder(orderNumber: number, orderInspection: OrderInspectionVehicle = InspectionService.selectedOrderInspection): boolean {
+	checkSelectedOrder(orderNumber: number, orderInspection: OrderInspection = InspectionService.selectedOrderInspection): boolean {
 		return orderInspection && orderInspection.order.number === orderNumber;
 	}
 
@@ -621,7 +707,7 @@ export class InspectionService {
 	}
 
 	deleteBudgetNotification(orderNumber: number): Observable<any> {
-		return this.http.delete(Url.budgetNotification(), { params: { orderNumber: `${orderNumber}` } }).pipe(
+		return this.http.delete(Url.budgetNotification(orderNumber)).pipe(
 			tap(() => {
 				InspectionService.budgetNotifications = InspectionService.budgetNotifications.filter(budgetNotification =>
 					budgetNotification.orderNumber !== orderNumber
@@ -640,7 +726,7 @@ export class InspectionService {
 		body.sellerCode = employee.code;
 		body.saved = dayjs();
 		console.log('Saving inspection', body);
-		return this.http.patch(Url.savedInspection(), body);
+		return this.http.patch(Url.savedInspections(), body);
 	}
 
 	sendInspectionMail(

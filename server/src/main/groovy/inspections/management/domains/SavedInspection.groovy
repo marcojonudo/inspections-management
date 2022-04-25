@@ -1,13 +1,16 @@
 package inspections.management.domains
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import grails.gorm.annotation.Entity
 import inspections.management.deserializers.SavedItemsDeserializer
+import inspections.management.domains.items.Item
 import inspections.management.domains.savedItems.SavedItem
 import inspections.management.utils.Constants
+import inspections.management.utils.Utils
 import org.grails.datastore.gorm.GormEntity
 
 import java.time.LocalDateTime
@@ -16,7 +19,7 @@ import java.time.LocalDateTime
 class SavedInspection implements GormEntity<SavedInspection> {
 
 	String inspectionTypeCode
-	int orderNumber
+	Integer orderNumber
 	String vehicle
 	String employeeCode
 	String numberPlate
@@ -32,13 +35,10 @@ class SavedInspection implements GormEntity<SavedInspection> {
 	LocalDateTime sent
 
 	@JsonDeserialize(using = SavedItemsDeserializer)
-	Set<SavedItem> items
+	@JsonInclude
+	List<SavedItem> items
 
-	static hasMany = [items: SavedItem]
-
-	static mapping = {
-		items fetch: 'join'
-	}
+	static transients = ['items']
 
 	static constraints = {
 		sent nullable: true
@@ -46,9 +46,13 @@ class SavedInspection implements GormEntity<SavedInspection> {
 
 	enum State {
 
-		PENDING({ Set<SavedItem> items -> false }),
-		STARTED({ Set<SavedItem> items -> items.find { it.item.required && !it.filled } as boolean }),
-		FINISHED({ Set<SavedItem> items -> !items.find { it.item.required && !it.filled } as boolean })
+		PENDING({ List<SavedItem> savedItems, List<Item> items -> false }),
+		STARTED({ List<SavedItem> savedItems, List<Item> items ->
+			savedItems.find { Utils.findItem(it.code, items).required && !it.filled } as boolean
+		}),
+		FINISHED({ List<SavedItem> savedItems, List<Item> items ->
+			!savedItems.find { Utils.findItem(it.code, items).required && !it.filled } as boolean
+		})
 
 		final Closure<Boolean> check
 

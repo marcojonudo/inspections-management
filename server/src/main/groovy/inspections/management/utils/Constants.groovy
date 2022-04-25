@@ -6,7 +6,8 @@ import groovy.transform.CompileStatic
 class Constants {
 
     static final String SPAIN_TIMEZONE = "Europe/Madrid"
-    static final List<String> CLOSED_ORDER_STATES = ['V', 'X']
+    static final List<String> CLOSED_ORDER_STATES = ['V', 'X', 'F']
+    static final String CANCELED_ORDER_STATE = 'X'
     static final String APPOINTMENT_IDENTIFIER = "C"
     static final int ROW_IMAGES = 4
     static final List<String> CAR_POSITION = ['DI', 'DD', 'TI', 'TD']

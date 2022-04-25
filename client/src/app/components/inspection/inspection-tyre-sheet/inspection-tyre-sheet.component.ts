@@ -4,7 +4,7 @@ import { Image } from '../../../objects/inspections/image';
 import { Constants } from '../../../utils/constants';
 import { SelectItemOption } from '../../../objects/inspections/items/select-item-option';
 import { InspectionService } from '../../../services/inspection.service';
-import { SelectItem } from '../../../objects/inspections/items/select-item';
+import { GroupedItemOptions } from '../../../objects/inspections/items/grouped-item-options';
 
 @Component({
 	selector: 'app-inspection-tyre-sheet',
@@ -48,8 +48,8 @@ export class InspectionTyreSheetComponent implements OnInit {
 		this.barWidth = this.BAR_WIDTH - (this.DEPTH_BAR_PADDING * 4) - (this.DEPTH_BAR_MARGIN * 2);
 	}
 
-	get selectItemOptions(): SelectItemOption[] {
-		return InspectionService.selectItemOptions;
+	get groupedItemOptions(): GroupedItemOptions[] {
+		return InspectionService.groupedItemOptions;
 	}
 
 	defaultOrder(a, b) {
@@ -57,19 +57,23 @@ export class InspectionTyreSheetComponent implements OnInit {
 	}
 
 	findStateItem(savedItems: SavedItem[]): SavedItem {
-		return savedItems.find(savedItem => savedItem.item.code.startsWith(Constants.TYRE_ITEM_CODES[0]));
+		return savedItems.find(savedItem => savedItem.code.startsWith(Constants.TYRE_ITEM_CODES[0]));
 	}
 
 	findAgeItem(savedItems: SavedItem[]): SavedItem {
-		return savedItems.find(savedItem => savedItem.item.code.startsWith(Constants.TYRE_ITEM_CODES[1]));
+		return savedItems.find(savedItem => savedItem.code.startsWith(Constants.TYRE_ITEM_CODES[1]));
 	}
 
 	findDepthItem(savedItems: SavedItem[]): SavedItem {
-		return savedItems.find(savedItem => savedItem.item.code.startsWith(Constants.TYRE_ITEM_CODES[2]));
+		return savedItems.find(savedItem => savedItem.code.startsWith(Constants.TYRE_ITEM_CODES[2]));
+	}
+
+	findSelectOptions(savedItem: SavedItem): SelectItemOption[] {
+		return this.groupedItemOptions.find(o => o.itemCode === savedItem.code).options;
 	}
 
 	findOption(savedItem: SavedItem): SelectItemOption {
-		return this.selectItemOptions.find(o => o.code === savedItem.findValue());
+		return this.findSelectOptions(savedItem).find(o => o.code === savedItem.findValue());
 	}
 
 	findIconColor(code: string): string {
