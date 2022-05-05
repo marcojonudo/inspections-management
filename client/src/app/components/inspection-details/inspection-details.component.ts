@@ -15,6 +15,7 @@ import { EmployeeDialogComponent } from '../employee-dialog/employee-dialog.comp
 import { ImageDialogComponent } from '../image-dialog/image-dialog.component';
 import { Image } from '../../objects/inspections/image';
 import { RealTimeService } from '../../services/real-time.service';
+import { Utils } from '../../utils/utils';
 
 export interface InspectionDetailsColumn {
 	item: ItemBudget;
@@ -118,6 +119,14 @@ export class InspectionDetailsComponent implements OnDestroy {
 		return EmployeeService.findEmployee(code);
 	}
 
+	findSellerCode(budgets: Budget[]): string {
+		if (budgets.length) {
+			const lastBudget = Utils.sort(budgets, (budget => budget.number)).reverse()[0];
+			return this.findEmployee(lastBudget.sellerCode).name;
+		}
+		return '-';
+	}
+
 	checkNotifiedClient(orderInspection: OrderInspection = this.orderInspection): boolean {
 		return orderInspection ? InspectionService.findBudgetNotifications(orderInspection.order.number).length > 0 : false;
 	}
@@ -128,8 +137,8 @@ export class InspectionDetailsComponent implements OnDestroy {
 		) !== undefined;
 	}
 
-	checkAcceptedBudget(budget: Budget): boolean {
-		return InspectionService.checkAcceptedBudget(budget);
+	checkAcceptedBudget(budgets: Budget[]): boolean {
+		return budgets.find(b => InspectionService.checkAcceptedBudget(b)) !== undefined;
 	}
 
 	openImage(imageId: number): void {

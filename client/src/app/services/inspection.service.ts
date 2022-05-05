@@ -371,14 +371,14 @@ export class InspectionService {
 		return `data:image/png;base64,${image}`;
 	}
 
-	static findBudget(
+	static findBudgets(
 		itemCode: string,
 		vehicle: string,
 		budgets: Budget[],
 		itemVehicleArticleCodes: ItemVehicleArticleCode[] = this.itemVehicleArticleCodes
-	): Budget {
+	): Budget[] {
 		const itemArticleCodes = itemVehicleArticleCodes.filter(i => i.vehicle === vehicle && i.itemCode === itemCode);
-		return budgets.find(b =>
+		return budgets.filter(b =>
 			b.lines.find(l =>
 				itemArticleCodes.find(i => i.articleCode === l.articleCode) !== undefined
 			) !== undefined
@@ -476,12 +476,12 @@ export class InspectionService {
 		let row = undefined;
 		const allColumns = Object.keys(columnsData);
 		const savedItem = savedItems.find(i => i.code === itemBudget.itemCode);
-		const budget = InspectionService.findBudget(
+		const budgets = InspectionService.findBudgets(
 			itemBudget.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
 		);
 		row = {};
 		allColumns.forEach(key => {
-			row[key] = columnsData[key](itemBudget, savedItem, budget);
+			row[key] = columnsData[key](itemBudget, savedItem, budgets);
 		});
 		return row;
 	}
