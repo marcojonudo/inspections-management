@@ -2,9 +2,9 @@ import { OrderLine } from './order-line';
 import { Client } from './client';
 import { Budget } from './budget';
 import { Vehicle } from './vehicles/vehicle';
-import { Builder } from '../../utils/builder';
 import { Dayjs } from 'dayjs';
 import * as dayjs from 'dayjs';
+import { VehicleType } from './vehicles/vehicle-type';
 
 export class Order {
 
@@ -25,7 +25,7 @@ export class Order {
 		this.code = order.code;
 		this.day = dayjs(order.day);
 		this.state = order.state;
-		this.vehicle = order.vehicle ? Builder.buildVehicle(order.vehicle) : undefined;
+		this.vehicle = order.vehicle ? VehicleType.parse(order.vehicle.type).build(order.vehicle) : undefined;
 		this.client = new Client(order.client);
 		this.sellerCode = order.sellerCode;
 		this.mechanicCode = order.mechanicCode;
