@@ -364,7 +364,7 @@ export class InspectionService {
 	}
 
 	static findIconColor(code: string, selectIconColor: { [key: string]: string } = this.SELECT_ICON_COLOR): string {
-		return selectIconColor[code];
+		return selectIconColor[code || Constants.SELECT_ITEM_OPTION_CODE.NA];
 	}
 
 	static findImageUrl(image: string): string {

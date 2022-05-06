@@ -110,11 +110,12 @@ export class InspectionComponent {
 		const tyreSavedItems = {};
 		this.CAR_TYRES.forEach(carTyre => {
 			tyreSavedItems[carTyre] = [];
-			Constants.TYRE_ITEM_CODES.forEach(tyreCode =>
-				tyreSavedItems[carTyre].push(
-					savedItems.find(savedItem => savedItem.code === `${tyreCode}${carTyre}`)
-				)
-			);
+			Constants.TYRE_ITEM_CODES.forEach(tyreCode => {
+				const savedItem = savedItems.find(s => s.code === `${tyreCode}${carTyre}`);
+				if (savedItem) {
+					tyreSavedItems[carTyre].push(savedItem);
+				}
+			});
 		});
 		return tyreSavedItems;
 	}

@@ -43,6 +43,7 @@ export class InspectionTyreSheetComponent implements OnInit {
 			splittedObject[keys[i + 1]] = this.tyreGroupedItems[keys[i + 1]];
 			this.tyreRowsGroupedItems.push(splittedObject);
 		}
+		console.log(this.tyreRowsGroupedItems);
 		/* Se restan los padding de los contenedores y el margen de 10px para que no se pegue mucho la flecha a los
 		 * extremos */
 		this.barWidth = this.BAR_WIDTH - (this.DEPTH_BAR_PADDING * 4) - (this.DEPTH_BAR_MARGIN * 2);
@@ -50,6 +51,10 @@ export class InspectionTyreSheetComponent implements OnInit {
 
 	get groupedItemOptions(): GroupedItemOptions[] {
 		return InspectionService.groupedItemOptions;
+	}
+
+	get selectItemOptions(): SelectItemOption[] {
+		return InspectionService.selectItemOptions;
 	}
 
 	defaultOrder(a, b) {
@@ -73,7 +78,9 @@ export class InspectionTyreSheetComponent implements OnInit {
 	}
 
 	findOption(savedItem: SavedItem): SelectItemOption {
-		return this.findSelectOptions(savedItem).find(o => o.code === savedItem.findValue());
+		return savedItem ?
+			this.findSelectOptions(savedItem).find(o => o.code === savedItem.findValue()) :
+			this.selectItemOptions.find(o => o.code === Constants.SELECT_ITEM_OPTION_CODE.NA);
 	}
 
 	findIconColor(code: string): string {

@@ -61,7 +61,7 @@ class TyresCard extends Card {
                 ${title.toHtml()}
                 <div class="card-content">
                     ${groupedCategories.collect { buildRow(it) }.join("\n")}
-                    ${buildCentralImage()}
+                    ${buildCentralImage(options)}
                 </div>
             </div>
         """
@@ -76,19 +76,20 @@ class TyresCard extends Card {
         """
     }
     
-    String buildCentralImage() {
+    String buildCentralImage(List<SelectItemOption> options) {
+        SelectItemOption naOption = options.find { it.code == SelectSavedItem.Value.NA.toString() }
         return """
             <div id="central-image">
                 <div>
                     <img id="car-axis" src="img/car-axis.png"/>
-                    <img id="steering-wheel" src="img/steering-wheel/${findVisualControlColorName(visualControlSavedItem.findValue())}-steering-wheel.png"/>
+                    <img id="steering-wheel" src="img/steering-wheel/${findVisualControlColorName(visualControlSavedItem?.findValue())}-steering-wheel.png"/>
                     <div id="visual-control-item" class="item">
                         <div>${CustomMessageSource.getMessage("print.tyres.geometryVisualControl")}</div>
-                        ${new ItemImage("img/icons/${visualControlSavedItem.findIcon(this.options)}.svg", SelectSavedItem.Value.valueOf(visualControlSavedItem.value).color).toHtml()}
+                        ${new ItemImage("img/icons/${visualControlSavedItem?.findIcon(this.options) ?: naOption.icon}.svg", (visualControlSavedItem ? SelectSavedItem.Value.valueOf(visualControlSavedItem.value) : SelectSavedItem.Value.NA).color).toHtml()}
                     </div>
                     <div id="pressure-item" class="item">
                         <div>${CustomMessageSource.getMessage("print.tyres.tyresPressure")}</div>
-                        ${new ItemImage("img/icons/${pressureSavedItem.findIcon(this.options)}.svg", SelectSavedItem.Value.valueOf(pressureSavedItem.value).color).toHtml()}
+                        ${new ItemImage("img/icons/${pressureSavedItem?.findIcon(this.options) ?: naOption.icon}.svg", (pressureSavedItem ? SelectSavedItem.Value.valueOf(pressureSavedItem.value) : SelectSavedItem.Value.NA).color).toHtml()}
                     </div>
                 </div>
             </div>
@@ -103,13 +104,16 @@ class TyresCard extends Card {
         }
         return """
             <div class="tyre-section">
-                ${order ? buildRightSection(depthItem, ageItem) : buildLeftSection(categoryItems.category.name, depthItem, stateItem)}
-                ${order ? buildLeftSection(categoryItems.category.name, depthItem, stateItem) : buildRightSection(depthItem, ageItem)}                
+                ${order ? buildRightSection(depthItem, ageItem) : buildLeftSection(categoryItems.category.name, depthItem, stateItem, options)}
+                ${order ? buildLeftSection(categoryItems.category.name, depthItem, stateItem, options) : buildRightSection(depthItem, ageItem)}
             </div>
         """
     }
 
-    String buildLeftSection(String name, SavedItem depthItem, SelectSavedItem stateItem) {
+    String buildLeftSection(
+        String name, SavedItem depthItem, SelectSavedItem stateItem, List<SelectItemOption> options
+    ) {
+        SelectItemOption naOption = options.find { it.code == SelectSavedItem.Value.NA.toString() }
         return """
             <div class="tyre-section-wrapper">
                 <div class="tyre-section-header">
@@ -118,20 +122,20 @@ class TyresCard extends Card {
                     <div class="measurement-value">${measurementSavedItem.findValue()}</div>
                 </div>
                 <div class="photo-wrapper">
-                    ${depthItem.imageId ? new Image([], null, PdfService.buildImageUrl(depthItem)).toHtml() : buildNoImageTemplate()}
+                    ${depthItem?.imageId ? new Image([], null, PdfService.buildImageUrl(depthItem)).toHtml() : buildNoImageTemplate()}
                 </div>
                 <div class="tyre-state">
                     <div>${CustomMessageSource.getMessage("print.tyres.tyreState")}</div>
-                    ${new ItemImage("img/icons/${stateItem.findIcon(this.options)}.svg", SelectSavedItem.Value.valueOf(stateItem.value).color).toHtml()}
+                    ${new ItemImage("img/icons/${stateItem?.findIcon(this.options) ?: naOption.icon}.svg", (stateItem ? SelectSavedItem.Value.valueOf(stateItem.value) : SelectSavedItem.Value.NA).color).toHtml()}
                 </div>
                 <div class="state-graph">
-                    <div class="state-name">${options.find { it.code == stateItem.value}.name}</div>
+                    <div class="state-name">${(stateItem ? options.find { it.code == stateItem.value} : naOption).name}</div>
                     <div class="state-graph-bar-wrapper">
                         <div
-                            class="indicator ${depthItem.findValue() ? '' : 'hide'}"
-                            style="left: ${findIndicatorLeft(depthItem.findValue())}px">
-                            <div>${depthItem.findValue()}mm</div>
-                            <img src="img/indicators/${findDepthColorName(depthItem.findValue())}-indicator.png"/>
+                            class="indicator ${depthItem?.findValue() ? '' : 'hide'}"
+                            style="left: ${findIndicatorLeft(depthItem?.findValue())}px">
+                            <div>${depthItem?.findValue()}mm</div>
+                            <img src="img/indicators/${findDepthColorName(depthItem?.findValue())}-indicator.png"/>
                         </div>
                         <div class="bar-wrapper">
                             <div class="bar"></div>
@@ -160,14 +164,14 @@ class TyresCard extends Card {
                 <div class="depth">
                     <div class="depth-section-title">${CustomMessageSource.getMessage("print.tyres.tyreDepth")}</div>
                     <div
-                        class="depth-section-value ${depthItem.findValue() ? findDepthColorName(depthItem.findValue()) : 'white'}-background">
-                        ${depthItem.findValue() ? "${depthItem.findValue()}mm" : '-'}
+                        class="depth-section-value ${depthItem?.findValue() ? findDepthColorName(depthItem.findValue()) : 'white'}-background">
+                        ${depthItem?.findValue() ? "${depthItem?.findValue()}mm" : '-'}
                     </div>
                 </div>
-                <img src="img/tyres/${findDepthColorName(depthItem.findValue())}-tyre.jpg"/>
+                <img src="img/tyres/${findDepthColorName(depthItem?.findValue())}-tyre.jpg"/>
                 <div>
                     <div class="depth-section-title">${CustomMessageSource.getMessage("print.tyres.tyreAge")}</div>
-                    <div class="depth-section-value">${ageItem.findValue() ?: '-'}</div>
+                    <div class="depth-section-value">${ageItem?.findValue() ?: '-'}</div>
                 </div>
             </div>
         """
