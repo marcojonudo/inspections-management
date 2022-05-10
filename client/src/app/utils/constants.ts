@@ -163,7 +163,7 @@ export class Constants {
 	static readonly INSPECTION_DETAILS_COLUMN_DATA: any = {
 		item: (i: ItemBudget) => i,
 		image: (i: ItemBudget, savedItem: SavedItem) => savedItem.imageId,
-		budget: (i: ItemBudget, savedItem: SavedItem, budget: Budget) => budget
+		budgets: (i: ItemBudget, savedItem: SavedItem, budgets: Budget[]) => budgets
 	};
 
 	static readonly PENDING_INSPECTION_ORDER_STATES: string[] = [

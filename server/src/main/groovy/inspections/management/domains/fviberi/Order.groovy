@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import grails.gorm.annotation.Entity
 import inspections.management.deserializers.VehicleDeserializer
+import inspections.management.domains.fviberi.vehicle.IVehicle
 import inspections.management.domains.savedItems.SavedItem
 import inspections.management.pogos.pdf.inspection.cards.CarCard
 import inspections.management.pogos.pdf.inspection.cards.ScooterCard
@@ -12,6 +13,7 @@ import inspections.management.pogos.pdf.inspection.cards.VehicleCard
 import inspections.management.pogos.vehicles.CarVehicle
 import inspections.management.pogos.vehicles.ScooterVehicle
 import inspections.management.pogos.vehicles.Vehicle
+import inspections.management.services.data.OrderDataService
 import inspections.management.utils.Constants
 import org.grails.datastore.gorm.GormEntity
 
@@ -70,17 +72,41 @@ class Order implements GormEntity<Order> {
 
 	enum VehicleType {
 
-		E_BIKE("BICICLETA", { CarVehicle car, List<SavedItem> headerItems -> null }, "bike.jpg"),
-		CAR("COCHE", { CarVehicle car, List<SavedItem> headerItems -> new CarCard(car, headerItems) }, "car.jpg"),
-		MOTORBIKE("MOTO", { CarVehicle car, List<SavedItem> headerItems -> null }, "motorbike.jpg"),
-		E_SCOOTER("PATINETE", { ScooterVehicle scooter, List<SavedItem> headerItems -> new ScooterCard(scooter) }, "scooter.jpg")
+		BIKE(
+			"BICICLETA",
+			{ OrderDataService dataService, String id -> dataService.bikeDataService.find(id) },
+			{ CarVehicle car, List<SavedItem> headerItems -> null },
+			"bike.jpg"
+		),
+		CAR(
+			"COCHE",
+			{ OrderDataService dataService, String id -> dataService.carDataService.find(id) },
+			{ CarVehicle car, List<SavedItem> headerItems -> new CarCard(car, headerItems) },
+			"car.jpg"
+		),
+		MOTORBIKE(
+			"MOTO",
+			{ OrderDataService dataService, String id -> null },
+			{ CarVehicle car, List<SavedItem> headerItems -> null },
+			"motorbike.jpg"
+		),
+		E_SCOOTER(
+			"PATINETE",
+			{ OrderDataService dataService, String id -> dataService.scooterDataService.find(id) },
+			{ ScooterVehicle scooter, List<SavedItem> headerItems -> new ScooterCard(scooter) },
+			"scooter.jpg"
+		),
 
 		final String type
+		final Closure<IVehicle> find
 		final Closure<VehicleCard> buildCard
 		final String backgroundImage
 
-		VehicleType(String type, Closure<VehicleCard> buildCard, String backgroundImage) {
+		VehicleType(
+			String type, Closure<IVehicle> find, Closure<VehicleCard> buildCard, String backgroundImage
+		) {
 			this.type = type
+			this.find = find
 			this.buildCard = buildCard
 			this.backgroundImage = backgroundImage
 		}

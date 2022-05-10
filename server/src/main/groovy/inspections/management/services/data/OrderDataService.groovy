@@ -7,6 +7,7 @@ import inspections.management.domains.fviberi.Budget
 import inspections.management.domains.fviberi.Order
 import inspections.management.domains.fviberi.OrderTime
 import inspections.management.domains.fviberi.vehicle.IVehicle
+import inspections.management.services.data.vehicles.BikeDataService
 import inspections.management.services.data.vehicles.CarDataService
 import inspections.management.services.data.vehicles.ScooterDataService
 import inspections.management.utils.Constants
@@ -22,6 +23,7 @@ abstract class OrderDataService {
 	@Inject BudgetDataService budgetDataService
 	@Inject CarDataService carDataService
 	@Inject ScooterDataService scooterDataService
+	@Inject BikeDataService bikeDataService
 
 	abstract Order findOrder(int number)
 
@@ -61,7 +63,8 @@ abstract class OrderDataService {
 		}.flatten()
 		List<Budget> budgets = budgetNumbers ? budgetDataService.findAll(budgetNumbers) : []
 		orders.each { Order order ->
-			IVehicle vehicle = carDataService.find(order.carIdentifier) ?: scooterDataService.find(order.carIdentifier)
+			Order.VehicleType vehicleType = Order.VehicleType.values().find { it.type == order.vehicleType }
+			IVehicle vehicle = ((Closure<IVehicle>) vehicleType.find)(this, order.carIdentifier)
 			order.vehicle = vehicle?.buildVehicle()
 
 			OrderTime orderTime = ordersTime.find { it.orderNumber == order.number }

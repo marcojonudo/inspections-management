@@ -8,7 +8,7 @@
 		<svg viewBox="0 0 198 198" xmlns="http://www.w3.org/2000/svg">
 			<path
 				id="steering-wheel"
-				[ngClass]="findVisualControlColorName(visualControlSavedItem.findValue()) + '-background'"
+				[ngClass]="findVisualControlColorName(visualControlSavedItem?.findValue()) + '-background'"
 				d="M 80,0.51 C 71.77,2.55 63.68,4.53 56,8.26 31.51,20.17 12.54,41.08 4,67 1.63,74.2 0.01,80.39 0,88 c 0,0 0,22 0,22 0.01,7.61 1.63,13.8 4,21 8.82,26.79 29.76,49.77 56,60.4 7.96,3.22 17.37,6.49 26,6.6 0,0 25,0 25,0 13.71,-0.07 31.64,-7.62 43,-15.08 20.64,-13.56 36.21,-34.83 42,-58.92 1.29,-5.36 1.93,-6.29 2,-12 0,0 0,-24 0,-24 C 197.97,68.88 186.35,46.02 173.83,32 159.12,15.54 132.58,0.04 110,0 110,0 98,0 98,0 92.3,0 85.54,-0.35 80,0.51 Z"/>
 			<path fill="#fff" d="m 173,100 c -0.2,21.63 -9.86,42.99 -27,56.48 -11.53,9.09 -20.26,11.87 -34,15.52 0.76,-34.61 22.9,-72 61,-72 z"/>
 			<path fill="#fff" d="M 86,172 C 75.86,169.3 70.35,168.12 61,162.55 38.57,149.18 25.24,126.07 25,100 c 38.15,0 60.24,37.36 61,72 z"/>
@@ -16,14 +16,14 @@
 			<path fill="#fff" d="m 168,74 c 0,0 -138,0 -138,0 1.5,-7.99 7.51,-16.77 12.62,-23 28.41,-34.67 84.32,-34.69 112.76,0 5.11,6.22 11.12,15.02 12.62,23 z"/>
 		</svg>
 		<div id="visual-control-item" class="item">
-			<div translate>print.item.{{visualControlSavedItem.code}}</div>
-			<mat-icon [style.color]="findIconColor(visualControlSavedItem.findValue())">
+			<div translate>print.item.CVGN</div>
+			<mat-icon [style.color]="findIconColor(visualControlSavedItem?.findValue())">
 				{{findOption(visualControlSavedItem).icon}}
 			</mat-icon>
 		</div>
 		<div id="pressure-item" class="item">
-			<div translate>print.item.{{pressureSavedItem.code}}</div>
-			<mat-icon [style.color]="findIconColor(pressureSavedItem.findValue())">
+			<div translate>print.item.PPN</div>
+			<mat-icon [style.color]="findIconColor(pressureSavedItem?.findValue())">
 				{{findOption(pressureSavedItem).icon}}
 			</mat-icon>
 		</div>
@@ -48,7 +48,7 @@
 				</div>
 				<div class="tyre-state">
 					<div translate>print.tyreState</div>
-					<mat-icon [style.color]="findIconColor(findStateItem(tyreInfo.value).findValue())">
+					<mat-icon [style.color]="findIconColor(findStateItem(tyreInfo.value)?.findValue())">
 						{{findOption(findStateItem(tyreInfo.value)).icon}}
 					</mat-icon>
 				</div>
