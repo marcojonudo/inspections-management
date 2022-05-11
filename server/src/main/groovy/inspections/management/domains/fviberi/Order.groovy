@@ -86,8 +86,8 @@ class Order implements GormEntity<Order> {
 		),
 		MOTORBIKE(
 			"MOTO",
-			{ OrderDataService dataService, String id -> null },
-			{ CarVehicle car, List<SavedItem> headerItems -> null },
+			{ OrderDataService dataService, String id -> dataService.carDataService.find(id) },
+			{ CarVehicle car, List<SavedItem> headerItems -> new CarCard(car, headerItems, true) },
 			"motorbike.jpg"
 		),
 		E_SCOOTER(
