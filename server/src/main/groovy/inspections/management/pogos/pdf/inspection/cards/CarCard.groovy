@@ -11,9 +11,10 @@ import org.apache.commons.text.WordUtils
 @CompileStatic
 class CarCard extends VehicleCard {
 
-    CarCard(CarVehicle car, List<SavedItem> headerItems) {
+    CarCard(CarVehicle car, List<SavedItem> headerItems, boolean motorbike = false) {
         super()
-        this.title = new CardTitle("img/icons/car.svg", CustomMessageSource.getMessage("print.car.title"))
+        String titleCode = motorbike ? "print.motorbike.title" : "print.car.title"
+        this.title = new CardTitle("img/icons/car.svg", CustomMessageSource.getMessage(titleCode))
         this.sections = [
             new KeyValueSection(
                 CustomMessageSource.getMessage("print.car.numberPlate"),
