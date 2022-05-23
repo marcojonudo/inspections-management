@@ -40,7 +40,7 @@ abstract class SavedInspectionDataService {
 
 	SavedInspection find(int orderNumber, boolean fillItem = false) {
 		SavedInspection savedInspection = findSavedInspection(orderNumber)
-		return fillSavedInspection(savedInspection, fillItem)
+		return savedInspection ? fillSavedInspection(savedInspection, fillItem) : null
 	}
 
 	SavedInspection fillSavedInspection(SavedInspection savedInspection, boolean fillItem) {

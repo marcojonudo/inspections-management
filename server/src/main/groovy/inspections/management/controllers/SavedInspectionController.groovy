@@ -5,6 +5,7 @@ import inspections.management.domains.BudgetNotification
 import inspections.management.domains.SavedInspection
 import inspections.management.domains.fviberi.Centre
 import inspections.management.domains.fviberi.Order
+import inspections.management.domains.savedItems.SavedItem
 import inspections.management.pogos.RealTimePublisher
 import inspections.management.pogos.realTime.RealTimeSavedInspection
 import inspections.management.services.InspectionService
@@ -14,13 +15,9 @@ import inspections.management.services.data.OrderDataService
 import inspections.management.services.data.SavedInspectionDataService
 import inspections.management.services.data.SavedItemDataService
 import io.micronaut.http.HttpResponse
+import io.micronaut.http.HttpStatus
 import io.micronaut.http.MediaType
-import io.micronaut.http.annotation.Body
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
-import io.micronaut.http.annotation.Header
-import io.micronaut.http.annotation.Patch
-import io.micronaut.http.annotation.Post
+import io.micronaut.http.annotation.*
 import io.micronaut.http.server.types.files.SystemFile
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.ArraySchema
@@ -68,6 +65,29 @@ class SavedInspectionController {
             pdf = new SystemFile(pdfFile).attach("${numberPlate}.pdf")
         }
         return pdf
+    }
+
+    @Get("/check/{orderNumber}")
+    @Operation(
+        summary = "Obtiene los items erróneos de una revisión",
+        description = "Obtiene los items erróneos de una revisión"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Lista de revisiones guardadas",
+        content = @Content(array = @ArraySchema(schema = @Schema(implementation = SavedItem)))
+    )
+    @ApiResponse(responseCode = "404", description = "Revisión no encontrada")
+    @ApiResponse(responseCode = "406", description = "Revisión no finalizada")
+    HttpResponse checkInspection(int orderNumber) {
+        SavedInspection savedInspection = savedInspectionDataService.find(orderNumber, true)
+        if (!savedInspection) {
+            return HttpResponse.notFound()
+        }
+        if (savedInspection.state != SavedInspection.State.FINISHED) {
+            return HttpResponse.status(HttpStatus.NOT_ACCEPTABLE)
+        }
+        return HttpResponse.ok(inspectionService.findWrongItems(savedInspection.items))
     }
 
     @Post

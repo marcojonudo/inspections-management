@@ -1,15 +1,17 @@
 package inspections.management.services
 
 import inspections.management.domains.fviberi.Order
-import inspections.management.services.data.InspectionVehicleDataService
-import inspections.management.services.data.ItemBudgetDataService
-import inspections.management.services.data.OrderDataService
-import inspections.management.services.data.SavedInspectionDataService
+import inspections.management.domains.items.Item
+import inspections.management.domains.savedItems.SavedItem
+import inspections.management.domains.savedItems.SelectSavedItem
+import inspections.management.domains.savedItems.TextSavedItem
+import inspections.management.services.data.*
 import io.micronaut.test.annotation.MicronautTest
 import io.micronaut.test.annotation.MockBean
 import spock.lang.Specification
 
 import javax.inject.Inject
+import java.time.LocalDateTime
 
 @MicronautTest
 class InspectionServiceSpec extends Specification {
@@ -19,6 +21,31 @@ class InspectionServiceSpec extends Specification {
     @Inject ItemBudgetDataService itemBudgetDataService
     @Inject SavedInspectionDataService savedInspectionDataService
     @Inject InspectionVehicleDataService inspectionVehicleDataService
+    @Inject CentreDataService centreDataService
+    @Inject MailDataDataService mailDataDataService
+    @Inject ImageDataService imageDataService
+    @Inject InspectionTypeDataService inspectionTypeDataService
+    @Inject SelectItemOptionDataService selectItemOptionDataService
+
+    @MockBean(SelectItemOptionDataService)
+    SelectItemOptionDataService selectItemOptionDataService() {
+        Mock(SelectItemOptionDataService)
+    }
+
+    @MockBean(InspectionTypeDataService)
+    InspectionTypeDataService inspectionTypeDataService() {
+        Mock(InspectionTypeDataService)
+    }
+
+    @MockBean(ImageDataService)
+    ImageDataService imageDataService() {
+        Mock(ImageDataService)
+    }
+
+    @MockBean(MailDataDataService)
+    MailDataDataService mailDataDataService() {
+        Mock(MailDataDataService)
+    }
 
     @MockBean(OrderDataService)
     OrderDataService orderDataService () {
@@ -38,6 +65,11 @@ class InspectionServiceSpec extends Specification {
     @MockBean(InspectionVehicleDataService)
     InspectionVehicleDataService inspectionVehicleDataService() {
         Mock(InspectionVehicleDataService)
+    }
+
+    @MockBean(CentreDataService)
+    CentreDataService centreDataService() {
+        Mock(CentreDataService)
     }
 
     // region Handle not inspection orders
@@ -269,6 +301,53 @@ class InspectionServiceSpec extends Specification {
 //        inspection.name == inspections[1].name
 //        inspection.items.size() == inspections.items.flatten().size()
 //    }
+
+    // endregion
+
+    // region Find wrong items
+
+    void "test find wrong no items"() {
+        given:
+        List<SavedItem> items = []
+
+        when:
+        List<SavedItem> wrongItems = inspectionService.findWrongItems(items)
+
+        then:
+        !wrongItems
+    }
+
+    void "test find wrong items select and text items no wrong items"() {
+        given:
+        List<SavedItem> items = [
+            new TextSavedItem(type: Item.Type.TEXT),
+            new SelectSavedItem(type: Item.Type.SELECT, value: SelectSavedItem.Value.C.toString()),
+            new SelectSavedItem(type: Item.Type.SELECT, value: SelectSavedItem.Value.C.toString())
+        ]
+
+        when:
+        List<SavedItem> wrongItems = inspectionService.findWrongItems(items)
+
+        then:
+        !wrongItems
+    }
+
+    void "test find wrong items select and text items wrong items"() {
+        given:
+        List<SavedItem> items = [
+            new TextSavedItem(type: Item.Type.TEXT),
+            new SelectSavedItem(type: Item.Type.SELECT, filled: LocalDateTime.now(), value: SelectSavedItem.Value.C.toString()),
+            new SelectSavedItem(type: Item.Type.SELECT, filled: LocalDateTime.now(), value: SelectSavedItem.Value.SN.toString())
+        ]
+
+        when:
+        List<SavedItem> wrongItems = inspectionService.findWrongItems(items)
+
+        then:
+        wrongItems
+        wrongItems.size() == 1
+        (wrongItems[0] as SelectSavedItem).value == SelectSavedItem.Value.SN.toString()
+    }
 
     // endregion
 

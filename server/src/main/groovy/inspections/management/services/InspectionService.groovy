@@ -9,6 +9,8 @@ import inspections.management.domains.fviberi.MailData
 import inspections.management.domains.fviberi.Order
 import inspections.management.domains.fviberi.OrderLine
 import inspections.management.domains.items.Item
+import inspections.management.domains.savedItems.SavedItem
+import inspections.management.domains.savedItems.SelectSavedItem
 import inspections.management.pogos.OrderInspection
 import inspections.management.pogos.logs.Log
 import inspections.management.pogos.mails.MailSender
@@ -173,6 +175,17 @@ class InspectionService {
 		String body = Builder.Mail.buildInspectionBody(centre, order.client, order.vehicle)
 		mailService.sendMail(mailData, sender, to, subject, body, pdfFile)
 		savedInspectionDataService.update(savedInspection.id, LocalDateTime.now(), employeeCode)
+	}
+
+	/**
+	 * Encuentra los items erróneos de una revisión
+	 * @param orderNumber Número de orden
+	 * @return
+	 */
+	static List<SavedItem> findWrongItems(List<SavedItem> items) {
+		return items.findAll {
+			it.type == Item.Type.SELECT && it.filled && (it as SelectSavedItem).value != SelectSavedItem.Value.C.toString()
+		}
 	}
 
 }
