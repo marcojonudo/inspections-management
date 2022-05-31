@@ -9,8 +9,6 @@ import inspections.management.pogos.realTime.RealTimeOrders
 import inspections.management.services.InspectionService
 import inspections.management.services.data.SavedInspectionDataService
 import io.micronaut.scheduling.annotation.Scheduled
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 import javax.inject.Inject
 import java.time.LocalDate

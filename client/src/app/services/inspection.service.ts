@@ -40,6 +40,7 @@ import { EmailDialogComponent } from '../components/email-dialog/email-dialog.co
 import { SnackBarService } from './snack-bar.service';
 import { GroupedItemOptions } from '../objects/inspections/items/grouped-item-options';
 import { ItemType } from '../objects/inspections/items/item-type';
+import { SmsDialogComponent } from '../components/sms-dialog/sms-dialog.component';
 import * as dayjs from 'dayjs';
 import { SavedInspectionData } from '../objects/inspections/saved-inspection-data';
 import { Dayjs } from 'dayjs';
@@ -761,6 +762,17 @@ export class InspectionService {
 		);
 	}
 
+	sendInspectionSms(
+		savedInspection: SavedInspection = InspectionService.selectedSavedInspection,
+		order: Order = InspectionService.selectedOrderInspection.order
+	): Observable<any> {
+		const dialogRef = this.dialog.open(SmsDialogComponent, { data: { phoneNumber: order.client.phoneNumber } });
+		return dialogRef.afterClosed().pipe(
+			filter(phoneNumber => phoneNumber),
+			concatMap(phoneNumber => this.sendSms(savedInspection, phoneNumber))
+		);
+	}
+
 	sendMail(savedInspection: SavedInspection, to: string, employeeCode: string = EmployeeService.employee.code): Observable<any> {
 		this.snackBarService.open(Constants.MESSAGE_CODE.SENDING_MAIL, Constants.SNACK_BAR.TYPE.WARNING, 10000);
 		savedInspection.addData(employeeCode, Constants.REASON.SENT, Constants.SEND_METHOD.MAIL);
@@ -772,6 +784,16 @@ export class InspectionService {
 					savedInspection.restoreSaved();
 				}
 			)
+		);
+	}
+
+	sendSms(savedInspection: SavedInspection, to: number, employeeCode: string = EmployeeService.employee.code): Observable<any> {
+		this.snackBarService.open(Constants.MESSAGE_CODE.SENDING_SMS, Constants.SNACK_BAR.TYPE.WARNING, 10000);
+		return this.http.post(Url.sms(savedInspection.orderNumber, to, employeeCode), {}).pipe(
+			tap(() => {
+				savedInspection.sent = dayjs();
+				this.inspectionsTriggerSubject.next();
+			})
 		);
 	}
 

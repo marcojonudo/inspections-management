@@ -6,6 +6,11 @@ database:
 cron:
     sync-orders: '0/45 * * * * ?'
 
+services:
+    sudoku:
+        port: ${SUDOKU_PORT:80}
+        url: http://apolo:${services.sudoku.port}/sudoku
+
 dataSource:
     logSql: false
 

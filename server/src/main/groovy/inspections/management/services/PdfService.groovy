@@ -45,6 +45,13 @@ class PdfService {
 	@Inject InspectionTypeDataService inspectionTypeDataService
 	@Inject SelectItemOptionDataService selectItemOptionDataService
 
+	File buildPdf(Integer orderNumber) {
+		SavedInspection savedInspection = savedInspectionDataService.find(orderNumber, true)
+		Centre centre = centreDataService.find()
+		Order order = orderDataService.find(savedInspection.orderNumber)
+		return buildPdf(centre, order, savedInspection)
+	}
+
 	File buildPdf(Centre centre, Order order, SavedInspection savedInspection) {
 		List<Long> imageIds = savedInspection.items.findAll { it.findImageId() }*.findImageId()
 		List<Image> images = imageDataService.getAll(imageIds)
@@ -79,8 +86,8 @@ class PdfService {
 			groupedImageCategories,
 			options
 		)
-		File htmlFile = createTempFile(HTML_FILE_NAME, pdfInspection.toHtml())
-		File pdf = createTempFile("${savedInspection.numberPlate}.pdf")
+		File htmlFile = FileService.createTempFile(HTML_FILE_NAME, pdfInspection.toHtml())
+		File pdf = FileService.createTempFile("${savedInspection.numberPlate}.pdf")
 
 		LocalTime refTime = LocalTime.now()
 		ConverterProperties properties = new ConverterProperties()
@@ -165,13 +172,6 @@ class PdfService {
 			}
 		}
 		return groupedCategories
-	}
-
-	static File createTempFile(String name, String content = "") {
-		File file = File.createTempFile(name, "")
-		file.deleteOnExit()
-		file.write(content)
-		return file
 	}
 
 	static String buildImageUrl(SavedItem savedItem) {

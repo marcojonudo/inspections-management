@@ -84,7 +84,9 @@
 		"employeeCode": "Código de empleado",
 		"introduceEmployeeCode": "Introduce el código de empleado",
 		"email": "Dirección de correo",
+		"sms": "Número de teléfono",
 		"introduceEmail": "Introduce una dirección de correo",
+		"introduceSms": "Introduce un número de teléfono",
 		"cancel": "Cancelar",
 		"accept": "Aceptar"
 	},
@@ -99,8 +101,11 @@
 		"NOT_FINISHED_SAVED_INSPECTION": "¡La revisión asociada todavía está en curso!",
 		"noWrongItems": "¡Revisión sin items en mal estado!",
 		"SENDING_MAIL": "Enviando correo...",
+		"SENDING_SMS": "Enviando SMS...",
 		"SUCCESS_SENDING_MAIL": "¡Correo enviado!",
+		"SUCCESS_SENDING_SMS": "¡SMS enviado!",
 		"ERROR_SENDING_MAIL": "Error enviando correo. ¡Inténtalo de nuevo!",
+		"ERROR_SENDING_SMS": "Error enviando SMS. ¡Inténtalo de nuevo!",
 		"INCOMPLETE_ITEMS": "Los siguientes items todavía no están rellenos: "
 	}
 }

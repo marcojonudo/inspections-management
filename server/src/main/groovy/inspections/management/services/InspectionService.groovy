@@ -1,6 +1,8 @@
 package inspections.management.services
 
+
 import groovy.transform.CompileStatic
+import inspections.management.clients.SudokuClient
 import inspections.management.domains.InspectionType
 import inspections.management.domains.InspectionVehicle
 import inspections.management.domains.SavedInspection
@@ -17,6 +19,9 @@ import inspections.management.pogos.mails.MailSender
 import inspections.management.services.data.*
 import inspections.management.utils.Builder
 import inspections.management.utils.Constants
+import io.micronaut.http.HttpResponse
+import io.micronaut.http.HttpStatus
+import io.micronaut.http.client.multipart.MultipartBody
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -40,6 +45,8 @@ class InspectionService {
 	@Inject private MailDataDataService mailDataDataService
 	@Inject private PdfService pdfService
 	@Inject private MailService mailService
+	@Inject private ConverterService converterService
+	@Inject private SudokuClient sudokuClient
 
 	/**
 	 * Obtiene las órdenes según los parámetros recibidos
@@ -167,12 +174,40 @@ class InspectionService {
 		Centre centre = centreDataService.find()
 		Order order = orderDataService.find(savedInspection.orderNumber)
 		MailData mailData = mailDataDataService.find(centre.code as int)
-		File pdfFile = pdfService.buildPdf(centre, order, savedInspection)
+		File pdfFile = pdfService.buildPdf(orderNumber)
 
 		MailSender sender = Builder.Mail.buildInspectionSender(mailData.email, centre.name)
 		String subject = Builder.Mail.buildInspectionSubject(order)
 		String body = Builder.Mail.buildInspectionBody(centre, order.client, order.vehicle)
 		mailService.sendMail(mailData, sender, to, subject, body, pdfFile)
+	}
+
+	/**
+	 * Envía un SMS con la revisión
+	 * @param orderNumber Número de orden
+	 * @param to Número de teléfono
+	 * @param employeeCode Código de empleado
+	 */
+	boolean sendInspectionSms(Integer orderNumber, int phoneNumber, String employeeCode) {
+		boolean sent = false
+		File pdfFile = pdfService.buildPdf(orderNumber)
+		try {
+			byte[] imageBytes = converterService.convertPdfToPng(pdfFile)
+
+			String fileName = FileService.findFileName(pdfFile.name, "pdf")
+			File imageFile = FileService.createTempFile(fileName, imageBytes)
+			MultipartBody requestBody = MultipartBody.builder()
+				.addPart("file", imageFile)
+				.addPart("filename", "${fileName}.png")
+				.addPart("phone", "$phoneNumber")
+				.build()
+			HttpResponse response = sudokuClient.sendSms(requestBody)
+			sent = response.status == HttpStatus.OK
+		} catch (all) {
+			all.printStackTrace()
+			LOG.error(new Log((Map) [employeeCode: employeeCode, orderNumber: orderNumber, phoneNumber: phoneNumber, exception: all.class.simpleName, exceptionMessage: all.message, message: Constants.Message.ERROR_SENDING_SMS]).toString())
+		}
+		return sent
 	}
 
 	/**

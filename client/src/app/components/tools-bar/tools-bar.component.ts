@@ -116,6 +116,13 @@ export class ToolsBarComponent {
 		);
 	}
 
+	sendSms(): void {
+		this.inspectionService.sendInspectionSms().subscribe(
+			() => this.snackBarService.open(Constants.MESSAGE_CODE.SUCCESS_SENDING_SMS),
+			() => this.snackBarService.open(Constants.MESSAGE_CODE.ERROR_SENDING_SMS, Constants.SNACK_BAR.TYPE.ERROR)
+		);
+	}
+
 	goBack(): void {
 		this.router.navigate(['/']);
 	}
