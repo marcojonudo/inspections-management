@@ -45,14 +45,8 @@ class PdfService {
 	@Inject InspectionTypeDataService inspectionTypeDataService
 	@Inject SelectItemOptionDataService selectItemOptionDataService
 
-	File buildPdf(Integer orderNumber) {
-		SavedInspection savedInspection = savedInspectionDataService.find(orderNumber, true)
-		Centre centre = centreDataService.find()
-		Order order = orderDataService.find(savedInspection.orderNumber)
-		return buildPdf(centre, order, savedInspection)
-	}
-
 	File buildPdf(Centre centre, Order order, SavedInspection savedInspection) {
+		LOG.info(new Log((Map) [orderNumber: order.number, numberPlate: savedInspection.numberPlate, message: Constants.Message.GENERATING_PDF]).toString())
 		List<Long> imageIds = savedInspection.items.findAll { it.findImageId() }*.findImageId()
 		List<Image> images = imageDataService.getAll(imageIds)
 		String inspectionName = inspectionTypeDataService.findInspectionTypeName(savedInspection.inspectionTypeCode)
@@ -92,9 +86,9 @@ class PdfService {
 		LocalTime refTime = LocalTime.now()
 		ConverterProperties properties = new ConverterProperties()
 		properties.setBaseUri(resourcesUrl)
-		LOG.info(new Log((Map) [message: "Generating inspection PDF..."]).toString())
+		LOG.info(new Log((Map) [orderNumber: order.number, numberPlate: savedInspection.numberPlate, message: Constants.Message.BUILDING_PDF]).toString())
 		HtmlConverter.convertToPdf(htmlFile, pdf, properties)
-		LOG.info(new Log((Map) [message: "Inspection PDF generated!", millis: ChronoUnit.MILLIS.between(refTime, LocalTime.now())]).toString())
+		LOG.info(new Log((Map) [orderNumber: order.number, numberPlate: savedInspection.numberPlate, message: Constants.Message.GENERATED_PDF, millis: ChronoUnit.MILLIS.between(refTime, LocalTime.now())]).toString())
 
 		return pdf
 	}

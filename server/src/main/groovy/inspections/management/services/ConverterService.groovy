@@ -6,8 +6,9 @@ import com.cloudmersive.client.invoker.ApiException
 import com.cloudmersive.client.invoker.Configuration
 import com.cloudmersive.client.invoker.auth.ApiKeyAuth
 import groovy.transform.CompileStatic
-import io.micronaut.context.annotation.Property
+import inspections.management.services.data.TokenDataService
 
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
@@ -16,8 +17,7 @@ class ConverterService {
 
 	private static final int TIMEOUT = 30000
 
-	@Property(name = "services.cloudmersive.token")
-	private String token
+	@Inject TokenDataService tokenDataService
 
 	byte[] convertPdfToPng(File file) throws ApiException {
 		ApiClient defaultClient = Configuration.getDefaultApiClient()
@@ -25,6 +25,7 @@ class ConverterService {
 		defaultClient.setConnectTimeout(TIMEOUT)
 		defaultClient.setWriteTimeout(TIMEOUT)
 
+		String token = tokenDataService.findTokenToken()
 		ApiKeyAuth Apikey = (ApiKeyAuth) defaultClient.getAuthentication("Apikey")
 		Apikey.setApiKey(token)
 
