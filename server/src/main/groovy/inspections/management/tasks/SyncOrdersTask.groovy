@@ -18,8 +18,6 @@ import java.time.LocalDate
 @CompileStatic
 class SyncOrdersTask {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SyncOrdersTask)
-
     @Inject private InspectionService inspectionService
     @Inject private SavedInspectionDataService savedInspectionDataService
 
