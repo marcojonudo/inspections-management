@@ -9,7 +9,7 @@ import org.grails.datastore.gorm.GormEntity
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-class TextAreaSavedItem extends SavedItem implements GormEntity<TextAreaSavedItem> {
+class TextAreaSavedItemData extends SavedItemData implements GormEntity<TextAreaSavedItemData> {
 
 	String text
 
@@ -17,16 +17,16 @@ class TextAreaSavedItem extends SavedItem implements GormEntity<TextAreaSavedIte
 		text nullable: true
 	}
 
-	boolean equals(SavedItem savedItem) {
-		return equalsSaveItem(savedItem) && text == ((TextAreaSavedItem) savedItem).text
+	SavedItemData fill(SavedItem savedItem) {
+		return fillSavedItem(savedItem)
 	}
 
 	String findValue() {
 		return text
 	}
 
-	PdfItem buildPdfItem(List<SelectItemOption> options) {
-		return new PdfTextAreaItem(this)
+	PdfItem buildPdfItem(SavedItem savedItem, List<SelectItemOption> options) {
+		return new PdfTextAreaItem(savedItem)
 	}
 
 }

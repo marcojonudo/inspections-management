@@ -14,8 +14,6 @@ import org.slf4j.LoggerFactory
 
 import javax.inject.Inject
 import java.time.LocalDate
-import java.time.LocalTime
-import java.time.temporal.ChronoUnit
 
 @CompileStatic
 class SyncOrdersTask {
@@ -27,7 +25,6 @@ class SyncOrdersTask {
 
     @Scheduled(cron = "\${cron.sync-orders}")
     void execute() {
-        LocalTime refTime = LocalTime.now()
         List<Order> orders = inspectionService.findOrders(LocalDate.now(), false)
         List<SavedInspection> savedInspections = savedInspectionDataService.findAllSavedInspections(
             orders.number as List<Integer>
@@ -41,7 +38,6 @@ class SyncOrdersTask {
         List<OrderInspection> orderInspections = inspectionService.findOrderInspections(orders).findAll {
             it.inspectionVehicle
         } + inspectionService.findDetectedAnomaliesInspections(detectedAnomaliesOrders)
-        LOG.info("Sync JPDV task: ${ChronoUnit.MILLIS.between(refTime, LocalTime.now())}")
         RealTimePublisher.send(new RealTimeOrders(orderInspections))
     }
 

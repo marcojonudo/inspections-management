@@ -22,7 +22,6 @@ import { Url } from '../utils/url';
 import { SavedItem } from '../objects/inspections/saved-items/saved-item';
 import { Builder } from '../utils/builder';
 import { ItemRelation } from '../objects/inspections/item-relation';
-import { SelectSavedItem } from '../objects/inspections/saved-items/select-saved-item';
 import { CountryHandler } from '../objects/country-info/country-handler';
 import { SelectItemOption } from '../objects/inspections/items/select-item-option';
 import { SelectItem } from '../objects/inspections/items/select-item';
@@ -32,16 +31,17 @@ import { EmployeeService } from './employee.service';
 import { OrderInspectionHandler } from '../objects/inspection-handler/order-inspection-handler';
 import { DetectedFaultsHandler } from '../objects/inspection-handler/detected-faults-handler';
 import { InspectionHandler } from '../objects/inspection-handler/inspection-handler';
-import * as dayjs from 'dayjs';
 import { InspectionsColumn } from '../components/inspections/inspections.component';
 import { InspectionDetailsColumn } from '../components/inspection-details/inspection-details.component';
-import { TextSavedItemField } from '../objects/inspections/saved-items/text-saved-item-field';
+import { TextSavedItemDataField } from '../objects/inspections/saved-items/text-saved-item-data-field';
 import { CountryHandlerType } from '../objects/country-info/country-handler-type';
 import { MatDialog } from '@angular/material/dialog';
 import { EmailDialogComponent } from '../components/email-dialog/email-dialog.component';
 import { SnackBarService } from './snack-bar.service';
 import { GroupedItemOptions } from '../objects/inspections/items/grouped-item-options';
 import { ItemType } from '../objects/inspections/items/item-type';
+import * as dayjs from 'dayjs';
+import { SavedInspectionData } from '../objects/inspections/saved-inspection-data';
 
 @Injectable({
 	providedIn: 'root'
@@ -82,16 +82,16 @@ export class InspectionService {
 	};
 
 	private static readonly ITEM_RELATION_ACTION: any = {
-		HIDE: (targetSavedItem: SelectSavedItem, newValue: string, employeeCode: string) =>
+		HIDE: (targetSavedItem: SavedItem, newValue: string, employeeCode: string) =>
 			targetSavedItem.updateHidden(employeeCode, true),
-		REPLICATE: (targetSavedItem: SelectSavedItem, newValue: string, employeeCode: string) =>
+		REPLICATE: (targetSavedItem: SavedItem, newValue: string, employeeCode: string) =>
 			targetSavedItem.update(newValue, employeeCode)
 	};
 
 	private static readonly ITEM_RELATION_RESTORE_ACTION: any = {
-		HIDE: (targetSavedItem: SelectSavedItem, newValue: string, employeeCode: string) =>
+		HIDE: (targetSavedItem: SavedItem, newValue: string, employeeCode: string) =>
 			targetSavedItem.updateHidden(employeeCode, false),
-		REPLICATE: (targetSavedItem: SelectSavedItem, newValue: string, employeeCode: string) =>
+		REPLICATE: (targetSavedItem: SavedItem, newValue: string, employeeCode: string) =>
 			targetSavedItem.update(Constants.SELECT_ITEM_OPTION_CODE.P, employeeCode)
 	};
 
@@ -122,7 +122,7 @@ export class InspectionService {
 		InspectionService.itemBudgets = this.buildItemBudgets(data[1]);
 		InspectionService.itemVehicleArticleCodes = InspectionService.itemVehicleArticleCodes.length ?
 			InspectionService.itemVehicleArticleCodes : data[2].map(i => new ItemVehicleArticleCode(i));
-		InspectionService.savedInspections = data[3].map(d => Builder.buildSavedInspection(d, InspectionService.itemBudgets));
+		InspectionService.savedInspections = data[3].map(d => Builder.buildSavedInspection(d));
 		InspectionService.budgetNotifications = data[4].map(b => new BudgetNotification(b));
 		InspectionService.centre = new Centre(data[5]);
 
@@ -187,7 +187,7 @@ export class InspectionService {
 			const item = savedItems.find(savedItem =>
 				savedItem.type === Constants.ITEM_TYPE.SELECT && savedItem.code === itemBudget.itemCode
 			);
-			return item && item.filled && InspectionService.checkWrongSelectValue(item.findValue());
+			return item && item.findFilled() && InspectionService.checkWrongSelectValue(item.findValue());
 		});
 	}
 
@@ -210,17 +210,15 @@ export class InspectionService {
 	static findOrderItemBudgetType(orderNumber: number, accepted: boolean = undefined): string {
 		const orderInspection = this.findOrderInspection(orderNumber);
 		const savedInspection = this.findSavedInspection(orderNumber);
-		let itemBudgets = [];
-		if (savedInspection) {
-			itemBudgets = accepted !== undefined ? savedInspection.itemBudgets.filter(i => {
-				const existentBudget = InspectionService.findExistentBudget(
-					i.itemCode, orderInspection.inspection.vehicle, orderInspection.order.budgets
-				) !== undefined;
-				return accepted ? existentBudget : !existentBudget;
-			}) : savedInspection.itemBudgets;
-		}
-		const types = itemBudgets.filter(i => i.budgetType !== '').map(i => i.budgetType);
-		return this.findItemBudgetsMainType(types);
+		const itemBudgetTypes = savedInspection ? savedInspection.itemBudgets.map(itemBudget =>
+			this.findItemBudgetType(itemBudget, orderInspection.inspection.vehicle, orderInspection.order.budgets)
+		).filter(type => type !== '') : [];
+		return this.findItemBudgetsMainType(itemBudgetTypes);
+	}
+
+	static findItemBudgetType(itemBudget: ItemBudget, vehicle: string, budgets: Budget[]): string {
+		const existentBudget = InspectionService.findExistentBudget(itemBudget.itemCode, vehicle, budgets) !== undefined;
+		return existentBudget ? '' : itemBudget.budgetType;
 	}
 
 	static findItemArticles(
@@ -489,32 +487,31 @@ export class InspectionService {
 	static findMechanicCode(order: Order, savedInspection: SavedInspection): string {
 		let mechanicCode;
 		if (savedInspection) {
-			mechanicCode = savedInspection.employeeCode || this.findItemsMechanicCode(savedInspection.items);
+			mechanicCode = savedInspection.findEmployeeCode() || this.findItemsMechanicCode(savedInspection.items);
 		}
 		return mechanicCode ? mechanicCode : order.mechanicCode;
 	}
 
 	static findItemsMechanicCode(items: SavedItem[]): string {
-		const maxFilled = Math.max(...items.map(i => i.filled.valueOf()));
-		const maxFilledItem = items.find(i => i.filled.valueOf() === maxFilled);
-		return maxFilledItem.employeeCode;
+		const maxFilled = Math.max(...items.map(i => i.findFilled().valueOf()));
+		const maxFilledItem = items.find(i => i.findFilled().valueOf() === maxFilled);
+		return maxFilledItem.findEmployeeCode();
 	}
 
 	static updateSelectItem(
 		savedItem: SavedItem,
-		item: Item,
 		value: string,
 		savedInspection: SavedInspection,
 		employee: Employee = EmployeeService.employee
 	): Observable<ItemRelation> {
-		const relations = this.findRelations(item.code);
+		const relations = this.findRelations(savedItem.code);
 		/* Antes de actualizar el valor, se debe comprobar si hay alguna relación que deshacer. Por ejemplo, al tener
 		 * 'Pastilla de freno' el valor 'No aplica', el espesor está oculto; sin embargo, en cuanto se actualiza el
 		 * valor de la primera, el segundo debe volver a aparecer (se está deshaciendo la relación) */
 		this.updateRelations(
 			savedItem, savedItem.findValue(), relations, this.ITEM_RELATION_RESTORE_ACTION, savedInspection
 		).subscribe();
-		savedItem.update(value, employee.code);
+		savedItem.findData(employee.code).update(value, employee.code);
 
 		return this.updateRelations(savedItem, savedItem.findValue(), relations, this.ITEM_RELATION_ACTION, savedInspection).pipe(
 			finalize(() => {
@@ -547,11 +544,11 @@ export class InspectionService {
 
 	static updateTextItem(
 		savedItem: SavedItem,
-		fields: TextSavedItemField[],
+		fields: TextSavedItemDataField[],
 		savedInspection: SavedInspection,
 		employee: Employee = EmployeeService.employee
 	): void {
-		savedItem.update(fields, employee.code);
+		savedItem.findData(employee.code).update(fields, employee.code);
 		LocalStorageService.setItem(Constants.LOCAL_STORAGE.SAVED_INSPECTION, savedInspection);
 	}
 
@@ -723,10 +720,17 @@ export class InspectionService {
 		employee: Employee = EmployeeService.employee
 	): Observable<any> {
 		const body = handler.findSavedInspection(savedInspection);
-		body.sellerCode = employee.code;
-		body.saved = dayjs();
+		body.data.push(new SavedInspectionData(employee.code));
 		console.log('Saving inspection', body);
-		return this.http.patch(Url.savedInspections(), body);
+		return this.http.patch(Url.savedInspections(), body).pipe(
+			tap(
+				(data) => {
+					const receivedSavedInspection = Builder.buildSavedInspection(data);
+					body.fillSaved(receivedSavedInspection, employee.code);
+				},
+				(error) => console.error('Error saving inspection', error)
+			)
+		);
 	}
 
 	sendInspectionMail(

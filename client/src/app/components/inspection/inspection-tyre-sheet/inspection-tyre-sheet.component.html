@@ -38,8 +38,8 @@
 				</div>
 				<div class="photo-wrapper">
 					<img
-						*ngIf="findDepthItem(tyreInfo.value)?.imageId; else emptyImageTemplate"
-						[src]="findImageUrl(findDepthItem(tyreInfo.value).imageId)">
+						*ngIf="findDepthItem(tyreInfo.value)?.findImageId(); else emptyImageTemplate"
+						[src]="findImageUrl(findDepthItem(tyreInfo.value).findImageId())">
 					<ng-template #emptyImageTemplate>
 						<div class="no-image">
 							<mat-icon>no_photography</mat-icon>

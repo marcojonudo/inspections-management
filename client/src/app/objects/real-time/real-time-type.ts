@@ -24,7 +24,7 @@ export class RealTimeType {
 	static readonly SAVED_INSPECTION = new RealTimeType(
 		'SAVED_INSPECTION',
 		(realTimeService: RealTimeService, info: any) =>
-			realTimeService.syncSavedInspection(Builder.buildSavedInspection(info.savedInspection, InspectionService.itemBudgets)),
+			realTimeService.syncSavedInspection(Builder.buildSavedInspection(info.savedInspection)),
 		(savedInspections: SavedInspection[], synced: SavedInspection) => new RealTimeSavedInspectionCreate(savedInspections, synced),
 		(savedInspections: SavedInspection[], savedInspection: SavedInspection, syncedInspection: SavedInspection) =>
 			new RealTimeSavedInspectionUpdate(savedInspections, savedInspection, syncedInspection)

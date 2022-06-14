@@ -10,7 +10,7 @@
 				<div *ngFor="let item of cat.items | printOrder" class="image-item">
 					<div [innerHTML]="item.item.name"></div>
 					<div class="image-container">
-						<img [src]="findImageUrl(item.imageId)">
+						<img [src]="findImageUrl(item.findImageId())">
 					</div>
 				</div>
 			</div>
@@ -24,8 +24,8 @@
 			</div>
 			<div class="card-content">
 				<div class="image-category-content">
-					<div class="image-item" [class.span]="findImage(cat.items[0].imageId)?.landscape">
-						<img [src]="findImageUrl(cat.items[0].imageId)" class="item-image">
+					<div class="image-item" [class.span]="findImage(cat.items[0].findImageId())?.landscape">
+						<img [src]="findImageUrl(cat.items[0].findImageId())" class="item-image">
 					</div>
 				</div>
 			</div>

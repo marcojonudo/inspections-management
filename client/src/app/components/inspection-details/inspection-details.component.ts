@@ -60,7 +60,7 @@ export class InspectionDetailsComponent implements OnDestroy {
 			console.log('Selected order inspection', this.orderInspection);
 			console.log('Selected saved inspection', this.savedInspection);
 			this.data = this.buildData(this.orderInspection, this.savedInspection);
-			this.mechanics = this.savedInspection ? this.savedInspection.items.map(i => i.employeeCode).filter(
+			this.mechanics = this.savedInspection ? this.savedInspection.items.map(i => i.findEmployeeCode()).filter(
 				(value, index, self) => self.indexOf(value) === index
 			).map(employeeCode => EmployeeService.findEmployee(employeeCode)) : [];
 			this.cdRef.detectChanges();

@@ -1,7 +1,9 @@
 package inspections.management.pogos.pdf.inspection.items
 
 import groovy.transform.CompileStatic
-import inspections.management.domains.savedItems.TextSavedItem
+import inspections.management.domains.items.TextItem
+import inspections.management.domains.savedItems.SavedItem
+import inspections.management.domains.savedItems.TextSavedItemData
 import inspections.management.pogos.pdf.structure.elements.PdfItem
 
 @CompileStatic
@@ -11,10 +13,10 @@ class PdfTextItem extends PdfItem {
     String unit
     boolean multipleFields
 
-    PdfTextItem(TextSavedItem savedItem) {
-        super(savedItem.item, savedItem.fields.size() > 2)
+    PdfTextItem(SavedItem savedItem) {
+        super(savedItem.item, ((TextSavedItemData) savedItem.findData()).fields.size() > 2)
         value = savedItem.findValue()
-        unit = savedItem.findUnit()
+        unit = ((TextSavedItemData) savedItem.findData()).findUnit((TextItem) savedItem.item)
     }
 
     String toHtml() {

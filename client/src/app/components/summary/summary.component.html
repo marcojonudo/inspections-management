@@ -48,7 +48,7 @@
 			</div>
 			<div class="content-block">
 				<span translate>summary.acceptPercentage</span>
-				<span class="color-correct smaller-font">{{findAcceptedPercentage() | percent}}</span>
+				<span class="color-correct smaller-font">{{(findAcceptedItemBudgets().length / findAllItemBudgetLength()) | percent}}</span>
 			</div>
         </mat-card-content>
     </mat-card>

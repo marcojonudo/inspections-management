@@ -1,15 +1,17 @@
-import { SavedItem } from './saved-item';
-import { TextSavedItemField } from './text-saved-item-field';
 import { TextItem } from '../items/text-item';
+import { TextSavedItemDataField } from './text-saved-item-data-field';
+import { SavedItemData } from './saved-item-data';
 import { Utils } from '../../../utils/utils';
 
-export class TextSavedItem extends SavedItem {
+export class TextSavedItemData extends SavedItemData {
 
-	fields: TextSavedItemField[];
+	item: TextItem;
+	fields: TextSavedItemDataField[];
 
-	constructor(savedItem: TextSavedItem, item: TextItem) {
-		super(savedItem, item);
-		this.fields = savedItem.fields.map(field => new TextSavedItemField(field));
+	constructor(employeeCode: string, textSavedItemData: any, item: TextItem) {
+		super(employeeCode, textSavedItemData, item);
+		this.item = item;
+		this.fields = (textSavedItemData ? textSavedItemData : item).fields.map(field => new TextSavedItemDataField(field));
 	}
 
 	findValue(): string {
@@ -24,7 +26,7 @@ export class TextSavedItem extends SavedItem {
 		return this.findValue() !== undefined && this.findValue() !== '';
 	}
 
-	update(fields: TextSavedItemField[], employeeCode: string): void {
+	update(fields: TextSavedItemDataField[], employeeCode: string): void {
 		this.fields.forEach(field => {
 			const updateField = fields.find(f => f.order === field.order);
 			field.text = updateField.text;
@@ -33,13 +35,9 @@ export class TextSavedItem extends SavedItem {
 	}
 
 	reset(employeeCode: string): void {
-		this.fields = (this.item as TextItem).fields.map(field => new TextSavedItemField(field));
+		this.fields = (this.item as TextItem).fields.map(field => new TextSavedItemDataField(field));
 		this.image = undefined;
 		this.updateCommonFields(employeeCode);
-	}
-
-	isUpdated(syncedSavedItem: TextSavedItem): boolean {
-		return this.findValue() !== syncedSavedItem.findValue();
 	}
 
 }

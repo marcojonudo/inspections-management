@@ -13,6 +13,7 @@ export class TextItemField {
 
 	constructor(textItemField: any) {
 		this.placeholder = textItemField.placeholder;
+		this.separator = textItemField.separator;
 		this.prefix = textItemField.prefix;
 		this.inputType = textItemField.inputType;
 		this.select = textItemField.select;

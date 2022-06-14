@@ -18,7 +18,7 @@
 				</div>
 				<div class="card-content">
 					<div class="text-area-card-content">
-						<div *ngFor="let line of findTextAreaLines(findTextAreaSavedItem(cat.items[0]))" class="highlight">{{line}}</div>
+						<div *ngFor="let line of findTextAreaLines(cat.items[0])" class="highlight">{{line}}</div>
 					</div>
 					<mat-form-field>
 						<textarea
@@ -26,8 +26,8 @@
 							cdkTextareaAutosize
 							cdkAutosizeMinRows="1"
 							cdkAutosizeMaxRows="5"
-							[(ngModel)]="findTextAreaSavedItem(cat.items[0]).text"
-							(change)="updateTextArea(findTextAreaSavedItem(cat.items[0]))">
+							[(ngModel)]="findTextAreaSavedItemData(cat.items[0]).text"
+							(change)="updateTextArea(cat.items[0])">
 						</textarea>
 					</mat-form-field>
 				</div>
@@ -40,7 +40,7 @@
 				<div
 					*ngIf="checkItemType(item.type, selectType); else textItemText"
 					matRipple
-					(click)="toggleSelectOption(findSelectSavedItem(item))">
+					(click)="toggleSelectOption(item)">
 					<div class="item-text" [innerHTML]="item.item.name"></div>
 					<div class="item-data">
 						<mat-icon
@@ -48,16 +48,16 @@
 							class="select-item-icon"
 							[ngClass]="{
 								'front': checkSelectedOption(item.findValue(), option.code, item, i),
-								'left': checkLeftOption(findSelectSavedItem(item), i),
-								'right': checkRightOption(findSelectSavedItem(item), i)
+								'left': checkLeftOption(item, i),
+								'right': checkRightOption(item, i)
 							}"
-							[style.color]="findIconColor(findSelectSavedItem(item).value)">
+							[style.color]="findIconColor(item.findValue())">
 							{{option.printIcon}}
 						</mat-icon>
 					</div>
 				</div>
 				<ng-template #textItemText>
-					<div class="text-item" [class.text-item-fields]="findTextSavedItem(item).fields.length > 2">
+					<div class="text-item" [class.text-item-fields]="checkMultipleFieldsItem(item)">
 						<div class="item-text" [innerHTML]="item.item.name"></div>
 						<mat-form-field>
 							<span *ngIf="checkIndividualTextField(findTextItem(item))" matPrefix>
@@ -67,7 +67,7 @@
 								<mat-select
 									*ngIf="findTextItemField(item).select; else textInput"
 									[(ngModel)]="findTextSavedItemField(item).text"
-									(selectionChange)="updateText(findTextSavedItem(item))">
+									(selectionChange)="updateText(item)">
 									<mat-option
 										*ngFor="let option of findTextItemField(item).values | order"
 										[value]="option.value">
@@ -81,14 +81,14 @@
 										[maxLength]="findTextItemFieldMaxLength(item)"
 										[placeholder]="findTextItemField(item).placeholder"
 										[(ngModel)]="findTextSavedItemField(item).text"
-										(change)="updateText(findTextSavedItem(item))"
+										(change)="updateText(item)"
 										autocomplete="off">
 								</ng-template>
 							</ng-container>
 							<ng-template #separatorInput>
 								<app-separator-input
 									[fields]="findTextItem(item).fields"
-									[model]="findTextSavedItem(item).fields"
+									[model]="findTextSavedItemData(item).fields"
 									(valueEmitter)="updateSeparatorValue(item, $event)">
 								</app-separator-input>
 							</ng-template>
@@ -96,7 +96,7 @@
 						</mat-form-field>
 						<div class="item-data">
 							<span class="item-text-value" [class.unit]="findTextItemUnit(item)">
-								{{findTextSavedItem(item).isFilled() ? findTextSavedItem(item).findValue() : '-'}}
+								{{item.isFilled() ? item.findValue() : '-'}}
 							</span>
 							<span class="item-unit">{{findTextItemUnit(item)}}</span>
 						</div>

@@ -1,7 +1,6 @@
 package inspections.management.controllers
 
 import groovy.transform.CompileStatic
-import inspections.management.domains.BudgetNotification
 import inspections.management.domains.SavedInspection
 import inspections.management.domains.fviberi.Centre
 import inspections.management.domains.fviberi.Order
@@ -112,12 +111,12 @@ class SavedInspectionController {
     @ApiResponse(
         responseCode = "200",
         description = "Revisión actualizada",
-        content = @Content(schema = @Schema(implementation = BudgetNotification))
+        content = @Content(schema = @Schema(implementation = SavedInspection))
     )
     @ApiResponse(responseCode = "500", description = "Error actualizando la revisión")
     HttpResponse<SavedInspection> updateInspection(@Header String sessionId, @Body SavedInspection savedInspection) {
         SavedInspection newSavedInspection = inspectionService.saveInspection(
-            savedInspection, savedInspection.orderNumber, savedInspection.sellerCode
+            savedInspection, savedInspection.orderNumber, savedInspection.findData().employeeCode
         )
         HttpResponse<SavedInspection> response
         if (newSavedInspection) {

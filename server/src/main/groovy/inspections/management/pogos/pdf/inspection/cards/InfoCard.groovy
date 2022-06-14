@@ -18,7 +18,7 @@ class InfoCard extends KeyValueCard {
         this.title = new CardTitle("img/icons/info.svg", CustomMessageSource.getMessage("print.info.title"))
         this.sections = [
             new KeyValueSection(CustomMessageSource.getMessage("print.info.day"),
-            savedInspection.saved.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+            savedInspection.findSaved().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
         ]
         if (order.sellerCode) {
             this.sections << new KeyValueSection(CustomMessageSource.getMessage("print.info.seller"), order.sellerCode)
@@ -27,7 +27,7 @@ class InfoCard extends KeyValueCard {
             CustomMessageSource.getMessage("print.info.orderNumber"), "$order.code · $order.number"
         )
         this.sections << new KeyValueSection(
-            CustomMessageSource.getMessage("print.info.mechanic"), "$savedInspection.employeeCode"
+            CustomMessageSource.getMessage("print.info.mechanic"), "${savedInspection.findEmployeeCode()}"
         )
         this.sections << new KeyValueSection(CustomMessageSource.getMessage("print.info.client"), "$order.client.name")
     }

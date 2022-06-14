@@ -140,10 +140,6 @@ export class SummaryComponent implements OnDestroy {
 		return doneBudgets;
 	}
 
-	findAcceptedPercentage(): number {
-		return this.findDoneItemBudgets().length ? this.findAcceptedItemBudgets().length / this.findDoneItemBudgets().length : 0;
-	}
-
 	findNotFinishedInspectionOrders(): number {
 		return this.orderInspections.filter(orderInspection => {
 			const savedInspection = orderInspection.inspection ?

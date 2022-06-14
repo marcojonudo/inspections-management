@@ -11,7 +11,6 @@ import inspections.management.domains.fviberi.Order
 import inspections.management.domains.items.Item
 import inspections.management.domains.items.SelectItemOption
 import inspections.management.domains.savedItems.SavedItem
-import inspections.management.domains.savedItems.SelectSavedItem
 import inspections.management.pogos.logs.Log
 import inspections.management.pogos.pdf.CategoryItems
 import inspections.management.pogos.pdf.inspection.PdfInspection
@@ -47,20 +46,21 @@ class PdfService {
 	@Inject SelectItemOptionDataService selectItemOptionDataService
 
 	File buildPdf(Centre centre, Order order, SavedInspection savedInspection) {
-		List<Image> images = imageDataService.getAll((List<Long>) savedInspection.items.findAll { it.imageId }*.imageId)
+		List<Long> imageIds = savedInspection.items.findAll { it.findImageId() }*.findImageId()
+		List<Image> images = imageDataService.getAll(imageIds)
 		String inspectionName = inspectionTypeDataService.findInspectionTypeName(savedInspection.inspectionTypeCode)
 
 		List<SavedItem> savedItems = savedInspection.items
 			.findAll { !it.item.header && it.item.print }
-			.each { SavedItem savedItem -> savedItem.image = images.find { it.id == savedItem.imageId } }
+			.each { SavedItem savedItem -> savedItem.image = images.find { it.id == savedItem.findImageId() } }
 
-		List<SavedItem> depthImageItems = findTyreDepthItems(savedItems).findAll { it.imageId }
+		List<SavedItem> depthImageItems = findTyreDepthItems(savedItems).findAll { it.findImageId() }
 		List<CategoryItems> tyreCategories = depthImageItems ? buildTyreCategories(savedItems) : null
 		List<SelectItemOption> options = selectItemOptionDataService.findAll()
 
 		List<SavedItem> existentSavedItems = savedItems.findAll {
-			!it.hidden &&
-				(it.type == Item.Type.SELECT ? ((SelectSavedItem) it).value != Constants.SelectItemOption.NA : true)
+			!it.findHidden() &&
+				(it.type == Item.Type.SELECT ? it.findValue() != Constants.SelectItemOption.NA : true)
 		}
 		List<CategoryItems> categories = buildPrintCategories(existentSavedItems)
 		List<List<CategoryItems>> groupedCategories = buildGroupedCategories(categories)
@@ -127,7 +127,7 @@ class PdfService {
 	}
 
 	static List<SavedItem> findImageItems(List<SavedItem> savedItems) {
-		List<SavedItem> depthImageItems = findTyreDepthItems(savedItems).findAll { it.imageId }
+		List<SavedItem> depthImageItems = findTyreDepthItems(savedItems).findAll { it.findImageId() }
 		return savedItems.findAll { it.image && !(it.code in depthImageItems*.code) }
 	}
 

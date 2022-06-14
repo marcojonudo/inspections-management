@@ -1,15 +1,9 @@
 package inspections.management.domains
 
-import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import grails.gorm.annotation.Entity
-import inspections.management.deserializers.SavedItemsDeserializer
 import inspections.management.domains.items.Item
 import inspections.management.domains.savedItems.SavedItem
-import inspections.management.utils.Constants
 import inspections.management.utils.Utils
 import org.grails.datastore.gorm.GormEntity
 
@@ -21,45 +15,48 @@ class SavedInspection implements GormEntity<SavedInspection> {
 	String inspectionTypeCode
 	Integer orderNumber
 	String vehicle
-	String employeeCode
 	String numberPlate
-	String sellerCode
 	State state
 	boolean orderInspection
 
-	@JsonFormat(pattern = Constants.DateTimeFormat.yyyy_MM_dd_HH_mm_ss, timezone = Constants.SPAIN_TIMEZONE)
-	LocalDateTime saved
-
-	@JsonFormat(pattern = Constants.DateTimeFormat.yyyy_MM_dd_HH_mm_ss, timezone = Constants.SPAIN_TIMEZONE)
-	@JsonSerialize(using = LocalDateTimeSerializer)
-	LocalDateTime sent
-
-	@JsonDeserialize(using = SavedItemsDeserializer)
 	@JsonInclude
 	List<SavedItem> items
 
-	static transients = ['items']
+	static hasMany = [data: SavedInspectionData]
 
-	static constraints = {
-		sent nullable: true
+	static mapping = {
+		data fetch: 'join'
 	}
+
+	static transients = ['items']
 
 	enum State {
 
 		PENDING({ List<SavedItem> savedItems, List<Item> items -> false }),
 		STARTED({ List<SavedItem> savedItems, List<Item> items ->
-			savedItems.find { Utils.findItem(it.code, items).required && !it.filled } as boolean
+			savedItems.find { Utils.findItem(it.code, items).required && !it.data } as boolean
 		}),
 		FINISHED({ List<SavedItem> savedItems, List<Item> items ->
-			!savedItems.find { Utils.findItem(it.code, items).required && !it.filled } as boolean
+			!savedItems.find { Utils.findItem(it.code, items).required && !it.data } as boolean
 		})
-
 		final Closure<Boolean> check
 
 		State(Closure<Boolean> check) {
 			this.check = check;
 		}
 
+	}
+
+	SavedInspectionData findData() {
+		return data.max { it.saved }
+	}
+
+	LocalDateTime findSaved() {
+		return findData().saved
+	}
+
+	String findEmployeeCode() {
+		return findData().employeeCode
 	}
 
 }

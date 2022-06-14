@@ -10,8 +10,9 @@ import inspections.management.domains.fviberi.Order
 import inspections.management.domains.fviberi.OrderLine
 import inspections.management.domains.items.Item
 import inspections.management.domains.savedItems.SavedItem
-import inspections.management.domains.savedItems.SelectSavedItem
+import inspections.management.domains.savedItems.SelectSavedItemData
 import inspections.management.pogos.OrderInspection
+import inspections.management.pogos.SendMethod
 import inspections.management.pogos.logs.Log
 import inspections.management.pogos.mails.MailSender
 import inspections.management.services.data.*
@@ -23,7 +24,6 @@ import org.slf4j.LoggerFactory
 import javax.inject.Inject
 import javax.inject.Singleton
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 @Singleton
 @CompileStatic
@@ -147,6 +147,8 @@ class InspectionService {
 		LOG.info(new Log((Map) [sellerCode: employeeCode, orderNumber: orderNumber, inspectionTypeCode: savedInspection.inspectionTypeCode, vehicle: savedInspection.vehicle, message: Constants.Message.SAVING_INSPECTION]).toString())
 		SavedInspection newSavedInspection = null
 		try {
+			/* En la app de revisiones sólo aparecen revisiones guardadas previamente, por lo que siempre se va a
+			 * encontrar en DB */
 			SavedInspection existent = savedInspectionDataService.find(orderNumber)
 			newSavedInspection = savedInspectionDataService.update(savedInspection, existent)
 			LOG.info(new Log((Map) [employeeCode: employeeCode, orderNumber: orderNumber, inspectionTypeCode: savedInspection.inspectionTypeCode, vehicle: savedInspection.vehicle, message: Constants.Message.SAVED_INSPECTION]).toString())
@@ -174,7 +176,7 @@ class InspectionService {
 		String subject = Builder.Mail.buildInspectionSubject(order)
 		String body = Builder.Mail.buildInspectionBody(centre, order.client, order.vehicle)
 		mailService.sendMail(mailData, sender, to, subject, body, pdfFile)
-		savedInspectionDataService.update(savedInspection.id, LocalDateTime.now(), employeeCode)
+		savedInspectionDataService.updateSent(savedInspection, employeeCode, SendMethod.MAIL)
 	}
 
 	/**
@@ -184,7 +186,7 @@ class InspectionService {
 	 */
 	static List<SavedItem> findWrongItems(List<SavedItem> items) {
 		return items.findAll {
-			it.type == Item.Type.SELECT && it.filled && (it as SelectSavedItem).value != SelectSavedItem.Value.C.toString()
+			it.type == Item.Type.SELECT && it.findData().filled && it.findValue() != SelectSavedItemData.Value.C.toString()
 		}
 	}
 

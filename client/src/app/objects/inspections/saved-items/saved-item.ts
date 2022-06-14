@@ -1,50 +1,71 @@
-import { Dayjs } from 'dayjs';
-import * as dayjs from 'dayjs';
 import { Item } from '../items/item';
-import { Image } from '../image';
+import { SavedItemData } from './saved-item-data';
+import { ItemType } from '../items/item-type';
+import { Dayjs } from 'dayjs';
 
-export abstract class SavedItem {
+export class SavedItem {
 
 	item: Item;
 	type: string;
 	code: string;
-	filled: Dayjs;
-	hidden: boolean;
-	employeeCode: string;
-	sellerCode: string;
-	image: Image;
-	imageId: number;
+	data: SavedItemData[];
 
-	protected constructor(savedItem: SavedItem, item: Item) {
+	constructor(savedItem: SavedItem, item: Item) {
 		this.item = item;
 		this.type = savedItem.type;
 		this.code = savedItem.code;
-		this.employeeCode = savedItem.employeeCode;
 		if (savedItem) {
-			this.filled = savedItem.filled ? dayjs(savedItem.filled) : undefined;
-			this.imageId = savedItem.imageId;
-			this.hidden = savedItem.hidden;
+			const itemType = ItemType.parse(this.item.type);
+			this.data = savedItem.data.map(d => itemType.buildData(d.employeeCode, d, this.item));
 		}
 	}
 
-	abstract findValue(): string;
+	isHidden(): boolean {
+		return this.findData().hidden;
+	}
 
-	abstract isFilled(): boolean;
+	isFilled(): boolean {
+		return this.findData().isFilled();
+	}
 
-	abstract update(value: any, employeeCode: string): void;
+	findLastData(data: SavedItemData[] = this.data): SavedItemData {
+		return data.reduce((prev, current) => (prev.filled > current.filled) ? prev : current);
+	}
 
-	abstract reset(employeeCode: string): void;
+	findData(employeeCode: string = undefined): SavedItemData {
+		if (employeeCode && this.findLastData().saved) {
+			this.addData(employeeCode);
+		}
+		return this.findLastData();
+	}
 
-	abstract isUpdated(syncedSavedItem: SavedItem): boolean;
+	addData(employeeCode: string, item: Item = this.item): void {
+		const itemType = ItemType.parse(item.type);
+		this.data.push(itemType.buildData(employeeCode, undefined, item));
+	}
 
-	protected updateCommonFields(employeeCode: string): void {
-		this.sellerCode = employeeCode;
-		this.filled = dayjs();
+	findValue(): string {
+		return this.findData().findValue();
+	}
+
+	findImageId(): number {
+		return this.findData().imageId;
+	}
+
+	findFilled(): Dayjs {
+		return this.findData().filled;
+	}
+
+	findEmployeeCode(): string {
+		return this.findData().employeeCode;
 	}
 
 	updateHidden(employeeCode: string, hidden: boolean): void {
-		this.hidden = hidden;
-		this.reset(employeeCode);
+		this.findData().updateHidden(employeeCode, hidden);
+	}
+
+	update(value: any, employeeCode: string): void {
+		this.findData().update(value, employeeCode);
 	}
 
 }

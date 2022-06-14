@@ -12,3 +12,5 @@ dataSource:
 dataSources:
     hestia-fviberi:
         url: jdbc:mysql://hestia:3306/fviberi?useSSL=false
+        username: user1
+        password: password1
