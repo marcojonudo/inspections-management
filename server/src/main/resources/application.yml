@@ -5,6 +5,9 @@ micronaut:
         port: 8096
         cors:
             enabled: true
+    http:
+        client:
+            read-timeout: 15s
     router:
         static-resources:
             default:

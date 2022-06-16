@@ -7,6 +7,7 @@ import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.multipart.MultipartBody
+import io.micronaut.retry.annotation.Retryable
 
 import javax.inject.Singleton
 
@@ -16,6 +17,7 @@ import javax.inject.Singleton
 interface SudokuClient {
 
     @Post(produces = MediaType.MULTIPART_FORM_DATA)
+    @Retryable
     HttpResponse sendSms(@Body MultipartBody body)
 
 }

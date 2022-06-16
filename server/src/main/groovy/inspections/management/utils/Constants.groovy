@@ -44,12 +44,13 @@ class Constants {
         static final String ERROR_SENDING_SMS = "Error sending SMS"
         static final String SAVED_INSPECTION = "Saved inspection!"
         static final String GENERATING_PDF = "Generating PDF..."
-        static final String BUILDING_PDF = "Building PDF file"
         static final String GENERATED_PDF = "PDF file generated!"
         static final String SENDING_MAIL = "Sending inspection mail..."
         static final String SENDING_SMS = "Sending inspection SMS..."
+        static final String CONVERTING_PDF_IMAGE = "Converting PDF file to image..."
+        static final String CONVERTED_PDF_IMAGE = "PDF converted to image!"
         static final String SENT_MAIL = "Mail sent!"
-        static final String SENT_SMS = "SMS sent!"
+        static final String FINISHED_SMS_PROCESS = "Finished SMS process!"
 
     }
 

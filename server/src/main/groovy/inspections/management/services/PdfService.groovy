@@ -86,7 +86,6 @@ class PdfService {
 		LocalTime refTime = LocalTime.now()
 		ConverterProperties properties = new ConverterProperties()
 		properties.setBaseUri(resourcesUrl)
-		LOG.info(new Log((Map) [orderNumber: order.number, numberPlate: savedInspection.numberPlate, message: Constants.Message.BUILDING_PDF]).toString())
 		HtmlConverter.convertToPdf(htmlFile, pdf, properties)
 		LOG.info(new Log((Map) [orderNumber: order.number, numberPlate: savedInspection.numberPlate, message: Constants.Message.GENERATED_PDF, millis: ChronoUnit.MILLIS.between(refTime, LocalTime.now())]).toString())
 

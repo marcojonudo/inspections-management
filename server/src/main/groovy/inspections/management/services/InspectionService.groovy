@@ -28,6 +28,8 @@ import org.slf4j.LoggerFactory
 import javax.inject.Inject
 import javax.inject.Singleton
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.temporal.ChronoUnit
 
 @Singleton
 @CompileStatic
@@ -203,7 +205,11 @@ class InspectionService {
 			Centre centre = centreDataService.find()
 			Order order = orderDataService.find(savedInspection.orderNumber)
 			File pdfFile = pdfService.buildPdf(centre, order, savedInspection)
+
+			LocalTime refTime = LocalTime.now()
+			LOG.info(new Log((Map) [employeeCode: employeeCode, orderNumber: orderNumber, phoneNumber: phoneNumber, message: Constants.Message.CONVERTING_PDF_IMAGE]).toString())
 			byte[] imageBytes = converterService.convertPdfToPng(pdfFile)
+			LOG.info(new Log((Map) [employeeCode: employeeCode, orderNumber: orderNumber, phoneNumber: phoneNumber, message: Constants.Message.CONVERTED_PDF_IMAGE, millis: ChronoUnit.MILLIS.between(refTime, LocalTime.now())]).toString())
 
 			String fileName = FileService.findFileName(pdfFile.name, "pdf")
 			File imageFile = FileService.createTempFile(fileName, imageBytes)
@@ -216,8 +222,8 @@ class InspectionService {
 			if (response.status == HttpStatus.OK) {
 				sent = true
 				savedInspectionDataService.updateSent(savedInspection, employeeCode, SendMethod.SMS)
-				LOG.info(new Log((Map) [employeeCode: employeeCode, orderNumber: orderNumber, phoneNumber: phoneNumber, message: Constants.Message.SENT_SMS]).toString())
 			}
+			LOG.info(new Log((Map) [employeeCode: employeeCode, orderNumber: orderNumber, phoneNumber: phoneNumber, sent: sent, message: Constants.Message.FINISHED_SMS_PROCESS]).toString())
 		} catch (all) {
 			all.printStackTrace()
 			LOG.error(new Log((Map) [employeeCode: employeeCode, orderNumber: orderNumber, phoneNumber: phoneNumber, exception: all.class.simpleName, exceptionMessage: all.message, message: Constants.Message.ERROR_SENDING_SMS]).toString())
