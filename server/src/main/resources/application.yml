@@ -60,6 +60,14 @@ services:
         port: ${SUDOKU_PORT:80}
         url: http://${host.ip}:${services.sudoku.port}/sudoku
 
+slack:
+    app:
+        notifier:
+            token: xoxb-531343073222-1104044199923-A6pTaIa10Heu7UFZQ8o0wGib
+    channel:
+        id:
+            inspections-management: C013RLQTXNC
+
 database:
     credentials:
         username: root

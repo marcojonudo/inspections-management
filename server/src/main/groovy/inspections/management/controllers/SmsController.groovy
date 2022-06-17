@@ -1,6 +1,7 @@
 package inspections.management.controllers
 
 import groovy.transform.CompileStatic
+import inspections.management.domains.SavedInspection
 import inspections.management.services.InspectionService
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
@@ -26,8 +27,10 @@ class SmsController {
     @ApiResponse(responseCode = "200", description = "Sms enviado")
     @ApiResponse(responseCode = "500", description = "Error enviando sms")
     HttpResponse sendMail(@QueryValue Integer orderNumber, @QueryValue int to, @QueryValue String employeeCode) {
-        boolean sent = inspectionService.sendInspectionSms(orderNumber, to, employeeCode)
-        return HttpResponse.status(sent ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR)
+        SavedInspection savedInspection = inspectionService.sendInspectionSms(orderNumber, to, employeeCode)
+        return HttpResponse
+            .status(savedInspection ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(savedInspection)
     }
 
 }

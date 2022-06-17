@@ -790,10 +790,13 @@ export class InspectionService {
 	sendSms(savedInspection: SavedInspection, to: number, employeeCode: string = EmployeeService.employee.code): Observable<any> {
 		this.snackBarService.open(Constants.MESSAGE_CODE.SENDING_SMS, Constants.SNACK_BAR.TYPE.WARNING, 10000);
 		return this.http.post(Url.sms(savedInspection.orderNumber, to, employeeCode), {}).pipe(
-			tap(() => {
-				savedInspection.sent = dayjs();
-				this.inspectionsTriggerSubject.next();
-			})
+			tap(
+				() => this.inspectionsTriggerSubject.next(),
+				(error) => {
+					console.error('Error sending SMS', error);
+					savedInspection.restoreSaved();
+				}
+			)
 		);
 	}
 

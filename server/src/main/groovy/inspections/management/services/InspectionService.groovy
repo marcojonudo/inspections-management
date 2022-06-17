@@ -1,6 +1,5 @@
 package inspections.management.services
 
-
 import groovy.transform.CompileStatic
 import inspections.management.clients.SudokuClient
 import inspections.management.domains.InspectionType
@@ -49,6 +48,7 @@ class InspectionService {
 	@Inject private MailService mailService
 	@Inject private ConverterService converterService
 	@Inject private SudokuClient sudokuClient
+	@Inject private SlackService slackService
 
 	/**
 	 * Obtiene las órdenes según los parámetros recibidos
@@ -197,12 +197,12 @@ class InspectionService {
 	 * @param to Número de teléfono
 	 * @param employeeCode Código de empleado
 	 */
-	boolean sendInspectionSms(Integer orderNumber, int phoneNumber, String employeeCode) {
+	SavedInspection sendInspectionSms(Integer orderNumber, int phoneNumber, String employeeCode) {
 		LOG.info(new Log((Map) [employeeCode: employeeCode, orderNumber: orderNumber, phoneNumber: phoneNumber, message: Constants.Message.SENDING_SMS]).toString())
-		boolean sent = false
+		SavedInspection updatedInspection = null
+		Centre centre = centreDataService.find()
+		SavedInspection savedInspection = savedInspectionDataService.find(orderNumber, true)
 		try {
-			SavedInspection savedInspection = savedInspectionDataService.find(orderNumber, true)
-			Centre centre = centreDataService.find()
 			Order order = orderDataService.find(savedInspection.orderNumber)
 			File pdfFile = pdfService.buildPdf(centre, order, savedInspection)
 
@@ -220,15 +220,30 @@ class InspectionService {
 				.build()
 			HttpResponse response = sudokuClient.sendSms(requestBody)
 			if (response.status == HttpStatus.OK) {
-				sent = true
-				savedInspectionDataService.updateSent(savedInspection, employeeCode, SendMethod.SMS)
+				updatedInspection = savedInspectionDataService.updateSent(savedInspection, employeeCode, SendMethod.SMS)
+				slackService.sendMessage(
+					Builder.Slack.buildSentSmsMessage(
+						Constants.Message.SENT_SMS, centre.code as int, savedInspection, employeeCode, phoneNumber
+					)
+				)
+			} else {
+				slackService.sendMessage(
+					Builder.Slack.buildSendSmsErrorMessage(
+						Constants.Message.ERROR_SENDING_SMS, centre.code as int, savedInspection, employeeCode, phoneNumber, response.status
+					)
+				)
 			}
-			LOG.info(new Log((Map) [employeeCode: employeeCode, orderNumber: orderNumber, phoneNumber: phoneNumber, sent: sent, message: Constants.Message.FINISHED_SMS_PROCESS]).toString())
+			LOG.info(new Log((Map) [employeeCode: employeeCode, orderNumber: orderNumber, phoneNumber: phoneNumber, sent: updatedInspection as boolean, message: Constants.Message.FINISHED_SMS_PROCESS]).toString())
 		} catch (all) {
 			all.printStackTrace()
 			LOG.error(new Log((Map) [employeeCode: employeeCode, orderNumber: orderNumber, phoneNumber: phoneNumber, exception: all.class.simpleName, exceptionMessage: all.message, message: Constants.Message.ERROR_SENDING_SMS]).toString())
+			slackService.sendMessage(
+				Builder.Slack.buildSendSmsErrorMessage(
+					Constants.Message.ERROR_SENDING_SMS, centre.code as int, savedInspection, employeeCode, phoneNumber, all
+				)
+			)
 		}
-		return sent
+		return updatedInspection
 	}
 
 	/**

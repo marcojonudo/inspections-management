@@ -10,6 +10,8 @@ services:
     sudoku:
         url: http://apolo:${services.sudoku.port}/sudoku/
 
+slack.channel.id.inspections-management: C03KW71L5ML
+
 dataSource:
     logSql: false
 

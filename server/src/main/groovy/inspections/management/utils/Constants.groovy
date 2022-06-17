@@ -50,7 +50,9 @@ class Constants {
         static final String CONVERTING_PDF_IMAGE = "Converting PDF file to image..."
         static final String CONVERTED_PDF_IMAGE = "PDF converted to image!"
         static final String SENT_MAIL = "Mail sent!"
+        static final String SENT_SMS = "SMS sent!"
         static final String FINISHED_SMS_PROCESS = "Finished SMS process!"
+        static final String SLACK_WRONG_REQUEST = "Slack wrong request!"
 
     }
 
