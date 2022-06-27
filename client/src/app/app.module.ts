@@ -44,6 +44,7 @@ import { InspectionTyreSheetComponent } from './components/inspection/inspection
 import { InspectionImagesSheetComponent } from './components/inspection/inspection-images-sheet/inspection-images-sheet.component';
 import { EmailDialogComponent } from './components/email-dialog/email-dialog.component';
 import { PendingContactsDialogComponent } from './components/pending-contacts-dialog/pending-contacts-dialog.component';
+import * as minMax from 'dayjs/plugin/minMax';
 registerLocaleData(localeEs);
 
 @NgModule({
@@ -110,6 +111,7 @@ registerLocaleData(localeEs);
 export class AppModule {
 
 	constructor() {
+		dayjs.extend(minMax);
 		this.overrideDateToJSON();
 	}
 

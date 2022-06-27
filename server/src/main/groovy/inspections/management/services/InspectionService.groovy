@@ -176,7 +176,7 @@ class InspectionService {
 		String subject = Builder.Mail.buildInspectionSubject(order)
 		String body = Builder.Mail.buildInspectionBody(centre, order.client, order.vehicle)
 		mailService.sendMail(mailData, sender, to, subject, body, pdfFile)
-		savedInspectionDataService.updateSent(savedInspection, employeeCode, SendMethod.MAIL)
+		return savedInspectionDataService.updateSent(savedInspection, employeeCode, SendMethod.MAIL)
 	}
 
 	/**

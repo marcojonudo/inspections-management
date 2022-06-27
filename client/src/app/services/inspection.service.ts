@@ -42,6 +42,7 @@ import { GroupedItemOptions } from '../objects/inspections/items/grouped-item-op
 import { ItemType } from '../objects/inspections/items/item-type';
 import * as dayjs from 'dayjs';
 import { SavedInspectionData } from '../objects/inspections/saved-inspection-data';
+import { Dayjs } from 'dayjs';
 
 @Injectable({
 	providedIn: 'root'
@@ -562,6 +563,11 @@ export class InspectionService {
 		LocalStorageService.setItem(Constants.LOCAL_STORAGE.SAVED_INSPECTION, savedInspection);
 	}
 
+	static findSentDate(savedInspection: SavedInspection): Dayjs {
+		const sentData = savedInspection.data.filter(d => d.sendMethod);
+		return sentData ? dayjs.max(sentData.map(d => d.saved)) : undefined;
+	}
+
 	findLanguage(): Observable<string> {
 		const language = LocalStorageService.getItem(Constants.LOCAL_STORAGE.LANGUAGE);
 		return (language ? of(language) : this.http.get(Url.languages(), { responseType: 'text' })).pipe(
@@ -747,8 +753,13 @@ export class InspectionService {
 	sendMail(savedInspection: SavedInspection, to: string, employeeCode: string = EmployeeService.employee.code): Observable<any> {
 		this.snackBarService.open(Constants.MESSAGE_CODE.SENDING_MAIL, Constants.SNACK_BAR.TYPE.WARNING, 10000);
 		return this.http.post(Url.mails(savedInspection.orderNumber, to, employeeCode), {}).pipe(
-			tap(() => {
-				savedInspection.sent = dayjs();
+			tap(data => {
+				// TODO Exception in controller
+				const savedData = data.data.map(d => new SavedInspectionData(d.employeeCode, d.sendMethod, d.saved));
+
+				const maxSaved: Dayjs = dayjs.max(savedData.map(d => d.saved));
+				const mailData = savedData.find(d => d.saved.isSame(maxSaved));
+				savedInspection.data.push(mailData);
 				this.inspectionsTriggerSubject.next();
 			})
 		);

@@ -1,6 +1,7 @@
 package inspections.management.controllers
 
 import groovy.transform.CompileStatic
+import inspections.management.domains.SavedInspection
 import inspections.management.services.InspectionService
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Controller
@@ -30,8 +31,8 @@ class MailController {
         content = @Content(mediaType = "application/json", schema = @Schema(type = "string"))
     )
     HttpResponse sendMail(@QueryValue Integer orderNumber, @QueryValue String to, @QueryValue String employeeCode) {
-        inspectionService.sendInspectionMail(orderNumber, to, employeeCode)
-        return HttpResponse.ok()
+        SavedInspection savedInspection = inspectionService.sendInspectionMail(orderNumber, to, employeeCode)
+        return HttpResponse.ok(savedInspection)
     }
 
 }

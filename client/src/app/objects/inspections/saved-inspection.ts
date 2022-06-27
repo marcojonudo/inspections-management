@@ -28,7 +28,7 @@ export class SavedInspection implements RealTimeObject {
 		this.itemBudgets = itemBudgets;
 		this.orderInspection = savedInspection.orderInspection;
 		this.sent = savedInspection.sent ? dayjs(savedInspection.sent) : undefined;
-		this.data = savedInspection.data.map(d => new SavedInspectionData(d.employeeCode, d.saved));
+		this.data = savedInspection.data.map(d => new SavedInspectionData(d.employeeCode, d.sendMethod, d.saved));
 	}
 
 	findData(): SavedInspectionData {
