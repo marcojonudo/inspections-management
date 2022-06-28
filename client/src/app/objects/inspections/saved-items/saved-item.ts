@@ -65,7 +65,7 @@ export class SavedItem {
 	}
 
 	update(value: any, employeeCode: string): void {
-		this.findData().update(value, employeeCode);
+		this.findData(employeeCode).update(value, employeeCode);
 	}
 
 }
