@@ -43,7 +43,6 @@ export class InspectionTyreSheetComponent implements OnInit {
 			splittedObject[keys[i + 1]] = this.tyreGroupedItems[keys[i + 1]];
 			this.tyreRowsGroupedItems.push(splittedObject);
 		}
-		console.log(this.tyreRowsGroupedItems);
 		/* Se restan los padding de los contenedores y el margen de 10px para que no se pegue mucho la flecha a los
 		 * extremos */
 		this.barWidth = this.BAR_WIDTH - (this.DEPTH_BAR_PADDING * 4) - (this.DEPTH_BAR_MARGIN * 2);

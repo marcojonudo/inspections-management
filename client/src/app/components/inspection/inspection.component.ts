@@ -14,7 +14,6 @@ import { Centre } from '../../objects/centre';
 import { ItemType } from '../../objects/inspections/items/item-type';
 import { Url } from '../../utils/url';
 import { HttpClient } from '@angular/common/http';
-import { PrintService } from '../../services/print.service';
 
 @Component({
 	selector: 'app-inspection',
@@ -53,9 +52,10 @@ export class InspectionComponent {
 		this.images = [];
 		this.adviser = EmployeeService.findEmployee(this.order.sellerCode);
 		this.mechanics = this.savedInspection.items
-			.map(i => i.employeeCode)
+			.map(i => i.findEmployeeCode())
 			.filter((value, index, self) => value && self.indexOf(value) === index)
-			.map(employeeCode => EmployeeService.findEmployee(employeeCode));
+			.map(employeeCode => EmployeeService.findEmployee(employeeCode))
+			.filter(employee => employee !== undefined);
 
 		this.vehicleType = VehicleType.parse(this.savedInspection.vehicle);
 
@@ -63,21 +63,21 @@ export class InspectionComponent {
 		this.tyreGroupedItems = this.findTyreItems(savedItems);
 		const depthCodes = this.CAR_TYRES.map(carTyre => `${Constants.ITEM_CODE.PN}${carTyre}`);
 		const depthItems = savedItems.filter(i => depthCodes.find(c => c === i.code) !== undefined);
-		this.showTyreSheet = depthItems.find(i => i.imageId) !== undefined;
+		this.showTyreSheet = depthItems.find(i => i.findImageId()) !== undefined;
 		this.visualControlSavedItem = savedItems.find(i => i.code === 'CVGN');
 		this.pressureSavedItem = savedItems.find(i => i.code === 'PPN');
 		this.measurementSavedItem = savedItems.find(i => i.code === 'PN');
 
 		const existentSavedItems = savedItems.filter(i => {
 			const selectItem = i.type === ItemType.SELECT.id;
-			return !i.hidden && (selectItem ? i.findValue() !== Constants.SELECT_ITEM_OPTION_CODE.NA : true);
+			return !i.isHidden() && (selectItem ? i.findValue() !== Constants.SELECT_ITEM_OPTION_CODE.NA : true);
 		});
 		const categories = this.buildPrintCategories(existentSavedItems);
 		this.groupedCategories = this.buildGroupedCategories(categories);
 
-		const imageSavedItems = this.savedInspection.items.filter(savedItem => savedItem.imageId);
+		const imageSavedItems = this.savedInspection.items.filter(savedItem => savedItem.findImageId());
 		if (imageSavedItems.length) {
-			const imageIds = imageSavedItems.map(savedItem => savedItem.imageId);
+			const imageIds = imageSavedItems.map(savedItem => savedItem.findImageId());
 			this.http.get(Url.images(), { params: { ids: `${imageIds.join(',')}` } }).subscribe((images: Image[]) => {
 				this.images = images;
 				const noTyreImages = imageSavedItems.filter(i => depthCodes.find(c => c === i.code) === undefined);

@@ -116,8 +116,8 @@ dataSources:
         driverClassName: com.mysql.jdbc.Driver
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
         url: jdbc:mysql://${host.ip}:${host.local-mysql-port}/fviberi?useSSL=false
-        username: user1
-        password: password1
+        username: ${database.credentials.username}
+        password: ${database.credentials.password}
         properties:
             initialSize: 1
             maxActive: 1

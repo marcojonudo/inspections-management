@@ -1,13 +1,13 @@
-import { SavedItem } from './saved-item';
 import { TextAreaItem } from '../items/text-area-item';
+import { SavedItemData } from './saved-item-data';
 
-export class TextAreaSavedItem extends SavedItem {
+export class TextAreaSavedItemData extends SavedItemData {
 
 	text: string;
 
-	constructor(savedItem: TextAreaSavedItem, item: TextAreaItem) {
-		super(savedItem, item);
-		this.text = savedItem?.text;
+	constructor(employeeCode: string, textAreaSavedItemData: any, item: TextAreaItem) {
+		super(employeeCode, textAreaSavedItemData, item);
+		this.text = textAreaSavedItemData?.text;
 	}
 
 	findValue(): string {
@@ -27,10 +27,6 @@ export class TextAreaSavedItem extends SavedItem {
 		this.text = undefined;
 		this.image = undefined;
 		this.updateCommonFields(employeeCode);
-	}
-
-	isUpdated(syncedSavedItem: TextAreaSavedItem): boolean {
-		return this.text !== syncedSavedItem.text;
 	}
 
 }

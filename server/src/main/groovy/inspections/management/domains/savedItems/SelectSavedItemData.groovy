@@ -9,12 +9,12 @@ import org.grails.datastore.gorm.GormEntity
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-class SelectSavedItem extends SavedItem implements GormEntity<SelectSavedItem> {
+class SelectSavedItemData extends SavedItemData implements GormEntity<SelectSavedItemData> {
 
 	String value
 
-	boolean equals(SavedItem savedItem) {
-		return equalsSaveItem(savedItem) && value == ((SelectSavedItem) savedItem).value
+	SavedItemData fill(SavedItem savedItem) {
+		return fillSavedItem(savedItem)
 	}
 
 	String findValue() {
@@ -27,6 +27,10 @@ class SelectSavedItem extends SavedItem implements GormEntity<SelectSavedItem> {
 
 	String findIcon(List<SelectItemOption> options) {
 		return options.find { it.code == this.value }.icon
+	}
+
+	PdfItem buildPdfItem(SavedItem savedItem, List<SelectItemOption> options) {
+		return new PdfSelectItem(savedItem, options)
 	}
 
 	enum Value {
@@ -45,10 +49,6 @@ class SelectSavedItem extends SavedItem implements GormEntity<SelectSavedItem> {
 			this.color = color
 		}
 
-	}
-
-	PdfItem buildPdfItem(List<SelectItemOption> options) {
-		return new PdfSelectItem(this, options)
 	}
 
 }

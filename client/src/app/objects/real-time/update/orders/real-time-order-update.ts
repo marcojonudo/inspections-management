@@ -38,9 +38,6 @@ export class RealTimeOrderUpdate extends RealTimeOrder {
 
 	check(): boolean {
 		this.updateTypes = RealTimeOrderUpdateType.findAll(this.orderInspection.order, this.syncedOrderInspection.order);
-		const updated = this.ORDER_UPDATE_PROPERTIES.find(updateProperty =>
-			updateProperty(this.orderInspection.order) !== updateProperty(this.syncedOrderInspection.order)
-		);
 		/* Al comprobar si se debe actualizar la OR, también se rellena el array de actualizaciones de presupuestos (al formar estos
 		 * parte de la OR). De esta forma, cuando se ejecute el update, se llevarán a cabo todas las acciones pendientes */
 		const syncedUpdates = this.handleSyncedBudgets(this.syncedOrderInspection.order.budgets, this.orderInspection.order.budgets);

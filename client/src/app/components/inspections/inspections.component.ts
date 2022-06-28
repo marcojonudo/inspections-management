@@ -139,7 +139,8 @@ export class InspectionsComponent implements OnDestroy {
 	}
 
 	findMailSent(orderNumber: number): Dayjs {
-		return InspectionService.findSavedInspection(orderNumber)?.sent;
+		const savedInspection = InspectionService.findSavedInspection(orderNumber);
+		return savedInspection ? InspectionService.findSentDate(savedInspection) : undefined;
 	}
 
 	findDateFormat(orderNumber: number): string {

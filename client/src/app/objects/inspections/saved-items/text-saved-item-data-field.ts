@@ -1,4 +1,4 @@
-export class TextSavedItemField {
+export class TextSavedItemDataField {
 
 	text: string;
 	order: number;

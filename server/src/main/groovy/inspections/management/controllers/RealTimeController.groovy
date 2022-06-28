@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.Operation
 @CompileStatic
 class RealTimeController {
 
-    @Patch("/inspection")
+    @Patch("/inspections")
     @Operation(
         summary = "Sincroniza una revisión",
         description = "Sincroniza una revisión"

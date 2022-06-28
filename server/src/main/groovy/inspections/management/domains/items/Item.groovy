@@ -4,11 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import grails.gorm.annotation.Entity
 import inspections.management.domains.InspectionVehicle
 import inspections.management.domains.ItemCategory
-import inspections.management.domains.savedItems.SavedItem
-import inspections.management.domains.savedItems.SelectSavedItem
-import inspections.management.domains.savedItems.TextAreaSavedItem
-import inspections.management.domains.savedItems.TextSavedItem
-import inspections.management.services.data.SavedItemDataService
+import inspections.management.domains.savedItems.SelectSavedItemData
+import inspections.management.domains.savedItems.TextAreaSavedItemData
+import inspections.management.domains.savedItems.TextSavedItemData
 import org.grails.datastore.gorm.GormEntity
 
 @Entity
@@ -21,10 +19,10 @@ class Item implements GormEntity<Item> {
 	Integer order
 	Integer printOrder
 	ItemCategory category
-	boolean required
 	HeaderCard header
 	boolean picture
 	boolean print
+	boolean required
 
 	@JsonIgnore
 	Set<InspectionVehicle> inspectionsVehicle
@@ -58,36 +56,16 @@ class Item implements GormEntity<Item> {
 
 	enum Type {
 
-		TEXT(
-			TextItem,
-			TextSavedItem,
-			{ TextSavedItem existent, TextSavedItem savedItem, SavedItemDataService savedItemDataService ->
-				return savedItemDataService.textSavedItemDataService.update(existent, savedItem.fields)
-			}
-		),
-		SELECT(
-			SelectItem,
-			SelectSavedItem,
-			{ SelectSavedItem existent, SelectSavedItem savedItem, SavedItemDataService savedItemDataService ->
-				return savedItemDataService.selectSavedItemDataService.update(existent.id, savedItem.value)
-			}
-		),
-		TEXT_AREA(
-			TextAreaItem,
-			TextAreaSavedItem,
-			{ TextAreaSavedItem existent, TextAreaSavedItem savedItem, SavedItemDataService savedItemDataService ->
-				return savedItemDataService.textAreaSavedItemDataService.update(existent.id, savedItem.text)
-			}
-		)
+		TEXT(TextItem, TextSavedItemData),
+		SELECT(SelectItem, SelectSavedItemData),
+		TEXT_AREA(TextAreaItem, TextAreaSavedItemData)
 
 		Class clazz
-		Class savedItemClazz
-		Closure<SavedItem> updateSavedItem
+		Class savedItemDataClazz
 
-		Type(Class clazz, Class savedItemClazz, Closure<SavedItem> updateSavedItem) {
+		Type(Class clazz, Class savedItemDataClazz) {
 			this.clazz = clazz
-			this.savedItemClazz = savedItemClazz
-			this.updateSavedItem = updateSavedItem
+			this.savedItemDataClazz = savedItemDataClazz
 		}
 
 	}

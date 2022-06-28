@@ -13,20 +13,12 @@ export class RealTimeSavedInspectionUpdate extends RealTimeSavedInspection {
 
 	realTimeSavedItems: RealTimeSavedItem[];
 
-	readonly UPDATE_PROPERTIES: ((savedInspection: SavedInspection) => void)[] = [
-		(savedInspection: SavedInspection) => savedInspection.sellerCode,
-		(savedInspection: SavedInspection) => savedInspection.state,
-		(savedInspection: SavedInspection) => savedInspection.saved
-	];
-
 	constructor(savedInspections: SavedInspection[], savedInspection: SavedInspection, syncedSavedInspection: SavedInspection) {
 		super(Constants.REAL_TIME_UPDATE_TYPE.UPDATE, savedInspections, savedInspection, syncedSavedInspection);
 	}
 
 	check(): boolean {
-		const updated = this.UPDATE_PROPERTIES.find(updateProperty =>
-			updateProperty(this.savedInspection) !== updateProperty(this.syncedSavedInspection)
-		) !== undefined;
+		const updated = this.savedInspection.data.length < this.syncedSavedInspection.data.length;
 
 		this.realTimeSavedItems = this.handleSyncedSavedItems(this.syncedSavedInspection.items, this.savedInspection.items);
 		return updated || this.realTimeSavedItems.length !== 0;
@@ -50,9 +42,7 @@ export class RealTimeSavedInspectionUpdate extends RealTimeSavedInspection {
 	}
 
 	update(): void {
-		this.savedInspection.sellerCode = this.syncedSavedInspection.sellerCode;
-		this.savedInspection.state = this.syncedSavedInspection.state;
-		this.savedInspection.saved = this.syncedSavedInspection.saved;
+		this.savedInspection.data.push(this.syncedSavedInspection.findData());
 
 		if (this.realTimeSavedItems.length) {
 			this.realTimeSavedItems.forEach(realTimeSavedItem => realTimeSavedItem.update());
@@ -66,9 +56,9 @@ export class RealTimeSavedInspectionUpdate extends RealTimeSavedInspection {
 
 	updateDetailsLayout(rows: InspectionDetailsColumn[]): InspectionDetailsColumn[] {
 		if (rows.length > this.savedInspection.itemBudgets.length) {
-			rows = rows.filter(row =>
-				!this.savedInspection.itemBudgets.findIndex(b => b.itemCode === row.item.itemCode)
-			);
+			rows = rows.filter(row => {
+				return this.savedInspection.itemBudgets.findIndex(b => b.itemCode === row.item.itemCode) !== -1;
+			});
 		} else if (rows.length < this.savedInspection.itemBudgets.length) {
 			const newItemBudgets = this.savedInspection.itemBudgets.filter(b => !rows.find(c => c.item.itemCode === b.itemCode));
 			newItemBudgets.forEach(itemBudget => {

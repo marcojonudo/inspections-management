@@ -11,7 +11,7 @@ import {
 	ViewChildren
 } from '@angular/core';
 import { TextItemField } from '../../objects/inspections/items/text-item-field';
-import { TextSavedItemField } from '../../objects/inspections/saved-items/text-saved-item-field';
+import { TextSavedItemDataField } from '../../objects/inspections/saved-items/text-saved-item-data-field';
 import { MAT_FORM_FIELD, MatFormField, MatFormFieldControl } from '@angular/material/form-field';
 import { AbstractControl, ControlValueAccessor, FormBuilder, FormGroup, NgControl, Validators } from '@angular/forms';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
@@ -31,15 +31,15 @@ import { FocusMonitor } from '@angular/cdk/a11y';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SeparatorInputComponent
-	implements ControlValueAccessor, MatFormFieldControl<TextSavedItemField[]>, OnInit, OnDestroy {
+	implements ControlValueAccessor, MatFormFieldControl<TextSavedItemDataField[]>, OnInit, OnDestroy {
 
 	static nextId = 0;
 
 	@ViewChildren('fieldInput') fieldInputs: QueryList<HTMLInputElement>;
 
 	@Input() fields: TextItemField[];
-	@Input() model: TextSavedItemField[];
-	@Output() valueEmitter: EventEmitter<TextSavedItemField[]>;
+	@Input() model: TextSavedItemDataField[];
+	@Output() valueEmitter: EventEmitter<TextSavedItemDataField[]>;
 
 	private _placeholder: string;
 	private _required = false;
@@ -95,14 +95,14 @@ export class SeparatorInputComponent
 	}
 
 	@Input()
-	get value(): TextSavedItemField[] | null {
+	get value(): TextSavedItemDataField[] | null {
 		if (this.formGroup.valid) {
 			return this.findValue();
 		}
 		return null;
 	}
 
-	set value(value: TextSavedItemField[] | null) {
+	set value(value: TextSavedItemDataField[] | null) {
 		this.formGroup.setValue(value);
 		this.stateChanges.next();
 	}
@@ -118,7 +118,7 @@ export class SeparatorInputComponent
 		@Optional() @Inject(MAT_FORM_FIELD) public _formField: MatFormField,
 		@Optional() @Self() public ngControl: NgControl
 	) {
-		this.valueEmitter = new EventEmitter<TextSavedItemField[]>();
+		this.valueEmitter = new EventEmitter<TextSavedItemDataField[]>();
 		if (this.ngControl != null) {
 			this.ngControl.valueAccessor = this;
 		}
@@ -193,7 +193,7 @@ export class SeparatorInputComponent
 		}
 	}
 
-	writeValue(value: TextSavedItemField[] | null): void {
+	writeValue(value: TextSavedItemDataField[] | null): void {
 		this.value = value;
 	}
 
@@ -237,11 +237,11 @@ export class SeparatorInputComponent
 		}
 	}
 
-	findValue(): TextSavedItemField[] {
+	findValue(): TextSavedItemDataField[] {
 		const keys = Object.keys(this.formGroup.value);
 		return keys.map(key => {
 			const value = this.formGroup.value[key];
-			return new TextSavedItemField({ text: value, order: this.findKeyOrder(key) });
+			return new TextSavedItemDataField({ text: value, order: this.findKeyOrder(key) });
 		});
 	}
 

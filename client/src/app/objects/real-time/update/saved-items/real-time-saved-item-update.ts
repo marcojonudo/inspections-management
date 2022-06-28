@@ -9,12 +9,11 @@ export class RealTimeSavedItemUpdate extends RealTimeSavedItem {
 	}
 
 	check(): boolean {
-		const updated = !this.savedItem.filled.isSame(this.syncedSavedItem.filled);
-		return updated || this.savedItem.isUpdated(this.syncedSavedItem);
+		return this.savedItem.data.length < this.syncedSavedItem.data.length;
 	}
 
 	update(): void {
-		this.savedItem.update(this.syncedSavedItem.findValue(), this.syncedSavedItem.employeeCode);
+		this.savedItem.data.push(this.syncedSavedItem.findData());
 	}
 
 }

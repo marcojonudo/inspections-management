@@ -4,7 +4,7 @@ import groovy.transform.CompileStatic
 import groovy.transform.TupleConstructor
 import inspections.management.domains.items.SelectItemOption
 import inspections.management.domains.savedItems.SavedItem
-import inspections.management.domains.savedItems.SelectSavedItem
+import inspections.management.domains.savedItems.SelectSavedItemData
 import inspections.management.i18n.CustomMessageSource
 import inspections.management.pogos.pdf.CategoryItems
 import inspections.management.pogos.pdf.inspection.cards.title.CardTitle
@@ -32,9 +32,9 @@ class TyresCard extends Card {
 
     private float barWidth
     private List<List<CategoryItems>> groupedCategories
-    private SelectSavedItem visualControlSavedItem
+    private SavedItem visualControlSavedItem
     private SavedItem measurementSavedItem
-    private SelectSavedItem pressureSavedItem
+    private SavedItem pressureSavedItem
     private List<SelectItemOption> options
 
     TyresCard(
@@ -49,9 +49,9 @@ class TyresCard extends Card {
         this.classes << "category"
         barWidth = (float) (BAR_WIDTH - (DEPTH_BAR_PADDING * 4) - (DEPTH_BAR_MARGIN * 2))
         groupedCategories = categories.collate(2)
-        this.visualControlSavedItem = (SelectSavedItem) visualControlSavedItem
+        this.visualControlSavedItem = visualControlSavedItem
         this.measurementSavedItem = measurementSavedItem
-        this.pressureSavedItem = (SelectSavedItem) pressureSavedItem
+        this.pressureSavedItem = pressureSavedItem
         this.options = options
     }
 
@@ -77,7 +77,7 @@ class TyresCard extends Card {
     }
     
     String buildCentralImage(List<SelectItemOption> options) {
-        SelectItemOption naOption = options.find { it.code == SelectSavedItem.Value.NA.toString() }
+        SelectItemOption naOption = options.find { it.code == SelectSavedItemData.Value.NA.toString() }
         return """
             <div id="central-image">
                 <div>
@@ -85,11 +85,11 @@ class TyresCard extends Card {
                     <img id="steering-wheel" src="img/steering-wheel/${findVisualControlColorName(visualControlSavedItem?.findValue())}-steering-wheel.png"/>
                     <div id="visual-control-item" class="item">
                         <div>${CustomMessageSource.getMessage("print.tyres.geometryVisualControl")}</div>
-                        ${new ItemImage("img/icons/${visualControlSavedItem?.findIcon(this.options) ?: naOption.icon}.svg", (visualControlSavedItem ? SelectSavedItem.Value.valueOf(visualControlSavedItem.value) : SelectSavedItem.Value.NA).color).toHtml()}
+                        ${new ItemImage("img/icons/${((SelectSavedItemData) visualControlSavedItem?.findData())?.findIcon(this.options) ?: naOption.icon}.svg", (visualControlSavedItem ? SelectSavedItemData.Value.valueOf(visualControlSavedItem.findValue()) : SelectSavedItemData.Value.NA).color).toHtml()}
                     </div>
                     <div id="pressure-item" class="item">
                         <div>${CustomMessageSource.getMessage("print.tyres.tyresPressure")}</div>
-                        ${new ItemImage("img/icons/${pressureSavedItem?.findIcon(this.options) ?: naOption.icon}.svg", (pressureSavedItem ? SelectSavedItem.Value.valueOf(pressureSavedItem.value) : SelectSavedItem.Value.NA).color).toHtml()}
+                        ${new ItemImage("img/icons/${((SelectSavedItemData) pressureSavedItem?.findData())?.findIcon(this.options) ?: naOption.icon}.svg", (pressureSavedItem ? SelectSavedItemData.Value.valueOf(pressureSavedItem.findValue()) : SelectSavedItemData.Value.NA).color).toHtml()}
                     </div>
                 </div>
             </div>
@@ -99,7 +99,7 @@ class TyresCard extends Card {
     String buildSection(CategoryItems categoryItems, int order) {
         SavedItem depthItem = categoryItems.items.find { it.code.startsWith(DEPTH_ITEM_PREFIX) }
         SavedItem ageItem = categoryItems.items.find { it.code.startsWith(AGE_ITEM_PREFIX) }
-        SelectSavedItem stateItem = (SelectSavedItem) categoryItems.items.find {
+        SavedItem stateItem = (SavedItem) categoryItems.items.find {
             it.code.startsWith(STATE_ITEM_PREFIX)
         }
         return """
@@ -111,9 +111,9 @@ class TyresCard extends Card {
     }
 
     String buildLeftSection(
-        String name, SavedItem depthItem, SelectSavedItem stateItem, List<SelectItemOption> options
+        String name, SavedItem depthItem, SavedItem stateItem, List<SelectItemOption> options
     ) {
-        SelectItemOption naOption = options.find { it.code == SelectSavedItem.Value.NA.toString() }
+        SelectItemOption naOption = options.find { it.code == SelectSavedItemData.Value.NA.toString() }
         return """
             <div class="tyre-section-wrapper">
                 <div class="tyre-section-header">
@@ -122,14 +122,14 @@ class TyresCard extends Card {
                     <div class="measurement-value">${measurementSavedItem.findValue()}</div>
                 </div>
                 <div class="photo-wrapper">
-                    ${depthItem?.imageId ? new Image([], null, PdfService.buildImageUrl(depthItem)).toHtml() : buildNoImageTemplate()}
+                    ${depthItem?.findImageId() ? new Image([], null, PdfService.buildImageUrl(depthItem)).toHtml() : buildNoImageTemplate()}
                 </div>
                 <div class="tyre-state">
                     <div>${CustomMessageSource.getMessage("print.tyres.tyreState")}</div>
-                    ${new ItemImage("img/icons/${stateItem?.findIcon(this.options) ?: naOption.icon}.svg", (stateItem ? SelectSavedItem.Value.valueOf(stateItem.value) : SelectSavedItem.Value.NA).color).toHtml()}
+                    ${new ItemImage("img/icons/${((SelectSavedItemData) stateItem?.findData())?.findIcon(this.options) ?: naOption.icon}.svg", (stateItem ? SelectSavedItemData.Value.valueOf(stateItem.findValue()) : SelectSavedItemData.Value.NA).color).toHtml()}
                 </div>
                 <div class="state-graph">
-                    <div class="state-name">${(stateItem ? options.find { it.code == stateItem.value} : naOption).name}</div>
+                    <div class="state-name">${(stateItem ? options.find { it.code == stateItem.findValue()} : naOption).name}</div>
                     <div class="state-graph-bar-wrapper">
                         <div
                             class="indicator ${depthItem?.findValue() ? '' : 'hide'}"

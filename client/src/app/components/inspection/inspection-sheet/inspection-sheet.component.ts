@@ -7,17 +7,15 @@ import { SavedItem } from '../../../objects/inspections/saved-items/saved-item';
 import { Order } from '../../../objects/orders/order';
 import { Centre } from '../../../objects/centre';
 import { SelectItemOption } from '../../../objects/inspections/items/select-item-option';
-import { SelectSavedItem } from '../../../objects/inspections/saved-items/select-saved-item';
-import { TextSavedItem } from '../../../objects/inspections/saved-items/text-saved-item';
 import { TextItem } from '../../../objects/inspections/items/text-item';
-import { SelectItem } from '../../../objects/inspections/items/select-item';
-import { Item } from '../../../objects/inspections/items/item';
-import { TextAreaSavedItem } from '../../../objects/inspections/saved-items/text-area-saved-item';
 import { TextItemField } from '../../../objects/inspections/items/text-item-field';
-import { TextSavedItemField } from '../../../objects/inspections/saved-items/text-saved-item-field';
 import { VehicleType } from '../../../objects/orders/vehicles/vehicle-type';
 import { CategoryItems } from '../../../objects/print/category-items';
 import { GroupedItemOptions } from '../../../objects/inspections/items/grouped-item-options';
+import { ItemType } from '../../../objects/inspections/items/item-type';
+import { TextSavedItemData } from '../../../objects/inspections/saved-items/text-saved-item-data';
+import { TextAreaSavedItemData } from '../../../objects/inspections/saved-items/text-area-saved-item-data';
+import { TextSavedItemDataField } from '../../../objects/inspections/saved-items/text-saved-item-data-field';
 
 @Component({
 	selector: 'app-inspection-sheet',
@@ -58,12 +56,12 @@ export class InspectionSheetComponent {
 		return value === optionCode;
 	}
 
-	checkLeftOption(savedItem: SelectSavedItem, i: number): boolean {
+	checkLeftOption(savedItem: SavedItem, i: number): boolean {
 		const options = this.findSelectItemOptions(savedItem);
 		return i < this.findOptionIndex(savedItem, options);
 	}
 
-	checkRightOption(savedItem: SelectSavedItem, i: number): boolean {
+	checkRightOption(savedItem: SavedItem, i: number): boolean {
 		const options = this.findSelectItemOptions(savedItem);
 		return i > this.findOptionIndex(savedItem, options);
 	}
@@ -78,24 +76,24 @@ export class InspectionSheetComponent {
 		return groupedItemOptions.find(o => o.itemCode === savedItem.code).options;
 	}
 
+	checkMultipleFieldsItem(savedItem: SavedItem): boolean {
+		return savedItem.item.type === ItemType.TEXT.id && (savedItem.findData() as TextSavedItemData).fields.length > 2;
+	}
+
 	findTextItem(savedItem: SavedItem): TextItem {
 		return savedItem.item as TextItem;
 	}
 
-	findSelectSavedItem(item: SavedItem): SelectSavedItem {
-		return item as SelectSavedItem;
+	findTextSavedItemData(savedItem: SavedItem): TextSavedItemData {
+		return savedItem.findData() as TextSavedItemData;
 	}
 
-	findTextSavedItem(item: SavedItem): TextSavedItem {
-		return item as TextSavedItem;
-	}
-
-	findTextAreaSavedItem(item: SavedItem): TextAreaSavedItem {
-		return item as TextAreaSavedItem;
+	findTextAreaSavedItemData(savedItem: SavedItem): TextAreaSavedItemData {
+		return savedItem.findData() as TextAreaSavedItemData;
 	}
 
 	findTextItemUnit(item: SavedItem): string {
-		return this.findTextSavedItem(item).isFilled() ? this.findTextItem(item).unit || '' : '';
+		return item.isFilled() ? this.findTextItem(item).unit || '' : '';
 	}
 
 	findIconColor(code: string): string {
@@ -110,48 +108,50 @@ export class InspectionSheetComponent {
 		return this.findTextItem(savedItem).fields[0];
 	}
 
-	findTextSavedItemField(savedItem: SavedItem): TextSavedItemField {
-		return this.findTextSavedItem(savedItem).fields[0];
+	findTextSavedItemField(savedItem: SavedItem): TextSavedItemDataField {
+		return this.findTextSavedItemData(savedItem).fields[0];
 	}
 
 	findTextItemFieldMaxLength(savedItem: SavedItem): number {
 		return this.findTextItemField(savedItem).maxLength || Constants.TEXT_ITEM_MAX_LENGTH;
 	}
 
-	findTextAreaLines(item: TextAreaSavedItem): string[] {
-		return item.text ? item.text.split('\n') : [];
+	findTextAreaLines(item: SavedItem): string[] {
+		return item.findValue() ? item.findValue().split('\n') : [];
 	}
 
 	checkWrongItem(savedItem: SavedItem): boolean {
 		if (savedItem.type !== Constants.ITEM_TYPE.SELECT) {
 			return false;
 		}
-		return InspectionService.checkWrongSelectValue((savedItem as SelectSavedItem).value);
+		return InspectionService.checkWrongSelectValue(savedItem.findValue());
 	}
 
-	toggleSelectOption(savedItem: SelectSavedItem): void {
+	toggleSelectOption(savedItem: SavedItem): void {
 		const options = this.findSelectItemOptions(savedItem);
 		const selectedIndex = this.findOptionIndex(savedItem, options);
 		const newIndex = this.inspectionHandler.findSelectOptionIndex(selectedIndex, options.length);
 
-		InspectionService.updateSelectItem(savedItem, savedItem.item, options[newIndex].code, this.savedInspection).subscribe();
+		InspectionService.updateSelectItem(savedItem, options[newIndex].code, this.savedInspection).subscribe();
 	}
 
-	findOptionIndex(savedItem: SelectSavedItem, options: SelectItemOption[]): number {
-		const selectedValue = savedItem.value;
+	findOptionIndex(savedItem: SavedItem, options: SelectItemOption[]): number {
+		const selectedValue = savedItem.findValue();
 		return options.findIndex(o => o.code === selectedValue);
 	}
 
-	updateText(savedItem: TextSavedItem): void {
-		InspectionService.updateTextItem(savedItem, savedItem.fields, this.savedInspection);
+	updateText(savedItem: SavedItem): void {
+		const textSavedItemData = savedItem.findData() as TextSavedItemData;
+		InspectionService.updateTextItem(savedItem, textSavedItemData.fields, this.savedInspection);
 	}
 
-	updateSeparatorValue(savedItem: SavedItem, fields: TextSavedItemField[]): void {
+	updateSeparatorValue(savedItem: SavedItem, fields: TextSavedItemDataField[]): void {
 		InspectionService.updateTextItem(savedItem, fields, this.savedInspection);
 	}
 
-	updateTextArea(savedItem: TextAreaSavedItem): void {
-		InspectionService.updateTextAreaItem(savedItem, savedItem.text, this.savedInspection);
+	updateTextArea(savedItem: SavedItem): void {
+		const textAreaSavedItemData = savedItem.findData() as TextAreaSavedItemData;
+		InspectionService.updateTextAreaItem(savedItem, textAreaSavedItemData.text, this.savedInspection);
 	}
 
 }

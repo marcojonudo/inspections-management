@@ -1,63 +1,60 @@
 package inspections.management.domains.savedItems
 
-import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import grails.gorm.annotation.Entity
+import groovy.transform.TupleConstructor
+import inspections.management.deserializers.SavedItemDeserializer
 import inspections.management.domains.Image
 import inspections.management.domains.SavedInspection
 import inspections.management.domains.items.Item
 import inspections.management.domains.items.SelectItemOption
 import inspections.management.pogos.pdf.structure.elements.PdfItem
-import inspections.management.utils.Constants
 import org.grails.datastore.gorm.GormEntity
 
-import java.time.LocalDateTime
-
 @Entity
-abstract class SavedItem implements GormEntity<SavedItem> {
-
-	long savedInspectionId
+@JsonDeserialize(using = SavedItemDeserializer)
+@TupleConstructor
+class SavedItem implements GormEntity<SavedItem> {
 
 	Item.Type type
 	String code
-	String employeeCode
-	String sellerCode
-	boolean hidden
-	Long imageId
-	boolean restrictive
+	Set<SavedItemData> data
+	Long savedInspectionId
 
-	@JsonFormat(pattern = Constants.DateTimeFormat.yyyy_MM_dd_HH_mm_ss, timezone = Constants.SPAIN_TIMEZONE)
-	@JsonDeserialize(using = LocalDateTimeDeserializer)
-	LocalDateTime filled
+	Image image
 
 	@JsonIgnore
 	Item item
-	Image image
 
 	static belongsTo = SavedInspection
 
-	static constraints = {
-		filled nullable: true
-		imageId nullable: true
-		sellerCode nullable: true
-	}
+	static hasMany = [data: SavedItemData]
 
 	static mapping = {
-		tablePerHierarchy false
+		data fetch: 'join'
 	}
 
-	static transients = ['item', 'image']
+	static transients = ['image', 'item']
 
-	abstract boolean equals(SavedItem savedItem)
+	SavedItemData findData() {
+		return data.max { it.saved }
+	}
 
-	abstract String findValue()
+	String findValue() {
+		return findData().findValue()
+	}
 
-	abstract PdfItem buildPdfItem(List<SelectItemOption> options)
+	Long findImageId() {
+		return findData().imageId
+	}
 
-	boolean equalsSaveItem(SavedItem savedItem) {
-		return hidden == savedItem.hidden
+	boolean findHidden() {
+		return findData().hidden
+	}
+
+	PdfItem buildPdfItem(List<SelectItemOption> options) {
+		return findData().buildPdfItem(this, options)
 	}
 
 }
