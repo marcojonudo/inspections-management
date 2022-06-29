@@ -549,7 +549,7 @@ export class InspectionService {
 		savedInspection: SavedInspection,
 		employee: Employee = EmployeeService.employee
 	): void {
-		savedItem.findData(employee.code).update(fields, employee.code);
+		savedItem.update(fields, employee.code);
 		LocalStorageService.setItem(Constants.LOCAL_STORAGE.SAVED_INSPECTION, savedInspection);
 	}
 
