@@ -122,7 +122,7 @@ export class InspectionDetailsComponent implements OnDestroy {
 	findSellerCode(budgets: Budget[]): string {
 		if (budgets.length) {
 			const lastBudget = Utils.sort(budgets, (budget => budget.number)).reverse()[0];
-			return this.findEmployee(lastBudget.sellerCode).name;
+			return this.findEmployee(lastBudget.sellerCode)?.name || lastBudget?.sellerCode;
 		}
 		return '-';
 	}
