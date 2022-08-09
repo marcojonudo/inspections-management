@@ -29,7 +29,7 @@ export class SavedItem {
 	}
 
 	findLastData(data: SavedItemData[] = this.data): SavedItemData {
-		return data.reduce((prev, current) => (prev.filled > current.filled) ? prev : current);
+		return data.reduce((prev, current) => !current.filled || (prev.filled > current.filled) ? prev : current);
 	}
 
 	findData(employeeCode: string = undefined): SavedItemData {
