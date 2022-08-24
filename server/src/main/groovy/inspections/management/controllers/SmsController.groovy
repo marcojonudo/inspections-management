@@ -26,7 +26,7 @@ class SmsController {
     )
     @ApiResponse(responseCode = "200", description = "Sms enviado")
     @ApiResponse(responseCode = "500", description = "Error enviando sms")
-    HttpResponse sendMail(@QueryValue Integer orderNumber, @QueryValue int to, @QueryValue String employeeCode) {
+    HttpResponse sendSms(@QueryValue Integer orderNumber, @QueryValue int to, @QueryValue String employeeCode) {
         SavedInspection savedInspection = inspectionService.sendInspectionSms(orderNumber, to, employeeCode)
         return HttpResponse
             .status(savedInspection ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR)

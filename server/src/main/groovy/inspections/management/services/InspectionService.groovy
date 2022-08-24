@@ -21,14 +21,21 @@ import inspections.management.utils.Constants
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.multipart.MultipartBody
+import org.apache.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.rendering.ImageType
+import org.apache.pdfbox.rendering.PDFRenderer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import javax.imageio.ImageIO
 import javax.inject.Inject
 import javax.inject.Singleton
+import java.awt.*
+import java.awt.image.BufferedImage
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
+import java.util.List
 
 @Singleton
 @CompileStatic
@@ -46,7 +53,6 @@ class InspectionService {
 	@Inject private MailDataDataService mailDataDataService
 	@Inject private PdfService pdfService
 	@Inject private MailService mailService
-	@Inject private ConverterService converterService
 	@Inject private SudokuClient sudokuClient
 	@Inject private SlackService slackService
 
@@ -208,14 +214,14 @@ class InspectionService {
 
 			LocalTime refTime = LocalTime.now()
 			LOG.info(new Log((Map) [employeeCode: employeeCode, orderNumber: orderNumber, phoneNumber: phoneNumber, message: Constants.Message.CONVERTING_PDF_IMAGE]).toString())
-			byte[] imageBytes = converterService.convertPdfToPng(pdfFile)
+			byte[] imageBytes = convertPdfToPng(pdfFile)
 			LOG.info(new Log((Map) [employeeCode: employeeCode, orderNumber: orderNumber, phoneNumber: phoneNumber, message: Constants.Message.CONVERTED_PDF_IMAGE, millis: ChronoUnit.MILLIS.between(refTime, LocalTime.now())]).toString())
 
 			String fileName = FileService.findFileName(pdfFile.name, "pdf")
 			File imageFile = FileService.createTempFile(fileName, imageBytes)
 			MultipartBody requestBody = MultipartBody.builder()
 				.addPart("file", imageFile)
-				.addPart("filename", "${centre.code as int}-$order.number-${savedInspection.numberPlate}.png")
+				.addPart("filename", "${centre.code as int}-$order.number-${savedInspection.numberPlate}.jpg")
 				.addPart("phone", "$phoneNumber")
 				.build()
 			HttpResponse response = sudokuClient.sendSms(requestBody)
@@ -244,6 +250,37 @@ class InspectionService {
 			)
 		}
 		return updatedInspection
+	}
+
+	static byte[] convertPdfToPng(File pdfFile) {
+		PDDocument document = PDDocument.load(pdfFile)
+		PDFRenderer pdfRenderer = new PDFRenderer(document)
+		BufferedImage bufferedImage = new BufferedImage(10, 10,  BufferedImage.TYPE_INT_ARGB)
+		for (int page = 0; page < document.getNumberOfPages(); ++page) {
+			BufferedImage bi = pdfRenderer.renderImageWithDPI(page, 300, ImageType.RGB)
+			bufferedImage = joinBufferedImage(bufferedImage, bi)
+		}
+		ByteArrayOutputStream baos = new ByteArrayOutputStream()
+		ImageIO.write(bufferedImage, "jpg", baos)
+		byte[] bytes = baos.toByteArray()
+		document.close()
+		return bytes
+	}
+
+	static BufferedImage joinBufferedImage(BufferedImage img1, BufferedImage img2) {
+		int offset = 5
+		int wid = Math.max(img1.getWidth(), img2.getWidth()) + offset
+		int height = img1.getHeight()+ img2.getHeight() + offset
+		BufferedImage newImage = new BufferedImage(wid, height, BufferedImage.TYPE_INT_RGB)
+		Graphics2D g2 = newImage.createGraphics()
+		Color oldColor = g2.getColor()
+		g2.setPaint(Color.WHITE)
+		g2.fillRect(0, 0, wid, height)
+		g2.setColor(oldColor)
+		g2.drawImage(img1, null, 0, 0)
+		g2.drawImage(img2, null, 0 , img1.getHeight() + offset)
+		g2.dispose()
+		return newImage
 	}
 
 	/**
