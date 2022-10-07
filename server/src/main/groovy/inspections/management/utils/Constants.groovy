@@ -37,6 +37,9 @@ class Constants {
     static class Message {
 
         static final String SAVING_INSPECTION = "Saving inspection"
+        static final String EXISTENT_INSPECTION_SAVED = "Existent inspection saved values"
+        static final String NEW_DATA_SAVED = "New inspection data saved value"
+        static final String ADDING_DATA_ITEM = "Adding data item"
         static final String ERROR_SAVING_INSPECTION = "Error saving inspection"
         static final String SAVED_INSPECTION = "Saved inspection!"
 

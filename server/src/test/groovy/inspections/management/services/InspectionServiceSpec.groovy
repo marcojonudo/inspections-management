@@ -3,8 +3,7 @@ package inspections.management.services
 import inspections.management.domains.fviberi.Order
 import inspections.management.domains.items.Item
 import inspections.management.domains.savedItems.SavedItem
-import inspections.management.domains.savedItems.SelectSavedItem
-import inspections.management.domains.savedItems.TextSavedItem
+import inspections.management.domains.savedItems.SelectSavedItemData
 import inspections.management.services.data.*
 import io.micronaut.test.annotation.MicronautTest
 import io.micronaut.test.annotation.MockBean
@@ -320,9 +319,9 @@ class InspectionServiceSpec extends Specification {
     void "test find wrong items select and text items no wrong items"() {
         given:
         List<SavedItem> items = [
-            new TextSavedItem(type: Item.Type.TEXT),
-            new SelectSavedItem(type: Item.Type.SELECT, value: SelectSavedItem.Value.C.toString()),
-            new SelectSavedItem(type: Item.Type.SELECT, value: SelectSavedItem.Value.C.toString())
+            new SavedItem(type: Item.Type.TEXT),
+            new SavedItem(type: Item.Type.SELECT, data: [new SelectSavedItemData(value: SelectSavedItemData.Value.C.toString())]),
+            new SavedItem(type: Item.Type.SELECT, data: [new SelectSavedItemData(value: SelectSavedItemData.Value.C.toString())])
         ]
 
         when:
@@ -335,9 +334,9 @@ class InspectionServiceSpec extends Specification {
     void "test find wrong items select and text items wrong items"() {
         given:
         List<SavedItem> items = [
-            new TextSavedItem(type: Item.Type.TEXT),
-            new SelectSavedItem(type: Item.Type.SELECT, filled: LocalDateTime.now(), value: SelectSavedItem.Value.C.toString()),
-            new SelectSavedItem(type: Item.Type.SELECT, filled: LocalDateTime.now(), value: SelectSavedItem.Value.SN.toString())
+            new SavedItem(type: Item.Type.TEXT),
+            new SavedItem(type: Item.Type.SELECT, data: [new SelectSavedItemData(filled: LocalDateTime.now(), value: SelectSavedItemData.Value.C.toString())]),
+            new SavedItem(type: Item.Type.SELECT, data: [new SelectSavedItemData(filled: LocalDateTime.now(), value: SelectSavedItemData.Value.SN.toString())])
         ]
 
         when:
@@ -346,7 +345,7 @@ class InspectionServiceSpec extends Specification {
         then:
         wrongItems
         wrongItems.size() == 1
-        (wrongItems[0] as SelectSavedItem).value == SelectSavedItem.Value.SN.toString()
+        wrongItems[0].findValue() == SelectSavedItemData.Value.SN.toString()
     }
 
     // endregion

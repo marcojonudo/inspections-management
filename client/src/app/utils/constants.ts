@@ -178,4 +178,9 @@ export class Constants {
 		Constants.ORDER_STATE.X
 	];
 
+	static readonly REASON: any = {
+		UPDATED: 'UPDATED',
+		SENT: 'SENT'
+	};
+
 }

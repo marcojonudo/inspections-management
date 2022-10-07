@@ -4,13 +4,15 @@ import * as dayjs from 'dayjs';
 export class SavedInspectionData {
 
 	employeeCode: string;
+	reason: string;
 	sendMethod: string;
 	saved: Dayjs;
 
-	constructor(employeeCode: string, sendMethod: string = undefined, saved: any = undefined) {
+	constructor(employeeCode: string, reason: string, saved: Dayjs = undefined, sendMethod: string = undefined) {
 		this.employeeCode = employeeCode;
+		this.reason = reason;
 		this.sendMethod = sendMethod;
-		this.saved = saved ? dayjs(saved) : undefined;
+		this.saved = saved ? saved : dayjs();
 	}
 
 }

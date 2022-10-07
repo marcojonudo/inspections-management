@@ -8,13 +8,17 @@ import inspections.management.domains.fviberi.Order
 import inspections.management.domains.items.Item
 import inspections.management.domains.savedItems.SavedItem
 import inspections.management.domains.savedItems.SavedItemData
-import inspections.management.pogos.SendMethod
+import inspections.management.pogos.logs.Log
 import inspections.management.utils.Constants
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import javax.inject.Inject
 
 @Service(SavedInspection)
 abstract class SavedInspectionDataService {
+
+	private static final Logger LOG = LoggerFactory.getLogger(SavedInspectionDataService)
 
 	@Inject SavedInspectionDataDataService savedInspectionDataDataService
 	@Inject SavedItemDataService savedItemDataService
@@ -67,19 +71,15 @@ abstract class SavedInspectionDataService {
 	SavedInspection update(SavedInspection savedInspection, SavedInspection existentSavedInspection) {
 		List<Item> items = itemDataService.findAll((List<String>) savedInspection.items.code)
 
-		SavedInspectionData newSavedInspectionData = savedInspection.data
-			.max { it.saved }
-			.tap {
-				it.savedInspection = existentSavedInspection
-				it.reason = SavedInspectionData.Reason.UPDATED
-			}
-		existentSavedInspection.addToData(newSavedInspectionData)
+		LOG.info(new Log((Map) [message: Constants.Message.EXISTENT_INSPECTION_SAVED, orderNumber: savedInspection.orderNumber, employeeCode: savedInspection.findData().employeeCode, saved: existentSavedInspection.data.saved.sort()*.toString()]).toString())
+		addData(savedInspection, existentSavedInspection)
 		savedInspection.items.each { SavedItem savedItem ->
 			SavedItem existentSavedItem = existentSavedInspection.items.find { it.code == savedItem.code }
 			if (!existentSavedItem) {
 				fillSavedItem(savedItem, existentSavedInspection)
 				savedItemDataService.save(savedItem)
 			} else if (savedItem.data.size() != existentSavedItem.data.size()) {
+				LOG.info(new Log((Map) [message: Constants.Message.ADDING_DATA_ITEM, orderNumber: savedInspection.orderNumber, employeeCode: savedInspection.findData().employeeCode, itemCode: existentSavedItem.code, existentSaved: existentSavedItem.data.saved.sort()*.toString(), newSaved: savedItem.data.saved.sort()*.toString()]).toString())
 				addSavedItem(savedItem, existentSavedItem)
 			}
 		}
@@ -94,7 +94,7 @@ abstract class SavedInspectionDataService {
 
 	void addSavedItem(SavedItem savedItem, SavedItem existentSavedItem) {
 		/* Si hay algún elemento nuevo en el array 'data', significa que se ha modificado en el front */
-		SavedItemData data = savedItem.data.max { it.filled }
+		SavedItemData data = savedItem.data.max { it.saved }
 		data.fill(existentSavedItem)
 		existentSavedItem.addToData(data)
 		savedItemDataDataService.save(data)
@@ -106,12 +106,15 @@ abstract class SavedInspectionDataService {
 		}
 	}
 
-	SavedInspection updateSent(SavedInspection savedInspection, String employeeCode, SendMethod sendMethod) {
-		SavedInspectionData newData = new SavedInspectionData(
-			savedInspection, employeeCode, SavedInspectionData.Reason.SENT, sendMethod
-		)
-		savedInspection.addToData(newData)
-		return save(savedInspection)
+	SavedInspection addData(
+		SavedInspection savedInspection, SavedInspection existentSavedInspection, boolean saveInspection = false
+	) {
+		SavedInspectionData newData = savedInspection.data
+			.max { it.saved }
+			.tap { it.savedInspection = existentSavedInspection }
+		LOG.info(new Log((Map) [message: Constants.Message.NEW_DATA_SAVED, orderNumber: existentSavedInspection.orderNumber, saved: savedInspection.data.saved.sort()*.toString(), newSaved: newData.saved.toString()]).toString())
+		existentSavedInspection.addToData(newData)
+		return saveInspection ? save(existentSavedInspection) : existentSavedInspection
 	}
 
 }

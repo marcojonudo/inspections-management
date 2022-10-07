@@ -21,7 +21,7 @@ class SavedInspectionData implements GormEntity<SavedInspectionData> {
 	SendMethod sendMethod
 
 	@JsonFormat(pattern = Constants.DateTimeFormat.yyyy_MM_dd_HH_mm_ss, timezone = Constants.SPAIN_TIMEZONE)
-	LocalDateTime saved = LocalDateTime.now()
+	LocalDateTime saved
 
 	static belongsTo = SavedInspection
 
