@@ -78,8 +78,7 @@ abstract class SavedInspectionDataService {
 			if (!existentSavedItem) {
 				fillSavedItem(savedItem, existentSavedInspection)
 				savedItemDataService.save(savedItem)
-			} else if (savedItem.data.size() != existentSavedItem.data.size()) {
-				LOG.info(new Log((Map) [message: Constants.Message.ADDING_DATA_ITEM, orderNumber: savedInspection.orderNumber, employeeCode: savedInspection.findData().employeeCode, itemCode: existentSavedItem.code, existentSaved: existentSavedItem.data.saved.sort()*.toString(), newSaved: savedItem.data.saved.sort()*.toString()]).toString())
+			} else if (checkNewItemData(savedItem.data, existentSavedItem.data)) {
 				addSavedItem(savedItem, existentSavedItem)
 			}
 		}
@@ -90,6 +89,10 @@ abstract class SavedInspectionDataService {
 	static void fillSavedItem(SavedItem savedItem, SavedInspection savedInspection) {
 		savedItem.savedInspectionId = savedInspection.id
 		savedItem.data.each { it.fill(savedItem) }
+	}
+
+	static boolean checkNewItemData(Set<SavedItemData> data, Set<SavedItemData> existentData) {
+		return data.saved.max() > existentData.saved.max()
 	}
 
 	void addSavedItem(SavedItem savedItem, SavedItem existentSavedItem) {
