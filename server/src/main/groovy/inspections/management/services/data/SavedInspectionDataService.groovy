@@ -76,6 +76,7 @@ abstract class SavedInspectionDataService {
 		savedInspection.items.each { SavedItem savedItem ->
 			SavedItem existentSavedItem = existentSavedInspection.items.find { it.code == savedItem.code }
 			if (!existentSavedItem) {
+				LOG.info(new Log((Map) [message: Constants.Message.NEW_DATA_ITEM, orderNumber: savedInspection.orderNumber, employeeCode: savedInspection.findData().employeeCode, itemCode: existentSavedItem.code, newSaved: savedItem.data.saved.sort()*.toString()]).toString())
 				fillSavedItem(savedItem, existentSavedInspection)
 				savedItemDataService.save(savedItem)
 			} else if (checkNewItemData(savedItem.data, existentSavedItem.data)) {
