@@ -27,7 +27,6 @@ class InspectionServiceSpec extends Specification {
     @Inject InspectionTypeDataService inspectionTypeDataService
     @Inject SelectItemOptionDataService selectItemOptionDataService
     @Inject PdfService pdfService
-    @Inject ConverterService converterService
     @Inject SudokuClient sudokuClient
 
     @MockBean(SelectItemOptionDataService)
@@ -78,11 +77,6 @@ class InspectionServiceSpec extends Specification {
     @MockBean(PdfService)
     PdfService pdfService() {
         Mock(PdfService)
-    }
-
-    @MockBean(ConverterService)
-    ConverterService converterService() {
-        Mock(ConverterService)
     }
 
     @MockBean(SudokuClient)

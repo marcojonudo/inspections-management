@@ -789,7 +789,7 @@ export class InspectionService {
 
 	sendSms(savedInspection: SavedInspection, to: number, employeeCode: string = EmployeeService.employee.code): Observable<any> {
 		this.snackBarService.open(Constants.MESSAGE_CODE.SENDING_SMS, Constants.SNACK_BAR.TYPE.WARNING, 10000);
-		return this.http.post(Url.sms(savedInspection.orderNumber, to, employeeCode), {}).pipe(
+		return this.http.post(Url.sms(to, employeeCode), savedInspection).pipe(
 			tap(
 				() => this.inspectionsTriggerSubject.next(),
 				(error) => {

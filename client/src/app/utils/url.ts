@@ -62,8 +62,8 @@ export class Url {
 		return `${environment.serverUrl}/mails?to=${to}`;
 	}
 
-	static sms(orderNumber: number, to: number, employeeCode: string): string {
-		return `${environment.serverUrl}/sms?orderNumber=${orderNumber}&to=${to}&employeeCode=${employeeCode}`;
+	static sms(to: number, employeeCode: string): string {
+		return `${environment.serverUrl}/sms?to=${to}&employeeCode=${employeeCode}`;
 	}
 
 }

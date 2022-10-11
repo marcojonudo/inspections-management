@@ -3,8 +3,9 @@ package inspections.management.controllers
 import groovy.transform.CompileStatic
 import inspections.management.domains.SavedInspection
 import inspections.management.services.InspectionService
+import inspections.management.services.data.SavedInspectionDataService
 import io.micronaut.http.HttpResponse
-import io.micronaut.http.HttpStatus
+import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.annotation.QueryValue
@@ -18,6 +19,7 @@ import javax.inject.Inject
 class SmsController {
 
     @Inject InspectionService inspectionService
+    @Inject SavedInspectionDataService savedInspectionDataService
 
     @Post
     @Operation(
@@ -26,11 +28,15 @@ class SmsController {
     )
     @ApiResponse(responseCode = "200", description = "Sms enviado")
     @ApiResponse(responseCode = "500", description = "Error enviando sms")
-    HttpResponse sendSms(@QueryValue Integer orderNumber, @QueryValue int to, @QueryValue String employeeCode) {
-        SavedInspection savedInspection = inspectionService.sendInspectionSms(orderNumber, to, employeeCode)
-        return HttpResponse
-            .status(savedInspection ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(savedInspection)
+    HttpResponse sendSms(@QueryValue int to, @QueryValue String employeeCode, @Body SavedInspection savedInspection) {
+        SavedInspection existent = savedInspectionDataService.find(savedInspection.orderNumber, true)
+        boolean sent = inspectionService.sendInspectionSms(existent, to, employeeCode)
+        if (sent) {
+            SavedInspection saved = savedInspectionDataService.addData(savedInspection, existent, true)
+            return HttpResponse.ok(saved)
+        } else {
+            return HttpResponse.serverError()
+        }
     }
 
 }

@@ -29,14 +29,14 @@ class MailController {
     @ApiResponse(responseCode = "200", description = "Correo enviado")
     @ApiResponse(responseCode = "500", description = "Error enviando correo")
     HttpResponse sendMail(@QueryValue String to, @Body SavedInspection savedInspection) {
-//        SavedInspection savedInspection = inspectionService.sendInspectionMail(orderNumber, to, employeeCode)
         SavedInspection existent = savedInspectionDataService.find(savedInspection.orderNumber, true)
-        inspectionService.sendInspectionMail(existent, to)
-        SavedInspection saved = savedInspectionDataService.addData(savedInspection, existent, true)
-        return HttpResponse.ok(saved)
-//        return HttpResponse
-//            .status(savedInspection ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR)
-//            .body(savedInspection)
+        boolean sent = inspectionService.sendInspectionMail(existent, to)
+        if (sent) {
+            SavedInspection saved = savedInspectionDataService.addData(savedInspection, existent, true)
+            return HttpResponse.ok(saved)
+        } else {
+            return HttpResponse.serverError()
+        }
     }
 
 }
