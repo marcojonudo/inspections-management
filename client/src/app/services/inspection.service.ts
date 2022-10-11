@@ -752,7 +752,7 @@ export class InspectionService {
 
 	sendMail(savedInspection: SavedInspection, to: string, employeeCode: string = EmployeeService.employee.code): Observable<any> {
 		this.snackBarService.open(Constants.MESSAGE_CODE.SENDING_MAIL, Constants.SNACK_BAR.TYPE.WARNING, 10000);
-		savedInspection.addData(employeeCode, Constants.REASON.SENT);
+		savedInspection.addData(employeeCode, Constants.REASON.SENT, Constants.SEND_METHOD.MAIL);
 		return this.http.post(Url.mails(to), savedInspection).pipe(
 			tap(
 				() => this.inspectionsTriggerSubject.next(),

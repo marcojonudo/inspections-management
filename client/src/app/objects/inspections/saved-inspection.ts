@@ -40,13 +40,13 @@ export class SavedInspection implements RealTimeObject {
 		return this.findData().employeeCode;
 	}
 
-	addData(employeeCode: string, reason: string = Constants.REASON.UPDATED): void {
+	addData(employeeCode: string, reason: string = Constants.REASON.UPDATED, sendMethod: string = undefined): void {
 		const maxSaved = dayjs(Math.max(...this.data.map(d => d.saved.valueOf())));
 		const now = dayjs();
 		/* Puede darse el caso de que, si se guarda muy rápido la revisión, se de clic al botón por segunda vez en el mismo segundo. En ese
 		 * caso, se suma un segundo a la fecha para evitar duplicados */
 		const saved = now.diff(maxSaved, 's') > 0 ? now : maxSaved.add(1, 's');
-		this.data.push(new SavedInspectionData(employeeCode, reason, saved));
+		this.data.push(new SavedInspectionData(employeeCode, reason, saved, sendMethod));
 		this.items.filter(i => !i.findData().saved).forEach(i => {
 			i.findData().saved = dayjs(this.findData().saved);
 		});

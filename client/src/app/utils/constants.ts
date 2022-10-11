@@ -183,4 +183,8 @@ export class Constants {
 		SENT: 'SENT'
 	};
 
+	static readonly SEND_METHOD: any = {
+		MAIL: 'MAIL'
+	};
+
 }
