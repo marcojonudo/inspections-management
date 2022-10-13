@@ -4,6 +4,7 @@ import { RealTimeObject } from '../real-time/update/real-time-object';
 import { SavedInspectionData } from './saved-inspection-data';
 import * as dayjs from 'dayjs';
 import { Dayjs } from 'dayjs';
+import { Constants } from '../../utils/constants';
 
 export class SavedInspection implements RealTimeObject {
 
@@ -28,28 +29,36 @@ export class SavedInspection implements RealTimeObject {
 		this.itemBudgets = itemBudgets;
 		this.orderInspection = savedInspection.orderInspection;
 		this.sent = savedInspection.sent ? dayjs(savedInspection.sent) : undefined;
-		this.data = savedInspection.data.map(d => new SavedInspectionData(d.employeeCode, d.sendMethod, d.saved));
+		this.data = savedInspection.data.map(d => new SavedInspectionData(d.employeeCode, d.reason, dayjs(d.saved), d.sendMethod));
 	}
 
 	findData(): SavedInspectionData {
-		return this.data[this.data.length - 1];
+		return this.data.reduce((d1, d2) => d1.saved > d2.saved ? d1 : d2);
 	}
 
 	findEmployeeCode(): string {
 		return this.findData().employeeCode;
 	}
 
-	addData(employeeCode: string): void {
-		this.data.push(new SavedInspectionData(employeeCode));
+	addData(employeeCode: string, reason: string = Constants.REASON.UPDATED, sendMethod: string = undefined): void {
+		const maxSaved = dayjs(Math.max(...this.data.map(d => d.saved.valueOf())));
+		const now = dayjs();
+		/* Puede darse el caso de que, si se guarda muy rápido la revisión, se de clic al botón por segunda vez en el mismo segundo. En ese
+		 * caso, se suma un segundo a la fecha para evitar duplicados */
+		const saved = now.diff(maxSaved, 's') > 0 ? now : maxSaved.add(1, 's');
+		this.data.push(new SavedInspectionData(employeeCode, reason, saved, sendMethod));
+		this.items.filter(i => !i.findData().saved).forEach(i => {
+			i.findData().saved = dayjs(this.findData().saved);
+		});
 	}
 
-	fillSaved(savedInspection: SavedInspection, employeeCode: string): void {
-		this.findData().saved = dayjs(savedInspection.findData().saved);
+	restoreSaved(): void {
+		const maxSavedItem = this.data.reduce((d1, d2) => d1.saved > d2.saved ? d1 : d2);
+		const i = this.data.indexOf(maxSavedItem);
+		this.data.splice(i, 1);
 		this.items.forEach(savedItem => {
-			const s = savedInspection.items.find(i => i.item.code === savedItem.item.code);
-			savedItem.findData().saved = dayjs(s.findData().saved);
+			savedItem.findData().saved = undefined;
 		});
-		this.addData(employeeCode);
 	}
 
 }

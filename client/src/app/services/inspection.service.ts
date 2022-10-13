@@ -725,16 +725,16 @@ export class InspectionService {
 		handler: InspectionHandler = InspectionService.inspectionHandler,
 		employee: Employee = EmployeeService.employee
 	): Observable<any> {
+		savedInspection.addData(employee.code);
 		const body = handler.findSavedInspection(savedInspection);
-		body.data.push(new SavedInspectionData(employee.code));
 		console.log('Saving inspection', body);
 		return this.http.patch(Url.savedInspections(), body).pipe(
 			tap(
-				(data) => {
-					const receivedSavedInspection = Builder.buildSavedInspection(data);
-					body.fillSaved(receivedSavedInspection, employee.code);
-				},
-				(error) => console.error('Error saving inspection', error)
+				(data) => console.log('Received saved inspection', data),
+				(error) => {
+					console.error('Error saving inspection', error);
+					savedInspection.restoreSaved();
+				}
 			)
 		);
 	}
@@ -752,16 +752,15 @@ export class InspectionService {
 
 	sendMail(savedInspection: SavedInspection, to: string, employeeCode: string = EmployeeService.employee.code): Observable<any> {
 		this.snackBarService.open(Constants.MESSAGE_CODE.SENDING_MAIL, Constants.SNACK_BAR.TYPE.WARNING, 10000);
-		return this.http.post(Url.mails(savedInspection.orderNumber, to, employeeCode), {}).pipe(
-			tap(data => {
-				// TODO Exception in controller
-				const savedData = data.data.map(d => new SavedInspectionData(d.employeeCode, d.sendMethod, d.saved));
-
-				const maxSaved: Dayjs = dayjs.max(savedData.map(d => d.saved));
-				const mailData = savedData.find(d => d.saved.isSame(maxSaved));
-				savedInspection.data.push(mailData);
-				this.inspectionsTriggerSubject.next();
-			})
+		savedInspection.addData(employeeCode, Constants.REASON.SENT, Constants.SEND_METHOD.MAIL);
+		return this.http.post(Url.mails(to), savedInspection).pipe(
+			tap(
+				() => this.inspectionsTriggerSubject.next(),
+				(error) => {
+					console.error('Error sending mail', error);
+					savedInspection.restoreSaved();
+				}
+			)
 		);
 	}
 

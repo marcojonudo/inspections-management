@@ -29,7 +29,12 @@ export class SavedItem {
 	}
 
 	findLastData(data: SavedItemData[] = this.data): SavedItemData {
-		return data.reduce((prev, current) => !current.filled || (prev.filled > current.filled) ? prev : current);
+		const savedData = data.filter(d => d.saved);
+		/* Si todos los elementos tienen saved, se obtiene en último que se haya guardado (y por tanto, con el valor más
+		 * reciente). Si no, se obtiene aquel que no tenga saved (y por tanto, no se haya guardado aún) */
+		return savedData.length === data.length ?
+			data.reduce((d1, d2) => d1.saved > d2.saved ? d1 : d2) :
+			data.find(d => !d.saved);
 	}
 
 	findData(employeeCode: string = undefined): SavedItemData {
@@ -41,7 +46,8 @@ export class SavedItem {
 
 	addData(employeeCode: string, item: Item = this.item): void {
 		const itemType = ItemType.parse(item.type);
-		this.data.push(itemType.buildData(employeeCode, undefined, item));
+		const newData = itemType.buildData(employeeCode, undefined, item);
+		this.data.push(newData);
 	}
 
 	findValue(): string {
@@ -61,7 +67,7 @@ export class SavedItem {
 	}
 
 	updateHidden(employeeCode: string, hidden: boolean): void {
-		this.findData().updateHidden(employeeCode, hidden);
+		this.findData(employeeCode).updateHidden(employeeCode, hidden);
 	}
 
 	update(value: any, employeeCode: string): void {

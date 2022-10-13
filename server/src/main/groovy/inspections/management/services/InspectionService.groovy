@@ -12,7 +12,6 @@ import inspections.management.domains.items.Item
 import inspections.management.domains.savedItems.SavedItem
 import inspections.management.domains.savedItems.SelectSavedItemData
 import inspections.management.pogos.OrderInspection
-import inspections.management.pogos.SendMethod
 import inspections.management.pogos.logs.Log
 import inspections.management.pogos.mails.MailSender
 import inspections.management.services.data.*
@@ -144,29 +143,27 @@ class InspectionService {
 	 * @return Revisión guardada
 	 */
 	SavedInspection saveInspection(SavedInspection savedInspection, Integer orderNumber, String employeeCode) {
-		LOG.info(new Log((Map) [sellerCode: employeeCode, orderNumber: orderNumber, inspectionTypeCode: savedInspection.inspectionTypeCode, vehicle: savedInspection.vehicle, message: Constants.Message.SAVING_INSPECTION]).toString())
+		LOG.info(new Log((Map) [message: Constants.Message.SAVING_INSPECTION, orderNumber: orderNumber, savedInspection: savedInspection]).toString())
 		SavedInspection newSavedInspection = null
 		try {
 			/* En la app de revisiones sólo aparecen revisiones guardadas previamente, por lo que siempre se va a
 			 * encontrar en DB */
 			SavedInspection existent = savedInspectionDataService.find(orderNumber)
 			newSavedInspection = savedInspectionDataService.update(savedInspection, existent)
-			LOG.info(new Log((Map) [employeeCode: employeeCode, orderNumber: orderNumber, inspectionTypeCode: savedInspection.inspectionTypeCode, vehicle: savedInspection.vehicle, message: Constants.Message.SAVED_INSPECTION]).toString())
+			LOG.info(new Log((Map) [message: Constants.Message.SAVED_INSPECTION, employeeCode: employeeCode, orderNumber: orderNumber, inspectionTypeCode: savedInspection.inspectionTypeCode, vehicle: savedInspection.vehicle]).toString())
 		} catch (all) {
 			all.printStackTrace()
-			LOG.error(new Log((Map) [employeeCode: employeeCode, orderNumber: orderNumber, inspectionTypeCode: savedInspection.inspectionTypeCode, vehicle: savedInspection.vehicle, exceptionMessage: all.message, message: Constants.Message.ERROR_SAVING_INSPECTION]).toString())
+			LOG.error(new Log((Map) [message: Constants.Message.ERROR_SAVING_INSPECTION, employeeCode: employeeCode, orderNumber: orderNumber, inspectionTypeCode: savedInspection.inspectionTypeCode, vehicle: savedInspection.vehicle, exceptionMessage: all.message]).toString())
 		}
 		return newSavedInspection
 	}
 
 	/**
 	 * Envía un correo con la revisión
-	 * @param orderNumber Número de orden
+	 * @param savedInspection Revisión guardada
 	 * @param to Destinatario
-	 * @param employeeCode Código de empleado
 	 */
-	SavedInspection sendInspectionMail(Integer orderNumber, String to, String employeeCode) {
-		SavedInspection savedInspection = savedInspectionDataService.find(orderNumber, true)
+	void sendInspectionMail(SavedInspection savedInspection, String to) {
 		Centre centre = centreDataService.find()
 		Order order = orderDataService.find(savedInspection.orderNumber)
 		MailData mailData = mailDataDataService.find(centre.code as int)
@@ -176,7 +173,6 @@ class InspectionService {
 		String subject = Builder.Mail.buildInspectionSubject(order)
 		String body = Builder.Mail.buildInspectionBody(centre, order.client, order.vehicle)
 		mailService.sendMail(mailData, sender, to, subject, body, pdfFile)
-		return savedInspectionDataService.updateSent(savedInspection, employeeCode, SendMethod.MAIL)
 	}
 
 	/**

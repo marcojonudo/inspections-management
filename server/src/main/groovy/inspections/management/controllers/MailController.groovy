@@ -3,7 +3,9 @@ package inspections.management.controllers
 import groovy.transform.CompileStatic
 import inspections.management.domains.SavedInspection
 import inspections.management.services.InspectionService
+import inspections.management.services.data.SavedInspectionDataService
 import io.micronaut.http.HttpResponse
+import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.annotation.QueryValue
@@ -19,6 +21,7 @@ import javax.inject.Inject
 class MailController {
 
     @Inject InspectionService inspectionService
+    @Inject SavedInspectionDataService savedInspectionDataService
 
     @Post
     @Operation(
@@ -30,9 +33,11 @@ class MailController {
         description = "Correo enviado",
         content = @Content(mediaType = "application/json", schema = @Schema(type = "string"))
     )
-    HttpResponse sendMail(@QueryValue Integer orderNumber, @QueryValue String to, @QueryValue String employeeCode) {
-        SavedInspection savedInspection = inspectionService.sendInspectionMail(orderNumber, to, employeeCode)
-        return HttpResponse.ok(savedInspection)
+    HttpResponse sendMail(@QueryValue String to, @Body SavedInspection savedInspection) {
+        SavedInspection existent = savedInspectionDataService.find(savedInspection.orderNumber, true)
+        inspectionService.sendInspectionMail(existent, to)
+        SavedInspection saved = savedInspectionDataService.addData(savedInspection, existent, true)
+        return HttpResponse.ok(saved)
     }
 
 }
