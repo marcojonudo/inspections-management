@@ -568,6 +568,17 @@ export class InspectionService {
 		return sentData ? dayjs.max(sentData.map(d => d.saved)) : undefined;
 	}
 
+	static findIncompleteItems(savedInspection: SavedInspection, items: Item[]): SavedItem[] {
+		/* Para comprobar si una categoría está completa, se tienen en cuenta sólo aquellos items obligatorios */
+		const itemNames = items.filter(item => item.required).map(item => item.name);
+
+		/* Tampoco se tienen en cuenta aquellos items ocultos */
+		const savedItems = savedInspection.items.filter(savedItem =>
+			!savedItem.isHidden() && itemNames.find(name => name === savedItem.item.name)
+		);
+		return savedItems.filter(savedItem => !savedItem.isFilled());
+	}
+
 	findLanguage(): Observable<string> {
 		const language = LocalStorageService.getItem(Constants.LOCAL_STORAGE.LANGUAGE);
 		return (language ? of(language) : this.http.get(Url.languages(), { responseType: 'text' })).pipe(

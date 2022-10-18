@@ -3,6 +3,8 @@ import { SavedInspection } from '../inspections/saved-inspection';
 import { Builder } from '../../utils/builder';
 import { Constants } from '../../utils/constants';
 import { InspectionVehicle } from '../inspections/inspection-vehicle';
+import { Item } from '../inspections/items/item';
+import { SavedItem } from '../inspections/saved-items/saved-item';
 
 export class DetectedFaultsHandler implements InspectionHandler {
 
@@ -23,6 +25,10 @@ export class DetectedFaultsHandler implements InspectionHandler {
 
 	findInspectionTitle(inspectionVehicle: InspectionVehicle): string {
 		return undefined;
+	}
+
+	findIncompleteItems(savedInspection: SavedInspection, items: Item[]): SavedItem[] {
+		return [];
 	}
 
 }

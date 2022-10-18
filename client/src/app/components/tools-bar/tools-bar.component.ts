@@ -14,6 +14,9 @@ import { AllOrdersFilter } from '../../objects/filters/all-orders-filter';
 import { EmployeeService } from '../../services/employee.service';
 import { HttpClient } from '@angular/common/http';
 import { LocalStorageService } from '../../services/local-storage.service';
+import { SavedInspection } from '../../objects/inspections/saved-inspection';
+import { OrderInspection } from '../../objects/order-inspection';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
 	selector: 'app-tools-bar',
@@ -55,7 +58,8 @@ export class ToolsBarComponent {
 		private snackBarService: SnackBarService,
 		private router: Router,
 		private http: HttpClient,
-		private cdRef: ChangeDetectorRef
+		private cdRef: ChangeDetectorRef,
+		private translateService: TranslateService
 	) {
 		this.pendingFilter = new PendingOrdersFilter();
 		this.todayFilter = new TodayOrdersFilter();
@@ -87,11 +91,22 @@ export class ToolsBarComponent {
 		this.inspectionService.loadMainInfo([filter]).subscribe(() => this.loadingService.stop());
 	}
 
-	print(): void {
+	print(
+		savedInspection: SavedInspection = InspectionService.selectedSavedInspection,
+		orderInspection: OrderInspection = InspectionService.selectedOrderInspection
+	): void {
 		if (!EmployeeService.checkAdminEmployee()) {
 			this.inspectionService.saveInspection().subscribe();
 		}
-		this.printService.openPrintDialog();
+		const incompleteItems = InspectionService.inspectionHandler.findIncompleteItems(savedInspection, orderInspection.inspection.items);
+		if (!incompleteItems.length) {
+			this.printService.openPrintDialog();
+		} else {
+			this.translateService.get(`message.${Constants.MESSAGE_CODE.INCOMPLETE_ITEMS}`).subscribe(value => {
+				const message = `${value}${incompleteItems.map(i => i.item.name).join(', ')}`;
+				this.snackBarService.notify(message, Constants.SNACK_BAR.TYPE.WARNING);
+			});
+		}
 	}
 
 	sendMail(): void {

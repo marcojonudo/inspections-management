@@ -100,6 +100,7 @@
 		"noWrongItems": "¡Revisión sin items en mal estado!",
 		"SENDING_MAIL": "Enviando correo...",
 		"SUCCESS_SENDING_MAIL": "¡Correo enviado!",
-		"ERROR_SENDING_MAIL": "Error enviando correo. ¡Inténtalo de nuevo!"
+		"ERROR_SENDING_MAIL": "Error enviando correo. ¡Inténtalo de nuevo!",
+		"INCOMPLETE_ITEMS": "Los siguientes items todavía no están rellenos: "
 	}
 }
