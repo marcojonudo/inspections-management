@@ -7,9 +7,11 @@ import grails.gorm.annotation.Entity
 import inspections.management.deserializers.VehicleDeserializer
 import inspections.management.domains.fviberi.vehicle.IVehicle
 import inspections.management.domains.savedItems.SavedItem
+import inspections.management.pogos.pdf.inspection.cards.BikeCard
 import inspections.management.pogos.pdf.inspection.cards.CarCard
 import inspections.management.pogos.pdf.inspection.cards.ScooterCard
 import inspections.management.pogos.pdf.inspection.cards.VehicleCard
+import inspections.management.pogos.vehicles.BikeVehicle
 import inspections.management.pogos.vehicles.CarVehicle
 import inspections.management.pogos.vehicles.ScooterVehicle
 import inspections.management.pogos.vehicles.Vehicle
@@ -72,10 +74,10 @@ class Order implements GormEntity<Order> {
 
 	enum VehicleType {
 
-		BIKE(
+		E_BIKE(
 			"BICICLETA",
 			{ OrderDataService dataService, String id -> dataService.bikeDataService.find(id) },
-			{ CarVehicle car, List<SavedItem> headerItems -> null },
+			{ BikeVehicle bike, List<SavedItem> headerItems -> new BikeCard(bike) },
 			"bike.jpg"
 		),
 		CAR(

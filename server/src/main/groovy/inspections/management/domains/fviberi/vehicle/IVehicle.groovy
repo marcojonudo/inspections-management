@@ -12,8 +12,8 @@ interface IVehicle {
     enum Type {
 
         CAR(CarVehicle),
-        SCOOTER(ScooterVehicle),
-        BIKE(BikeVehicle)
+        E_SCOOTER(ScooterVehicle),
+        E_BIKE(BikeVehicle)
 
         final Class clazz
 

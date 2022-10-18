@@ -29,7 +29,7 @@ class Bike implements GormEntity<Bike>, IVehicle {
     }
 
     Vehicle buildVehicle() {
-        return new BikeVehicle(Type.BIKE, this.serialNumber, this.brand, this.model)
+        return new BikeVehicle(Type.E_BIKE, this.serialNumber, this.brand, this.model)
     }
 
 }

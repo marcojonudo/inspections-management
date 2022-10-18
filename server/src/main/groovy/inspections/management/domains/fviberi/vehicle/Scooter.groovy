@@ -29,7 +29,7 @@ class Scooter implements GormEntity<Scooter>, IVehicle {
     }
 
     Vehicle buildVehicle() {
-        return new ScooterVehicle(Type.SCOOTER, this.serialNumber, this.brand, this.model)
+        return new ScooterVehicle(Type.E_SCOOTER, this.serialNumber, this.brand, this.model)
     }
 
 }

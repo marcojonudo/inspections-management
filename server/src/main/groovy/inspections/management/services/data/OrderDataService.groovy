@@ -84,8 +84,10 @@ abstract class OrderDataService {
 
 	Order fillOrder(Order order) {
 		OrderTime orderTime = orderTimeDataService.find(order.number)
-		IVehicle vehicle = carDataService.find(order.carIdentifier) ?: scooterDataService.find(order.carIdentifier)
-		order.vehicle = vehicle.buildVehicle()
+
+		Order.VehicleType vehicleType = Order.VehicleType.values().find { it.type == order.vehicleType }
+		IVehicle vehicle = ((Closure<IVehicle>) vehicleType.find)(this, order.carIdentifier)
+		order.vehicle = vehicle?.buildVehicle()
 
 		order.code = orderTime.code
 		order.mechanicCode = orderTime.mechanicCode
