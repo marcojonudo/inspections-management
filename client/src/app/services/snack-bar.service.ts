@@ -24,10 +24,17 @@ export class SnackBarService {
 		snackBarClass: { [key: string]: string } = this.snackBarClass
 	): void {
 		this.translateService.get(`message.${messageCode}`).subscribe(value => {
-			this.snackBar.open(
-				value, '', { verticalPosition: 'top', duration, panelClass: snackBarClass[type] }
-			);
+			this.notify(value, type, duration, snackBarClass);
 		});
+	}
+
+	notify(
+		message: string,
+		type: string = Constants.SNACK_BAR.TYPE.SUCCESS,
+		duration: number = Constants.SNACK_BAR.DURATION,
+		snackBarClass: { [key: string]: string } = this.snackBarClass
+	): void {
+		this.snackBar.open(message, '', { verticalPosition: 'top', duration, panelClass: snackBarClass[type] });
 	}
 
 }

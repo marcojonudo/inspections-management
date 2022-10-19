@@ -100,6 +100,7 @@
 		"noWrongItems": "Revisão sem itens em mau estado!",
 		"SENDING_MAIL": "Enviando email...",
 		"SUCCESS_SENDING_MAIL": "Email enviado!",
-		"ERROR_SENDING_MAIL": "Erro ao enviar e-mail. Tenta de novo!"
+		"ERROR_SENDING_MAIL": "Erro ao enviar e-mail. Tenta de novo!",
+		"INCOMPLETE_ITEMS": "Por favor, preencha todos os itens: "
 	}
 }

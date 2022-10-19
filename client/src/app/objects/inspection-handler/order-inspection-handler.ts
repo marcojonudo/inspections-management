@@ -1,6 +1,9 @@
 import { InspectionHandler } from './inspection-handler';
 import { SavedInspection } from '../inspections/saved-inspection';
 import { InspectionVehicle } from '../inspections/inspection-vehicle';
+import { Item } from '../inspections/items/item';
+import { InspectionService } from '../../services/inspection.service';
+import { SavedItem } from '../inspections/saved-items/saved-item';
 
 export class OrderInspectionHandler implements InspectionHandler {
 
@@ -15,6 +18,10 @@ export class OrderInspectionHandler implements InspectionHandler {
 
 	findInspectionTitle(inspectionVehicle: InspectionVehicle): string {
 		return inspectionVehicle.inspectionType.name;
+	}
+
+	findIncompleteItems(savedInspection: SavedInspection, items: Item[]): SavedItem[] {
+		return InspectionService.findIncompleteItems(savedInspection, items);
 	}
 
 }
