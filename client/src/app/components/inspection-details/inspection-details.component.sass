@@ -52,11 +52,14 @@
 	#correct-inspection
 		height: 100%
 		@include flex-column-center
-		text-align: center
 		background-color: $light-grey
 		color: rgba(0, 0, 0, .54)
 
+		& > *:not(:last-child)
+			margin-bottom: $default-gap
+
 		p
+			text-align: center
 			font-size: $medium-font
 			font-weight: 500
 
@@ -69,4 +72,25 @@
 				font-size: 2.25em
 
 			.client-contact
+				text-align: center
 				width: 6rem
+
+		.card
+			width: 100%
+			@include flex-column
+			align-items: stretch
+			box-sizing: border-box
+			padding: 0 $small-gap
+			text-transform: none
+
+			&-header
+				padding: $tiny-gap
+
+				mat-icon
+					width: .86rem
+					height: .86rem
+					font-size: .86rem
+
+			&-content
+				padding: $tiny-gap $small-gap
+				white-space: pre-line

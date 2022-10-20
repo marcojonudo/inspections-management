@@ -127,6 +127,10 @@ export class InspectionDetailsComponent implements OnDestroy {
 		return '-';
 	}
 
+	findComments(savedInspection: SavedInspection = this.savedInspection): string {
+		return savedInspection.items.find(i => i.code === Constants.ITEM_CODE.C).findValue();
+	}
+
 	checkNotifiedClient(orderInspection: OrderInspection = this.orderInspection): boolean {
 		return orderInspection ? InspectionService.findBudgetNotifications(orderInspection.order.number).length > 0 : false;
 	}
