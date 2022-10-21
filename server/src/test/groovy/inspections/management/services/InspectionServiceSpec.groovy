@@ -1,5 +1,6 @@
 package inspections.management.services
 
+import inspections.management.clients.SudokuClient
 import inspections.management.domains.fviberi.Order
 import inspections.management.domains.items.Item
 import inspections.management.domains.savedItems.SavedItem
@@ -25,6 +26,8 @@ class InspectionServiceSpec extends Specification {
     @Inject ImageDataService imageDataService
     @Inject InspectionTypeDataService inspectionTypeDataService
     @Inject SelectItemOptionDataService selectItemOptionDataService
+    @Inject PdfService pdfService
+    @Inject SudokuClient sudokuClient
 
     @MockBean(SelectItemOptionDataService)
     SelectItemOptionDataService selectItemOptionDataService() {
@@ -69,6 +72,16 @@ class InspectionServiceSpec extends Specification {
     @MockBean(CentreDataService)
     CentreDataService centreDataService() {
         Mock(CentreDataService)
+    }
+
+    @MockBean(PdfService)
+    PdfService pdfService() {
+        Mock(PdfService)
+    }
+
+    @MockBean(SudokuClient)
+    SudokuClient sudokuClient() {
+        Mock(SudokuClient)
     }
 
     // region Handle not inspection orders
@@ -347,6 +360,31 @@ class InspectionServiceSpec extends Specification {
         wrongItems.size() == 1
         wrongItems[0].findValue() == SelectSavedItemData.Value.SN.toString()
     }
+
+    // endregion
+
+    // region Send inspection SMS
+
+//    void "test send inspection SMS"() {
+//        given:
+//        int orderNumber = 1
+//        int phoneNumber = 666666666
+//        String employeeCode = "0000001"
+//        File pdfFile = FileService.createTempFile("file.pdf", "")
+//        byte[] bytes = pdfFile.bytes
+//        savedInspectionDataService.find(orderNumber, true) >> new SavedInspection(orderNumber: orderNumber, numberPlate: "AA")
+//        centreDataService.find() >> new Centre(code: 99)
+//        orderDataService.find(orderNumber) >> new Order(number: orderNumber)
+//        pdfService.buildPdf(_, _, _) >> pdfFile
+//        converterService.convertPdfToPng(_) >> bytes
+//        sudokuClient.sendSms(_) >> { throw new HttpClientResponseException("Error", HttpResponse.serverError()) }
+//
+//        when:
+//        boolean sent = inspectionService.sendInspectionSms(orderNumber, phoneNumber, employeeCode)
+//
+//        then:
+//        !sent
+//    }
 
     // endregion
 

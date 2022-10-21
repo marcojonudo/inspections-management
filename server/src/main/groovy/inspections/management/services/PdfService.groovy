@@ -46,6 +46,7 @@ class PdfService {
 	@Inject SelectItemOptionDataService selectItemOptionDataService
 
 	File buildPdf(Centre centre, Order order, SavedInspection savedInspection) {
+		LOG.info(new Log((Map) [orderNumber: order.number, numberPlate: savedInspection.numberPlate, message: Constants.Message.GENERATING_PDF]).toString())
 		List<Long> imageIds = savedInspection.items.findAll { it.findImageId() }*.findImageId()
 		List<Image> images = imageDataService.getAll(imageIds)
 		String inspectionName = inspectionTypeDataService.findInspectionTypeName(savedInspection.inspectionTypeCode)
@@ -79,15 +80,14 @@ class PdfService {
 			groupedImageCategories,
 			options
 		)
-		File htmlFile = createTempFile(HTML_FILE_NAME, pdfInspection.toHtml())
-		File pdf = createTempFile("${savedInspection.numberPlate}.pdf")
+		File htmlFile = FileService.createTempFile(HTML_FILE_NAME, pdfInspection.toHtml())
+		File pdf = FileService.createTempFile("${savedInspection.numberPlate}.pdf")
 
 		LocalTime refTime = LocalTime.now()
 		ConverterProperties properties = new ConverterProperties()
 		properties.setBaseUri(resourcesUrl)
-		LOG.info(new Log((Map) [message: "Generating inspection PDF..."]).toString())
 		HtmlConverter.convertToPdf(htmlFile, pdf, properties)
-		LOG.info(new Log((Map) [message: "Inspection PDF generated!", millis: ChronoUnit.MILLIS.between(refTime, LocalTime.now())]).toString())
+		LOG.info(new Log((Map) [orderNumber: order.number, numberPlate: savedInspection.numberPlate, message: Constants.Message.GENERATED_PDF, millis: ChronoUnit.MILLIS.between(refTime, LocalTime.now())]).toString())
 
 		return pdf
 	}
@@ -165,13 +165,6 @@ class PdfService {
 			}
 		}
 		return groupedCategories
-	}
-
-	static File createTempFile(String name, String content = "") {
-		File file = File.createTempFile(name, "")
-		file.deleteOnExit()
-		file.write(content)
-		return file
 	}
 
 	static String buildImageUrl(SavedItem savedItem) {

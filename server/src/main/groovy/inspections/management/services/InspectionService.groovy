@@ -1,6 +1,7 @@
 package inspections.management.services
 
 import groovy.transform.CompileStatic
+import inspections.management.clients.SudokuClient
 import inspections.management.domains.InspectionType
 import inspections.management.domains.InspectionVehicle
 import inspections.management.domains.SavedInspection
@@ -17,12 +18,24 @@ import inspections.management.pogos.mails.MailSender
 import inspections.management.services.data.*
 import inspections.management.utils.Builder
 import inspections.management.utils.Constants
+import io.micronaut.http.HttpResponse
+import io.micronaut.http.HttpStatus
+import io.micronaut.http.client.multipart.MultipartBody
+import org.apache.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.rendering.ImageType
+import org.apache.pdfbox.rendering.PDFRenderer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import javax.imageio.ImageIO
 import javax.inject.Inject
 import javax.inject.Singleton
+import java.awt.*
+import java.awt.image.BufferedImage
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.temporal.ChronoUnit
+import java.util.List
 
 @Singleton
 @CompileStatic
@@ -40,6 +53,8 @@ class InspectionService {
 	@Inject private MailDataDataService mailDataDataService
 	@Inject private PdfService pdfService
 	@Inject private MailService mailService
+	@Inject private SudokuClient sudokuClient
+	@Inject private SlackService slackService
 
 	/**
 	 * Obtiene las órdenes según los parámetros recibidos
@@ -163,16 +178,111 @@ class InspectionService {
 	 * @param savedInspection Revisión guardada
 	 * @param to Destinatario
 	 */
-	void sendInspectionMail(SavedInspection savedInspection, String to) {
-		Centre centre = centreDataService.find()
-		Order order = orderDataService.find(savedInspection.orderNumber)
-		MailData mailData = mailDataDataService.find(centre.code as int)
-		File pdfFile = pdfService.buildPdf(centre, order, savedInspection)
+	boolean sendInspectionMail(SavedInspection savedInspection, String to) {
+		boolean sent = false
+		LOG.info(new Log((Map) [message: Constants.Message.SENDING_MAIL, employeeCode: savedInspection.findData().employeeCode, orderNumber: savedInspection.orderNumber, to: to]).toString())
+		try {
+			Centre centre = centreDataService.find()
+			Order order = orderDataService.find(savedInspection.orderNumber)
+			MailData mailData = mailDataDataService.find(centre.code as int)
+			File pdfFile = pdfService.buildPdf(centre, order, savedInspection)
 
-		MailSender sender = Builder.Mail.buildInspectionSender(mailData.email, centre.name)
-		String subject = Builder.Mail.buildInspectionSubject(order)
-		String body = Builder.Mail.buildInspectionBody(centre, order.client, order.vehicle)
-		mailService.sendMail(mailData, sender, to, subject, body, pdfFile)
+			MailSender sender = Builder.Mail.buildInspectionSender(mailData.email, centre.name)
+			String subject = Builder.Mail.buildInspectionSubject(order)
+			String body = Builder.Mail.buildInspectionBody(centre, order.client, order.vehicle)
+			mailService.sendMail(mailData, sender, to, subject, body, pdfFile)
+			sent = true
+			LOG.info(new Log((Map) [message: Constants.Message.SENT_MAIL, employeeCode: savedInspection.findData().employeeCode, orderNumber: savedInspection.orderNumber, to: to]).toString())
+		} catch (all) {
+			all.printStackTrace()
+			LOG.error(new Log((Map) [message: Constants.Message.ERROR_SENDING_MAIL, employeeCode: savedInspection.findData().employeeCode, orderNumber: savedInspection.orderNumber, to: to, exception: all.class.simpleName, exceptionMessage: all.message]).toString())
+		}
+		return sent
+	}
+
+	/**
+	 * Envía un SMS con la revisión
+	 * @param savedInspection Revisión guardada
+	 * @param to Número de teléfono
+	 * @param employeeCode Código de empleado
+	 */
+	boolean sendInspectionSms(SavedInspection savedInspection, int phoneNumber, String employeeCode) {
+		LOG.info(new Log((Map) [message: Constants.Message.SENDING_SMS, employeeCode: employeeCode, orderNumber: savedInspection.orderNumber, phoneNumber: phoneNumber]).toString())
+		boolean sent = false
+		Centre centre = centreDataService.find()
+		try {
+			Order order = orderDataService.find(savedInspection.orderNumber)
+			File pdfFile = pdfService.buildPdf(centre, order, savedInspection)
+
+			LocalTime refTime = LocalTime.now()
+			LOG.info(new Log((Map) [message: Constants.Message.CONVERTING_PDF_IMAGE, employeeCode: employeeCode, orderNumber: savedInspection.orderNumber, phoneNumber: phoneNumber]).toString())
+			byte[] imageBytes = convertPdfToPng(pdfFile)
+			LOG.info(new Log((Map) [message: Constants.Message.CONVERTED_PDF_IMAGE, employeeCode: employeeCode, orderNumber: savedInspection.orderNumber, phoneNumber: phoneNumber, millis: ChronoUnit.MILLIS.between(refTime, LocalTime.now())]).toString())
+
+			String fileName = FileService.findFileName(pdfFile.name, "pdf")
+			File imageFile = FileService.createTempFile(fileName, imageBytes)
+			MultipartBody requestBody = MultipartBody.builder()
+				.addPart("file", imageFile)
+				.addPart("filename", "${centre.code as int}-$order.number-${savedInspection.numberPlate}.jpg")
+				.addPart("phone", "$phoneNumber")
+				.build()
+			HttpResponse response = sudokuClient.sendSms(requestBody)
+			if (response.status == HttpStatus.OK) {
+				sent = true
+				slackService.sendMessage(
+					Builder.Slack.buildSentSmsMessage(
+						Constants.Message.SENT_SMS, centre.code as int, savedInspection, employeeCode, phoneNumber
+					)
+				)
+			} else {
+				slackService.sendMessage(
+					Builder.Slack.buildSendSmsErrorMessage(
+						Constants.Message.ERROR_SENDING_SMS, centre.code as int, savedInspection, employeeCode, phoneNumber, response.status
+					)
+				)
+			}
+			LOG.info(new Log((Map) [message: Constants.Message.FINISHED_SMS_PROCESS, employeeCode: employeeCode, orderNumber: savedInspection.orderNumber, phoneNumber: phoneNumber, sent: sent]).toString())
+		} catch (all) {
+			all.printStackTrace()
+			LOG.error(new Log((Map) [message: Constants.Message.ERROR_SENDING_SMS, employeeCode: employeeCode, orderNumber: savedInspection.orderNumber, phoneNumber: phoneNumber, exception: all.class.simpleName, exceptionMessage: all.message]).toString())
+			slackService.sendMessage(
+				Builder.Slack.buildSendSmsErrorMessage(
+					Constants.Message.ERROR_SENDING_SMS, centre.code as int, savedInspection, employeeCode, phoneNumber, all
+				)
+			)
+		}
+		return sent
+	}
+
+	static byte[] convertPdfToPng(File pdfFile) {
+		PDDocument document = PDDocument.load(pdfFile)
+		PDFRenderer pdfRenderer = new PDFRenderer(document)
+		BufferedImage bufferedImage = new BufferedImage(10, 10,  BufferedImage.TYPE_INT_ARGB)
+		for (int page = 0; page < document.getNumberOfPages(); ++page) {
+			BufferedImage bi = pdfRenderer.renderImageWithDPI(page, 300, ImageType.RGB)
+			bufferedImage = joinBufferedImage(bufferedImage, bi)
+		}
+		ByteArrayOutputStream baos = new ByteArrayOutputStream()
+		ImageIO.write(bufferedImage, "jpg", baos)
+		byte[] bytes = baos.toByteArray()
+		document.close()
+		return bytes
+	}
+
+	static BufferedImage joinBufferedImage(BufferedImage img1, BufferedImage img2) {
+		int offset = 5
+		int wid = Math.max(img1.getWidth(), img2.getWidth()) + offset
+		int height = img1.getHeight()+ img2.getHeight() + offset
+		BufferedImage newImage = new BufferedImage(wid, height, BufferedImage.TYPE_INT_RGB)
+		Graphics2D g2 = newImage.createGraphics()
+		Color oldColor = g2.getColor()
+		g2.setPaint(Color.WHITE)
+		g2.fillRect(0, 0, wid, height)
+		g2.setColor(oldColor)
+		g2.drawImage(img1, null, 0, 0)
+		g2.drawImage(img2, null, 0 , img1.getHeight() + offset)
+		g2.dispose()
+		return newImage
 	}
 
 	/**

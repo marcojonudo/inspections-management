@@ -10,8 +10,6 @@ import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.annotation.QueryValue
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 
 import javax.inject.Inject
@@ -28,16 +26,17 @@ class MailController {
         summary = "Envía un correo con una revisión",
         description = "Envía un correo con la revisión asociada al número de orden indicado"
     )
-    @ApiResponse(
-        responseCode = "200",
-        description = "Correo enviado",
-        content = @Content(mediaType = "application/json", schema = @Schema(type = "string"))
-    )
+    @ApiResponse(responseCode = "200", description = "Correo enviado")
+    @ApiResponse(responseCode = "500", description = "Error enviando correo")
     HttpResponse sendMail(@QueryValue String to, @Body SavedInspection savedInspection) {
         SavedInspection existent = savedInspectionDataService.find(savedInspection.orderNumber, true)
-        inspectionService.sendInspectionMail(existent, to)
-        SavedInspection saved = savedInspectionDataService.addData(savedInspection, existent, true)
-        return HttpResponse.ok(saved)
+        boolean sent = inspectionService.sendInspectionMail(existent, to)
+        if (sent) {
+            SavedInspection saved = savedInspectionDataService.addData(savedInspection, existent, true)
+            return HttpResponse.ok(saved)
+        } else {
+            return HttpResponse.serverError()
+        }
     }
 
 }

@@ -40,7 +40,19 @@ class Constants {
         static final String EXISTENT_INSPECTION_SAVED = "Existent inspection saved values"
         static final String NEW_DATA_SAVED = "New inspection data saved value"
         static final String ERROR_SAVING_INSPECTION = "Error saving inspection"
+        static final String ERROR_SENDING_MAIL = "Error sending mail!"
+        static final String ERROR_SENDING_SMS = "Error sending SMS"
         static final String SAVED_INSPECTION = "Saved inspection!"
+        static final String GENERATING_PDF = "Generating PDF..."
+        static final String GENERATED_PDF = "PDF file generated!"
+        static final String SENDING_MAIL = "Sending inspection mail..."
+        static final String SENDING_SMS = "Sending inspection SMS..."
+        static final String CONVERTING_PDF_IMAGE = "Converting PDF file to image..."
+        static final String CONVERTED_PDF_IMAGE = "PDF converted to image!"
+        static final String SENT_MAIL = "Mail sent!"
+        static final String SENT_SMS = "SMS sent!"
+        static final String FINISHED_SMS_PROCESS = "Finished SMS process!"
+        static final String SLACK_WRONG_REQUEST = "Slack wrong request!"
 
     }
 

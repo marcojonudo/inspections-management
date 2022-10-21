@@ -84,7 +84,9 @@
 		"employeeCode": "Código de funcionário",
 		"introduceEmployeeCode": "Digite o código de funcionário",
 		"email": "Endereço de e-mail",
+		"sms": "Número de telefone",
 		"introduceEmail": "Digite um endereço de e-mail",
+		"introduceSms": "Digite um número de telefone",
 		"cancel": "Cancelar",
 		"accept": "Aceitar"
 	},
@@ -99,8 +101,11 @@
 		"NOT_FINISHED_SAVED_INSPECTION": "A revisão associada ainda está em andamento!",
 		"noWrongItems": "Revisão sem itens em mau estado!",
 		"SENDING_MAIL": "Enviando email...",
+		"SENDING_SMS": "Enviando SMS...",
 		"SUCCESS_SENDING_MAIL": "Email enviado!",
+		"SUCCESS_SENDING_SMS": "SMS enviado!",
 		"ERROR_SENDING_MAIL": "Erro ao enviar e-mail. Tenta de novo!",
+		"ERROR_SENDING_SMS": "Erro ao enviar SMS. Tenta de novo!",
 		"INCOMPLETE_ITEMS": "Por favor, preencha todos os itens: "
 	}
 }

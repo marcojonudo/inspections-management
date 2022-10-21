@@ -62,4 +62,8 @@ export class Url {
 		return `${environment.serverUrl}/mails?to=${to}`;
 	}
 
+	static sms(to: number, employeeCode: string): string {
+		return `${environment.serverUrl}/sms?to=${to}&employeeCode=${employeeCode}`;
+	}
+
 }

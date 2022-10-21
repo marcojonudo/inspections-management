@@ -1,0 +1,16 @@
+<div mat-dialog-content translate>
+	dialog.introduceSms
+	<mat-form-field>
+		<mat-label translate>dialog.sms</mat-label>
+		<input
+			matInput
+			type="tel"
+			[formControl]="smsControl"
+			autocomplete="off"
+			(keydown.enter)="accept()">
+	</mat-form-field>
+</div>
+<div mat-dialog-actions class="buttons">
+	<button mat-button mat-dialog-close translate><span translate>dialog.cancel</span></button>
+	<button mat-button (click)="accept()"><span translate>dialog.accept</span></button>
+</div>

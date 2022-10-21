@@ -11,6 +11,9 @@ group "inspections.management"
 repositories {
     mavenCentral()
     jcenter()
+    maven {
+        url "https://jitpack.io"
+    }
 }
 
 dependencies {
@@ -44,6 +47,7 @@ dependencies {
 
     implementation "com.itextpdf:itext7-core:7.1.9"
     implementation "com.itextpdf:html2pdf:4.0.1"
+    implementation "org.apache.pdfbox:pdfbox:2.0.26"
 
     implementation "org.apache.commons:commons-text:1.9"
 
