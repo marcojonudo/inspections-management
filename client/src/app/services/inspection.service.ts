@@ -213,14 +213,14 @@ export class InspectionService {
 		const orderInspection = this.findOrderInspection(orderNumber);
 		const savedInspection = this.findSavedInspection(orderNumber);
 		const itemBudgetTypes = savedInspection ? savedInspection.itemBudgets.map(itemBudget =>
-			this.findItemBudgetType(itemBudget, orderInspection.inspection.vehicle, orderInspection.order.budgets)
+			this.findItemBudgetType(itemBudget, orderInspection.inspection.vehicle, orderInspection.order.budgets, accepted)
 		).filter(type => type !== '') : [];
 		return this.findItemBudgetsMainType(itemBudgetTypes);
 	}
 
-	static findItemBudgetType(itemBudget: ItemBudget, vehicle: string, budgets: Budget[]): string {
+	static findItemBudgetType(itemBudget: ItemBudget, vehicle: string, budgets: Budget[], accepted: boolean): string {
 		const existentBudget = InspectionService.findExistentBudget(itemBudget.itemCode, vehicle, budgets) !== undefined;
-		return existentBudget ? '' : itemBudget.budgetType;
+		return existentBudget && !accepted ? '' : itemBudget.budgetType;
 	}
 
 	static findItemArticles(
@@ -434,7 +434,7 @@ export class InspectionService {
 					if (aState && bState) {
 						const aStateOrder = this.findInspectionsRowOrder(aState, Constants.INSPECTION_STATE_ORDER);
 						const bStateOrder = this.findInspectionsRowOrder(bState, Constants.INSPECTION_STATE_ORDER);
-						return aStateOrder < bStateOrder ? -1 : (aStateOrder > bStateOrder ? 1 : 0);
+						return aStateOrder < bStateOrder ? 1 : (aStateOrder > bStateOrder ? -1 : 0);
 					} else if (aState) {
 						return -1;
 					} else if (bState) {
