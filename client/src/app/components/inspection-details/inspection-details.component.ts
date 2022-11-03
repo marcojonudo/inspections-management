@@ -128,7 +128,7 @@ export class InspectionDetailsComponent implements OnDestroy {
 	}
 
 	findComments(savedInspection: SavedInspection = this.savedInspection): string {
-		return savedInspection.items.find(i => i.code === Constants.ITEM_CODE.C).findValue();
+		return savedInspection.items.find(i => i.code === Constants.ITEM_CODE.C)?.findValue();
 	}
 
 	checkNotifiedClient(orderInspection: OrderInspection = this.orderInspection): boolean {
