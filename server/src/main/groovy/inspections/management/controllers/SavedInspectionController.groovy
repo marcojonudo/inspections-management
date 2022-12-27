@@ -40,7 +40,7 @@ class SavedInspectionController {
     @Get(value = "/{numberPlate}", consumes = MediaType.MULTIPART_FORM_DATA)
     SystemFile getPdf(String numberPlate) {
         Integer orderNumber = savedInspectionDataService.findSavedInspectionOrderNumber(
-            numberPlate, [sort: 'saved', order: 'desc', max: 1]
+            numberPlate, [sort: 'id', order: 'desc', max: 1]
         )
         SystemFile pdf = null
         if (orderNumber) {
