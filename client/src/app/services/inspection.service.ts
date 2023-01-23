@@ -489,7 +489,7 @@ export class InspectionService {
 	static findMechanicCode(order: Order, savedInspection: SavedInspection): string {
 		let mechanicCode;
 		if (savedInspection) {
-			mechanicCode = savedInspection.findEmployeeCode() || this.findItemsMechanicCode(savedInspection.items);
+			mechanicCode = savedInspection.findMechanic() || this.findItemsMechanicCode(savedInspection.items);
 		}
 		return mechanicCode ? mechanicCode : order.mechanicCode;
 	}

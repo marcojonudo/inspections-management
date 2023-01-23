@@ -36,8 +36,12 @@ export class SavedInspection implements RealTimeObject {
 		return this.data.reduce((d1, d2) => d1.saved > d2.saved ? d1 : d2);
 	}
 
-	findEmployeeCode(): string {
-		return this.findData().employeeCode;
+	findFirstData(): SavedInspectionData {
+		return this.data.find(d => d.reason === Constants.REASON.SAVED);
+	}
+
+	findMechanic(): string {
+		return this.findFirstData().employeeCode;
 	}
 
 	addData(employeeCode: string, reason: string = Constants.REASON.UPDATED, sendMethod: string = undefined): void {
