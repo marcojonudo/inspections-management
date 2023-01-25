@@ -183,6 +183,7 @@ export class Constants {
 	];
 
 	static readonly REASON: any = {
+		SAVED: 'SAVED',
 		UPDATED: 'UPDATED',
 		SENT: 'SENT'
 	};
