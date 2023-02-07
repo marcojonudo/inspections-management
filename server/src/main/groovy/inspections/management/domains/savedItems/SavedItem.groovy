@@ -1,6 +1,6 @@
 package inspections.management.domains.savedItems
 
-import com.fasterxml.jackson.annotation.JsonIgnore
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import grails.gorm.annotation.Entity
 import groovy.transform.TupleConstructor
@@ -24,7 +24,6 @@ class SavedItem implements GormEntity<SavedItem> {
 
 	Image image
 
-	@JsonIgnore
 	Item item
 
 	static belongsTo = SavedInspection
