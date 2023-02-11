@@ -37,7 +37,7 @@ export class InspectionsComponent implements OnDestroy {
 	private readonly INSPECTION_NAME = 'Revisión';
 
 	private COLUMNS: string[] = [
-		'order', 'brand', 'model', 'inspectionType', 'inspectionState', 'mechanic', 'budgets', 'clientContact', 'sentMail'
+		'order', 'brand', 'model', 'inspectionType', 'inspectionState', 'mechanic', 'budgets', 'clientContact', 'sent'
 	];
 
 	private budgetNotificationsSubscription: Subscription;
