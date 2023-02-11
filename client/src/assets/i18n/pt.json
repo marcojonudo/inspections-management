@@ -47,7 +47,7 @@
 			"doneBudget": "Pt. Feito",
 			"acceptedBudget": "Pto. Aceito",
 			"item": "Item",
-			"sentMail": "Mail"
+			"sent": "Envio"
 		}
 	},
 	"print": {
