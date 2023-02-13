@@ -189,7 +189,8 @@ export class Constants {
 	};
 
 	static readonly SEND_METHOD: any = {
-		MAIL: 'MAIL'
+		MAIL: 'MAIL',
+		SMS: 'SMS'
 	};
 
 }
