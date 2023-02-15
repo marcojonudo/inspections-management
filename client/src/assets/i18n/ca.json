@@ -1,0 +1,111 @@
+{
+	"header": {
+		"title": "Situación revisiones taller"
+	},
+	"summary": {
+		"urgentPendingBudgets": "Items urgentes pendientes de presupuestar",
+		"secondaryPendingBudgets": "Items secundarios pendientes de presupuestar",
+		"pendingClientContacts": "Contactos clientes pendientes",
+		"sells": "Ventas presupuestadas",
+		"acceptedSells": "Ventas aceptadas",
+		"budgets": "Items presupuestados",
+		"acceptPercentage": "% aceptación",
+		"notFinishedInspectionOrders": "ORs sin finalizar revisión",
+		"completedInspections": "Revisiones realizadas",
+		"detectedProblems": "% anomalías detectadas",
+		"orderNumber": "Nº OR",
+		"model": "Marca y modelo",
+		"mechanic": "Mecánico",
+		"mechanics": "Mecánicos"
+	},
+	"inspection": {
+		"type": {
+			"AD": "Anomalías detectadas"
+		},
+		"state": {
+			"PENDING": "Pendiente",
+			"STARTED": "En curso",
+			"FINISHED": "Realizada"
+		}
+	},
+	"inspections": {
+		"title": {
+			"inspections": "Revisiones",
+			"pendingBudgets": "Presupuestos a realizar"
+		},
+		"table": {
+			"order": "OR",
+			"brand": "Marca",
+			"model": "Modelo",
+			"inspectionType": "Revisión",
+			"inspectionState": "Estado",
+			"mechanic": "Mecánico",
+			"budgets": "Presupuestos",
+			"briefBudgets": "Ptos.",
+			"clientContact": "Contacto cliente",
+			"seller": "Vendedor",
+			"doneBudget": "Pto. realizado",
+			"acceptedBudget": "Pto. aceptado",
+			"item": "Item",
+			"sent": "Envío"
+		}
+	},
+	"print": {
+		"info": "Información",
+		"adviser": "Asesor",
+		"mechanic": "Mecánico",
+		"mechanics": "Mecánicos",
+		"day": "Día",
+		"orderNumber": "Nº orden",
+		"centre": "Centro",
+		"vehicle": "Vehículo",
+		"client": "Cliente",
+		"summary": "Resumen",
+		"numberPlate": "Matrícula",
+		"model": "Modelo",
+		"cylinder": "Cilindrada",
+		"engine": "Motor",
+		"power": "Potencia",
+		"registration": "Matriculación",
+		"tyre": "Neumático",
+		"tyreState": "Estado neumático",
+		"tyreMin": "1.6mm mínimo legal",
+		"tyreDepth": "Profundidad neumático",
+		"tyreAge": "Edad neumático",
+		"category": {
+			"N": "Neumáticos"
+		},
+		"item": {
+			"CVGN": "Control visual geometría",
+			"PPN": "Puesta a presión"
+		}
+	},
+	"dialog": {
+		"employeeCode": "Código de empleado",
+		"introduceEmployeeCode": "Introduce el código de empleado",
+		"email": "Dirección de correo",
+		"sms": "Número de teléfono",
+		"introduceEmail": "Introduce una dirección de correo",
+		"introduceSms": "Introduce un número de teléfono",
+		"cancel": "Cancelar",
+		"accept": "Aceptar"
+	},
+	"validation": {
+		"requiredEmployeeCode": "Debes introducir un código de empleado"
+	},
+	"message": {
+		"EMPLOYEE_NOT_FOUND": "Empleado no encontrado. Accede a la aplicación de horarios para sincronizarlos y prueba de nuevo",
+		"ERROR_SAVING_INSPECTION": "Error al guardar la revisión. Por favor, inténtalo de nuevo",
+		"SAVED_INSPECTION": "Revisión guardada correctamente",
+		"ORDER_WITHOUT_SAVED_INSPECTION": "La orden no tiene una revisión guardada asociada",
+		"NOT_FINISHED_SAVED_INSPECTION": "¡La revisión asociada todavía está en curso!",
+		"noWrongItems": "¡Revisión sin items en mal estado!",
+		"SENDING_MAIL": "Enviando correo...",
+		"SENDING_SMS": "Enviando SMS...",
+		"SUCCESS_SENDING_MAIL": "¡Correo enviado!",
+		"SUCCESS_SENDING_SMS": "¡SMS enviado!",
+		"ERROR_SENDING_MAIL": "Error enviando correo. ¡Inténtalo de nuevo!",
+		"ERROR_SENDING_SMS": "Error enviando SMS. ¡Inténtalo de nuevo!",
+		"INCOMPLETE_ITEMS": "Los siguientes items todavía no están rellenos: "
+	}
+}
