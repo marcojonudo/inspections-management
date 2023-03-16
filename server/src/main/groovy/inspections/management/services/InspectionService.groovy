@@ -222,14 +222,12 @@ class InspectionService {
 			)
 			if (response.status == HttpStatus.OK) {
 				sent = true
-				slackService.sendMessage(Builder.Slack.buildSentSmsMessage(Constants.Message.SENT_SMS, centre.code as int, savedInspection, employeeCode, phoneNumber))
 			} else {
 				slackService.sendMessage(Builder.Slack.buildSendSmsErrorMessage(Constants.Message.ERROR_SENDING_SMS, centre.code as int, savedInspection, employeeCode, phoneNumber, response.status))
 			}
 			LOG.info(new Log((Map) [message: Constants.Message.FINISHED_SMS_PROCESS, employeeCode: employeeCode, orderNumber: savedInspection.orderNumber, phoneNumber: phoneNumber, sent: sent]).toString())
 		} catch (all) {
-			all.printStackTrace()
-			LOG.error(new Log((Map) [message: Constants.Message.ERROR_SENDING_SMS, employeeCode: employeeCode, orderNumber: savedInspection.orderNumber, phoneNumber: phoneNumber, exception: all.class.simpleName, exceptionMessage: all.message]).toString())
+			LOG.error(new Log((Map) [message: Constants.Message.ERROR_SENDING_SMS, employeeCode: employeeCode, orderNumber: savedInspection.orderNumber, phoneNumber: phoneNumber, exception: all.class.simpleName, exceptionMessage: all.message]).toString(), all)
 			slackService.sendMessage(Builder.Slack.buildSendSmsErrorMessage(Constants.Message.ERROR_SENDING_SMS, centre.code as int, savedInspection, employeeCode, phoneNumber, all))
 		}
 		return sent
