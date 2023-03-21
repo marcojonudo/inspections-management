@@ -119,7 +119,7 @@ class TyresCard extends Card {
                 <div class="tyre-section-header">
                     <div class="measurement-name">
                         <span>${CustomMessageSource.getMessage("print.tyres.tyre")}</span>&nbsp;${CustomMessageSource.getMessage("print.tyres.$name")}</div>
-                    <div class="measurement-value">${measurementSavedItem.findValue()}</div>
+                    <div class="measurement-value">${measurementSavedItem?.findValue()}</div>
                 </div>
                 <div class="photo-wrapper">
                     ${depthItem?.findImageId() ? new Image([], null, PdfService.buildImageUrl(depthItem)).toHtml() : buildNoImageTemplate()}
