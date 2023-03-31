@@ -11,7 +11,8 @@ class Constants {
     static final String APPOINTMENT_IDENTIFIER = "C"
     static final int ROW_IMAGES = 4
     static final List<String> CAR_POSITION = ['DI', 'DD', 'TI', 'TD']
-    static final DEPTH_ITEM_PREFIX = 'PN'
+    static final String DEPTH_ITEM_PREFIX = 'PN'
+    static final float KW_TO_CV_FACTOR = 1.35962
 
     static class DataSource {
 
@@ -53,6 +54,7 @@ class Constants {
         static final String SENT_SMS = "SMS sent!"
         static final String FINISHED_SMS_PROCESS = "Finished SMS process!"
         static final String SLACK_WRONG_REQUEST = "Slack wrong request!"
+        static final String CALC_POWER_ERROR = "Error calculating vehicle power"
 
     }
 

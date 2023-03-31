@@ -14,10 +14,10 @@ class Car implements GormEntity<Car>, IVehicle {
     String cylinder
     String brand
     Integer registrationYear
+    String engineCode
+    String power
 
-    CarInfo extraInfo
-
-    static transients = ['extraInfo', 'type']
+    static transients = ['type', 'engineCode', 'power']
 
     static constraints = {
         registrationYear nullable: true
@@ -44,8 +44,8 @@ class Car implements GormEntity<Car>, IVehicle {
             this.brand,
             this.model,
             this.cylinder,
-            this.extraInfo?.engineCode,
-            this.extraInfo?.power,
+            this.engineCode,
+            this.power,
             this.registrationYear
         )
     }
