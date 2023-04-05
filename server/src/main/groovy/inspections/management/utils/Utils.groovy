@@ -10,4 +10,9 @@ class Utils {
 		return items.find { it.code == itemCode }
 	}
 
+	static float kwToCv(float power) {
+		return power * Constants.KW_TO_CV_FACTOR
+	}
+
+
 }

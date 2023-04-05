@@ -81,7 +81,7 @@
 					</div>
 					<div>
 						<div translate>print.power</div>
-						<div>{{findCar(order.vehicle).power ? findCar(order.vehicle).power + 'cv' : '-'}}</div>
+						<div>{{findCar(order.vehicle).power ? (findCar(order.vehicle).power | number: '1.0-0') + ' CV' : '-'}}</div>
 					</div>
 					<div>
 						<div translate>print.registration</div>
