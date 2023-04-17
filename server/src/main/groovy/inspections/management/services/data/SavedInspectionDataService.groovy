@@ -61,9 +61,7 @@ abstract class SavedInspectionDataService {
 	List<SavedInspection> findAll(List<Order> orders) {
 		List<SavedInspection> savedInspections = findAllSavedInspections(orders.number as List<Integer>)
 		savedInspections.each { SavedInspection savedInspection ->
-			String orderState = orders.find { it.number == savedInspection.orderNumber }.state
-			savedInspection.items = orderState in Constants.CLOSED_ORDER_STATES ?
-				[] : savedItemDataService.findAll(savedInspection.id)
+			savedInspection.items = savedItemDataService.findAll(savedInspection.id)
 		}
 		return savedInspections
 	}

@@ -277,12 +277,14 @@ export class InspectionService {
 		savedInspections.forEach(savedInspection => {
 			const order = this.findOrder(savedInspection.orderNumber);
 
-			const foundItemBudgets = type ?
-				savedInspection.itemBudgets.filter(itemBudget => itemBudget.budgetType === type) : savedInspection.itemBudgets;
-			const pendingItemBudgets = foundItemBudgets.filter(itemBudget =>
-				this.findExistentBudget(itemBudget.itemCode, savedInspection.vehicle, order.budgets) === undefined
-			);
-			itemBudgets.push(...pendingItemBudgets);
+			if (order) {
+				const foundItemBudgets = type ?
+					savedInspection.itemBudgets.filter(itemBudget => itemBudget.budgetType === type) : savedInspection.itemBudgets;
+				const pendingItemBudgets = foundItemBudgets.filter(itemBudget =>
+					this.findExistentBudget(itemBudget.itemCode, savedInspection.vehicle, order.budgets) === undefined
+				);
+				itemBudgets.push(...pendingItemBudgets);
+			}
 		});
 		return itemBudgets;
 	}
