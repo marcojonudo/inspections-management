@@ -9,15 +9,20 @@ import org.grails.datastore.gorm.GormEntity
 @JsonIgnoreProperties(ignoreUnknown = true)
 class ItemRelation implements GormEntity<ItemRelation> {
 
-	String itemCode
+	String triggerType
+	String triggerItemCode
 	String matchText
+	boolean differentMatchText
 	String targetItemCode
-	Action action
+	Action actionType
+	String targetText
 
 	enum Action {
 
 		HIDE,
-		REPLICATE
+		SHOW,
+		SET,
+		REMOVE_TEXT
 
 	}
 
