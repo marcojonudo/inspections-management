@@ -189,7 +189,7 @@ export class InspectionService {
 			const item = savedItems.find(savedItem =>
 				savedItem.type === Constants.ITEM_TYPE.SELECT && savedItem.code === itemBudget.itemCode
 			);
-			return item && item.findFilled() && InspectionService.checkWrongSelectValue(item.findValue());
+			return item && item.findFilled() && InspectionService.checkNotCorrectSelectValue(item.findValue());
 		});
 	}
 
@@ -277,12 +277,14 @@ export class InspectionService {
 		savedInspections.forEach(savedInspection => {
 			const order = this.findOrder(savedInspection.orderNumber);
 
-			const foundItemBudgets = type ?
-				savedInspection.itemBudgets.filter(itemBudget => itemBudget.budgetType === type) : savedInspection.itemBudgets;
-			const pendingItemBudgets = foundItemBudgets.filter(itemBudget =>
-				this.findExistentBudget(itemBudget.itemCode, savedInspection.vehicle, order.budgets) === undefined
-			);
-			itemBudgets.push(...pendingItemBudgets);
+			if (order) {
+				const foundItemBudgets = type ?
+					savedInspection.itemBudgets.filter(itemBudget => itemBudget.budgetType === type) : savedInspection.itemBudgets;
+				const pendingItemBudgets = foundItemBudgets.filter(itemBudget =>
+					this.findExistentBudget(itemBudget.itemCode, savedInspection.vehicle, order.budgets) === undefined
+				);
+				itemBudgets.push(...pendingItemBudgets);
+			}
 		});
 		return itemBudgets;
 	}
@@ -400,8 +402,12 @@ export class InspectionService {
 		return budget && budget.state === Constants.BUDGET_STATE.O;
 	}
 
-	static checkWrongSelectValue(value: string): boolean {
-		return value === Constants.SELECT_ITEM_OPTION_CODE.SN || value === Constants.SELECT_ITEM_OPTION_CODE.PS;
+	static checkWrongSelectValue(value: string, wrongOptions = Constants.WRONG_ITEM_OPTIONS): boolean {
+		return wrongOptions.find(o => o === value) !== undefined;
+	}
+
+	static checkNotCorrectSelectValue(value: string, notCorrectOptions = Constants.NOT_CORRECT_ITEM_OPTIONS): boolean {
+		return notCorrectOptions.find(o => o === value) !== undefined;
 	}
 
 	static buildInspectionsRow(order: Order, columnsData: any): InspectionsColumn {
