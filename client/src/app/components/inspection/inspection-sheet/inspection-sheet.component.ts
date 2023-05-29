@@ -16,6 +16,7 @@ import { ItemType } from '../../../objects/inspections/items/item-type';
 import { TextSavedItemData } from '../../../objects/inspections/saved-items/text-saved-item-data';
 import { TextAreaSavedItemData } from '../../../objects/inspections/saved-items/text-area-saved-item-data';
 import { TextSavedItemDataField } from '../../../objects/inspections/saved-items/text-saved-item-data-field';
+import { Utils } from '../../../utils/utils';
 
 @Component({
 	selector: 'app-inspection-sheet',
@@ -124,7 +125,7 @@ export class InspectionSheetComponent {
 		if (savedItem.type !== Constants.ITEM_TYPE.SELECT) {
 			return false;
 		}
-		return InspectionService.checkWrongSelectValue(savedItem.findValue());
+		return Utils.checkValueInList(savedItem.findValue(), Constants.WRONG_ITEM_OPTIONS);
 	}
 
 	toggleSelectOption(savedItem: SavedItem): void {
