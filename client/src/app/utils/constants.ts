@@ -119,10 +119,6 @@ export class Constants {
 		Constants.SELECT_ITEM_OPTION_CODE.SN, Constants.SELECT_ITEM_OPTION_CODE.PS
 	];
 
-	static readonly NOT_CORRECT_ITEM_OPTIONS: string[] = [
-		Constants.SELECT_ITEM_OPTION_CODE.SN, Constants.SELECT_ITEM_OPTION_CODE.PS, Constants.SELECT_ITEM_OPTION_CODE.RA
-	];
-
 	public static readonly PATH: any = {
 		ROOT: '/',
 		HOME: '/home',

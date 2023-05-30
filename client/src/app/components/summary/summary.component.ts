@@ -10,6 +10,7 @@ import { ItemBudget } from '../../objects/item-budget';
 import { RealTimeService } from '../../services/real-time.service';
 import { MatDialog } from '@angular/material/dialog';
 import { PendingContactsDialogComponent } from '../pending-contacts-dialog/pending-contacts-dialog.component';
+import { Utils } from '../../utils/utils';
 
 @Component({
 	selector: 'app-summary',
@@ -169,7 +170,7 @@ export class SummaryComponent implements OnDestroy {
 			}
 		});
 		const totalItems = [].concat(...savedInspections.map(s => s.items.filter(i => i.type === Constants.ITEM_TYPE.SELECT)));
-		const wrongItems = totalItems.filter(i => i.filled && InspectionService.checkWrongSelectValue(i.findValue()));
+		const wrongItems = totalItems.filter(i => i.filled && Utils.checkValueInList(i.findValue(), Constants.WRONG_ITEM_OPTIONS));
 		return totalItems.length ? wrongItems.length / totalItems.length : 0;
 	}
 

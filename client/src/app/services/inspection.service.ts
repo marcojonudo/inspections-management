@@ -189,7 +189,7 @@ export class InspectionService {
 			const item = savedItems.find(savedItem =>
 				savedItem.type === Constants.ITEM_TYPE.SELECT && savedItem.code === itemBudget.itemCode
 			);
-			return item && item.findFilled() && InspectionService.checkNotCorrectSelectValue(item.findValue());
+			return item && item.findFilled() && Utils.checkValueInList(item.findValue(), Constants.WRONG_ITEM_OPTIONS);
 		});
 	}
 
@@ -400,14 +400,6 @@ export class InspectionService {
 
 	static checkAcceptedBudget(budget: Budget): boolean {
 		return budget && budget.state === Constants.BUDGET_STATE.O;
-	}
-
-	static checkWrongSelectValue(value: string, wrongOptions = Constants.WRONG_ITEM_OPTIONS): boolean {
-		return wrongOptions.find(o => o === value) !== undefined;
-	}
-
-	static checkNotCorrectSelectValue(value: string, notCorrectOptions = Constants.NOT_CORRECT_ITEM_OPTIONS): boolean {
-		return notCorrectOptions.find(o => o === value) !== undefined;
 	}
 
 	static buildInspectionsRow(order: Order, columnsData: any): InspectionsColumn {

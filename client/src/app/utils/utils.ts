@@ -20,4 +20,8 @@ export class Utils {
 		});
 	}
 
+	static checkValueInList(value: string, values): boolean {
+		return values.find(o => o === value) !== undefined;
+	}
+
 }
