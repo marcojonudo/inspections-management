@@ -21,6 +21,7 @@ class SavedInspectionData implements GormEntity<SavedInspectionData> {
 	@JsonIgnore
 	SavedInspection savedInspection
 	String employeeCode
+	Origin origin
 	Reason reason
 	SendMethod sendMethod
 
@@ -33,6 +34,13 @@ class SavedInspectionData implements GormEntity<SavedInspectionData> {
 
 	static constraints = {
 		sendMethod nullable: true
+	}
+
+	enum Origin {
+
+		INSPECTIONS,
+		INSPECTIONS_MANAGEMENT
+
 	}
 
 	enum Reason {

@@ -29,7 +29,9 @@ export class SavedInspection implements RealTimeObject {
 		this.itemBudgets = itemBudgets;
 		this.orderInspection = savedInspection.orderInspection;
 		this.sent = savedInspection.sent ? dayjs(savedInspection.sent) : undefined;
-		this.data = savedInspection.data.map(d => new SavedInspectionData(d.employeeCode, d.reason, dayjs(d.saved), d.sendMethod));
+		this.data = savedInspection.data.map(d =>
+			new SavedInspectionData(d.employeeCode, d.origin, d.reason, dayjs(d.saved), d.sendMethod)
+		);
 	}
 
 	findData(): SavedInspectionData {
@@ -44,13 +46,18 @@ export class SavedInspection implements RealTimeObject {
 		return this.findFirstData().employeeCode;
 	}
 
-	addData(employeeCode: string, reason: string = Constants.REASON.UPDATED, sendMethod: string = undefined): void {
+	addData(
+		employeeCode: string,
+		origin: string = Constants.ORIGIN.INSPECTIONS_MANAGEMENT,
+		reason: string = Constants.REASON.UPDATED,
+		sendMethod: string = undefined
+	): void {
 		const maxSaved = dayjs(Math.max(...this.data.map(d => d.saved.valueOf())));
 		const now = dayjs();
 		/* Puede darse el caso de que, si se guarda muy rápido la revisión, se de clic al botón por segunda vez en el mismo segundo. En ese
 		 * caso, se suma un segundo a la fecha para evitar duplicados */
 		const saved = now.diff(maxSaved, 's') > 0 ? now : maxSaved.add(1, 's');
-		this.data.push(new SavedInspectionData(employeeCode, reason, saved, sendMethod));
+		this.data.push(new SavedInspectionData(employeeCode, origin, reason, saved, sendMethod));
 		this.items.filter(i => !i.findData().saved).forEach(i => {
 			i.findData().saved = dayjs(this.findData().saved);
 		});
