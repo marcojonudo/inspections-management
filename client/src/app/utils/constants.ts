@@ -187,6 +187,10 @@ export class Constants {
 		Constants.ORDER_STATE.X
 	];
 
+	static readonly ORIGIN: any = {
+		INSPECTIONS_MANAGEMENT: 'INSPECTIONS_MANAGEMENT'
+	};
+
 	static readonly REASON: any = {
 		SAVED: 'SAVED',
 		UPDATED: 'UPDATED',
