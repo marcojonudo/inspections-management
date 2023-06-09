@@ -31,7 +31,6 @@ export class InspectionHeaderComponent {
 	@Input() adviser: Employee;
 	@Input() mechanics: Employee[];
 
-	today: Dayjs;
 	avoidLegendItems: string[] = [Constants.SELECT_ITEM_OPTION_CODE.NA];
 
 	@HostBinding('class') classes = this.EXIT_INSPECTION;
@@ -49,7 +48,6 @@ export class InspectionHeaderComponent {
 				Constants.SELECT_ITEM_OPTION_CODE.RA, Constants.SELECT_ITEM_OPTION_CODE.RR
 			]
 		};
-		this.today = dayjs();
 	}
 
 	// region Getters / setters
