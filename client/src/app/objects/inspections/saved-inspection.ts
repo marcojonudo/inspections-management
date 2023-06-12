@@ -48,9 +48,9 @@ export class SavedInspection implements RealTimeObject {
 
 	addData(
 		employeeCode: string,
-		origin: string = Constants.ORIGIN.INSPECTIONS_MANAGEMENT,
 		reason: string = Constants.REASON.UPDATED,
-		sendMethod: string = undefined
+		sendMethod: string = undefined,
+		origin: string = Constants.ORIGIN.INSPECTIONS_MANAGEMENT
 	): void {
 		const maxSaved = dayjs(Math.max(...this.data.map(d => d.saved.valueOf())));
 		const now = dayjs();
