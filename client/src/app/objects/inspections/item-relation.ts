@@ -29,7 +29,6 @@ export class ItemRelation {
 	}
 
 	match(newValue: string): boolean {
-		console.log(this.triggerItemCode, this.matchText, this.differentMatchText, this.actionType, this.trigger.match(newValue));
 		return this.trigger.match(newValue);
 	}
 
