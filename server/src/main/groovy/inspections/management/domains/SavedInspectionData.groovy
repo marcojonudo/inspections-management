@@ -33,6 +33,7 @@ class SavedInspectionData implements GormEntity<SavedInspectionData> {
 	static belongsTo = SavedInspection
 
 	static constraints = {
+		origin nullable: true
 		sendMethod nullable: true
 	}
 
