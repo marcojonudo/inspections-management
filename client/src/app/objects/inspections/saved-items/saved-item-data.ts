@@ -17,6 +17,7 @@ export abstract class SavedItemData {
 	protected constructor(employeeCode: string, savedData: any, item: Item) {
 		this.employeeCode = employeeCode;
 		this.itemType = item.type;
+		this.hidden = false;
 		if (savedData) {
 			this.imageId = savedData.imageId;
 			this.filled = savedData.filled ? dayjs(savedData.filled) : undefined;

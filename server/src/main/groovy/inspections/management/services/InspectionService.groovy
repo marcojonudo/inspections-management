@@ -151,7 +151,7 @@ class InspectionService {
 	 * @return Revisión guardada
 	 */
 	SavedInspection saveInspection(SavedInspection savedInspection, Integer orderNumber, String employeeCode) {
-		LOG.info(new Log((Map) [message: Constants.Message.SAVING_INSPECTION, orderNumber: orderNumber, savedInspection: savedInspection]).toString())
+		LOG.info(new Log((Map) [message: Constants.Message.SAVING_INSPECTION, employeeCode: employeeCode, orderNumber: orderNumber, inspectionTypeCode: savedInspection.inspectionTypeCode, vehicle: savedInspection.vehicle]).toString())
 		SavedInspection newSavedInspection = null
 		try {
 			/* En la app de revisiones sólo aparecen revisiones guardadas previamente, por lo que siempre se va a
