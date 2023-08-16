@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, concatMap, filter, finalize, map, mergeMap, tap } from 'rxjs/operators';
-import { forkJoin, from, Observable, of, Subject } from 'rxjs';
+import { catchError, concatMap, filter, map, mergeAll, mergeMap, tap, toArray } from 'rxjs/operators';
+import { combineLatest, forkJoin, from, Observable, of, Subject } from 'rxjs';
 import { LocalStorageService } from './local-storage.service';
 import { OrdersFilter } from '../objects/filters/orders-filter';
 import { TodayOrdersFilter } from '../objects/filters/today-orders-filter';
@@ -42,7 +42,6 @@ import { GroupedItemOptions } from '../objects/inspections/items/grouped-item-op
 import { ItemType } from '../objects/inspections/items/item-type';
 import { SmsDialogComponent } from '../components/sms-dialog/sms-dialog.component';
 import * as dayjs from 'dayjs';
-import { SavedInspectionData } from '../objects/inspections/saved-inspection-data';
 import { Dayjs } from 'dayjs';
 
 @Injectable({
@@ -80,21 +79,8 @@ export class InspectionService {
 		SN: '#d23636',
 		RA: '#3681d2',
 		RR: '#3681d2',
-		NA: '#000'
-	};
-
-	private static readonly ITEM_RELATION_ACTION: any = {
-		HIDE: (targetSavedItem: SavedItem, newValue: string, employeeCode: string) =>
-			targetSavedItem.updateHidden(employeeCode, true),
-		REPLICATE: (targetSavedItem: SavedItem, newValue: string, employeeCode: string) =>
-			targetSavedItem.update(newValue, employeeCode)
-	};
-
-	private static readonly ITEM_RELATION_RESTORE_ACTION: any = {
-		HIDE: (targetSavedItem: SavedItem, newValue: string, employeeCode: string) =>
-			targetSavedItem.updateHidden(employeeCode, false),
-		REPLICATE: (targetSavedItem: SavedItem, newValue: string, employeeCode: string) =>
-			targetSavedItem.update(Constants.SELECT_ITEM_OPTION_CODE.P, employeeCode)
+		NA: '#000',
+		PSI: '#ff6a00'
 	};
 
 	filters: OrdersFilter[];
@@ -151,6 +137,10 @@ export class InspectionService {
 				this.selectItemOptions.push(new SelectItemOption(option.option));
 			}
 		});
+	}
+
+	static buildRelations(relations: any[]): ItemRelation[] {
+		return relations.map(r => new ItemRelation(r));
 	}
 
 	static initOrderInspections(orderInspections: any[]): void {
@@ -365,6 +355,10 @@ export class InspectionService {
 		return listElements;
 	}
 
+	static findSavedItem(code: string, savedInspection: SavedInspection): SavedItem {
+		return savedInspection.items.find(i => i.code === code);
+	}
+
 	static findIconColor(code: string, selectIconColor: { [key: string]: string } = this.SELECT_ICON_COLOR): string {
 		return selectIconColor[code || Constants.SELECT_ITEM_OPTION_CODE.NA];
 	}
@@ -395,7 +389,7 @@ export class InspectionService {
 	}
 
 	static findRelations(itemCode: string, relations: ItemRelation[] = InspectionService.relations): ItemRelation[] {
-		return relations.filter(r => r.itemCode === itemCode);
+		return relations.filter(r => r.triggerItemCode === itemCode);
 	}
 
 	static checkAcceptedBudget(budget: Budget): boolean {
@@ -503,44 +497,53 @@ export class InspectionService {
 		value: string,
 		savedInspection: SavedInspection,
 		employee: Employee = EmployeeService.employee
-	): Observable<ItemRelation> {
+	): void {
 		const relations = this.findRelations(savedItem.code);
 		/* Antes de actualizar el valor, se debe comprobar si hay alguna relación que deshacer. Por ejemplo, al tener
 		 * 'Pastilla de freno' el valor 'No aplica', el espesor está oculto; sin embargo, en cuanto se actualiza el
 		 * valor de la primera, el segundo debe volver a aparecer (se está deshaciendo la relación) */
-		this.updateRelations(
-			savedItem, savedItem.findValue(), relations, this.ITEM_RELATION_RESTORE_ACTION, savedInspection
-		).subscribe();
+		this.handleRelations(value, relations, savedInspection).subscribe();
 		savedItem.findData(employee.code).update(value, employee.code);
-
-		return this.updateRelations(savedItem, savedItem.findValue(), relations, this.ITEM_RELATION_ACTION, savedInspection).pipe(
-			finalize(() => {
-				LocalStorageService.setItem(Constants.LOCAL_STORAGE.SAVED_INSPECTION, savedInspection);
-			})
-		);
+		LocalStorageService.setItem(Constants.LOCAL_STORAGE.SAVED_INSPECTION, savedInspection);
 	}
 
-	static updateRelations(
-		savedItem: SavedItem, value: string, relations: ItemRelation[], actions: any, savedInspection: SavedInspection
-	): Observable<ItemRelation> {
+	static handleRelations(
+		newValue: string, relations: ItemRelation[], savedInspection: SavedInspection, employeeCode: string = EmployeeService.employee.code
+	): Observable<void> {
 		return from(relations).pipe(
-			tap(itemRelation => InspectionService.handleRelation(savedItem, value, itemRelation, actions, savedInspection))
+			filter(r => r.match(newValue)),
+			toArray(),
+			map(r => this.filterPriorityRelations(r)),
+			mergeAll(),
+			mergeMap(r => combineLatest([of(r), of(this.findSavedItem(r.targetItemCode, savedInspection))])),
+			map(([relation, targetSavedItem]) => relation.apply(targetSavedItem, employeeCode))
 		);
 	}
 
-	static handleRelation(
-		savedItem: SavedItem,
-		value: string,
-		itemRelation: ItemRelation,
-		actions: any,
-		savedInspection: SavedInspection,
-		employee: Employee = EmployeeService.employee
-	): void {
-		if (value === itemRelation.matchText) {
-			const targetSavedItem = savedInspection.items.find(i => i.code === itemRelation.targetItemCode);
-			actions[itemRelation.action](targetSavedItem, savedItem.findValue(), employee.code);
-		}
+	static filterPriorityRelations(relations: ItemRelation[]): ItemRelation[] {
+		const groupedTargetItemCodes = Utils.groupBy(relations, r => r.targetItemCode);
+		/* Se obtienen aquellas relaciones cuyo target item es el mismo. Se hace para poder determinar si las acciones
+		 * a llevar a cabo son contradictorias; por ejemplo, el item ENTI actúa sobre FNTI de 2 formas: por un lado,
+		 * si el texto es igual a RA, lo oculta; pero si es distinto a NA, lo muestra. Es necesario establecer un
+		 * sistema de prioridades (teniendo preferencia el texto concreto, con differentMatchText = true) para evitar
+		 * estos casos */
+		const severalActionsGroupedRelations = Object.values(groupedTargetItemCodes)
+			.filter(v => v.length > 1);
+
+		/* Se obtienen las relaciones prioritarias, que son aquellas en las que el texto debe coincidir (frente a
+		 * aquellas en las que debe ser diferente a lo establecido en BD) */
+		const priorityRelations = [].concat(...severalActionsGroupedRelations
+			.map(v => v.filter(rel => !rel.differentMatchText)));
+		/* Si existen relaciones prioritarias, será necesario eliminar las no prioritarias de la lista final. Por tanto
+		 * se obtienen para poder filtrar más adelante */
+		const nonPriorityRelations = [].concat(...severalActionsGroupedRelations.map(v => {
+			return v.filter(rel => rel.differentMatchText);
+		}));
+		return priorityRelations.length
+			? relations.filter(r => nonPriorityRelations.find(rel => rel === r) === undefined)
+			: relations;
 	}
+
 
 	static updateTextItem(
 		savedItem: SavedItem,
@@ -548,6 +551,8 @@ export class InspectionService {
 		savedInspection: SavedInspection,
 		employee: Employee = EmployeeService.employee
 	): void {
+		const relations = this.findRelations(savedItem.code);
+		this.handleRelations(undefined, relations, savedInspection).subscribe();
 		savedItem.update(fields, employee.code);
 		LocalStorageService.setItem(Constants.LOCAL_STORAGE.SAVED_INSPECTION, savedInspection);
 	}
@@ -650,7 +655,7 @@ export class InspectionService {
 		const rel = LocalStorageService.getItem(Constants.LOCAL_STORAGE.RELATIONS);
 		return (rel ? of(rel) : this.http.get(Url.itemRelations())).pipe(
 			tap(relations => {
-				InspectionService.relations = relations.map(r => new ItemRelation(r));
+				InspectionService.relations = InspectionService.buildRelations(relations);
 				LocalStorageService.setItem(Constants.LOCAL_STORAGE.RELATIONS, InspectionService.relations);
 				console.log('Item relations', InspectionService.relations);
 			})

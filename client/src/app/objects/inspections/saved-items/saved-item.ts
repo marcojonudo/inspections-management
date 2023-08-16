@@ -67,7 +67,9 @@ export class SavedItem {
 	}
 
 	updateHidden(employeeCode: string, hidden: boolean): void {
-		this.findData(employeeCode).updateHidden(employeeCode, hidden);
+		if (this.findData().hidden !== hidden) {
+			this.findData(employeeCode).updateHidden(employeeCode, hidden);
+		}
 	}
 
 	update(value: any, employeeCode: string): void {

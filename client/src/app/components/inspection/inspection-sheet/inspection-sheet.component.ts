@@ -133,7 +133,7 @@ export class InspectionSheetComponent {
 		const selectedIndex = this.findOptionIndex(savedItem, options);
 		const newIndex = this.inspectionHandler.findSelectOptionIndex(selectedIndex, options.length);
 
-		InspectionService.updateSelectItem(savedItem, options[newIndex].code, this.savedInspection).subscribe();
+		InspectionService.updateSelectItem(savedItem, options[newIndex].code, this.savedInspection);
 	}
 
 	findOptionIndex(savedItem: SavedItem, options: SelectItemOption[]): number {

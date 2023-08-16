@@ -6,7 +6,6 @@ import groovy.transform.CompileStatic
 class Constants {
 
     static final String SPAIN_TIMEZONE = "Europe/Madrid"
-    static final List<String> CLOSED_ORDER_STATES = ['V', 'X', 'F']
     static final String CANCELED_ORDER_STATE = 'X'
     static final String APPOINTMENT_IDENTIFIER = "C"
     static final int ROW_IMAGES = 4
@@ -51,7 +50,6 @@ class Constants {
         static final String CONVERTING_PDF_IMAGE = "Converting PDF file to image..."
         static final String CONVERTED_PDF_IMAGE = "PDF converted to image!"
         static final String SENT_MAIL = "Mail sent!"
-        static final String SENT_SMS = "SMS sent!"
         static final String FINISHED_SMS_PROCESS = "Finished SMS process!"
         static final String SLACK_WRONG_REQUEST = "Slack wrong request!"
         static final String CALC_POWER_ERROR = "Error calculating vehicle power"
