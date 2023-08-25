@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Constants } from '../utils/constants';
 
 @Injectable({
 	providedIn: 'root'
@@ -15,7 +16,9 @@ export class LocalStorageService {
 	}
 
 	static clear(): void {
+		const version = this.getItem(Constants.LOCAL_STORAGE.VERSION);
 		localStorage.clear();
+		this.setItem(Constants.LOCAL_STORAGE.VERSION, version);
 	}
 
 }
