@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, concatMap, filter, map, mergeAll, mergeMap, tap, toArray } from 'rxjs/operators';
+import { catchError, concatMap, defaultIfEmpty, filter, map, mergeAll, mergeMap, tap, toArray } from 'rxjs/operators';
 import { combineLatest, forkJoin, from, Observable, of, Subject } from 'rxjs';
 import { LocalStorageService } from './local-storage.service';
 import { OrdersFilter } from '../objects/filters/orders-filter';
@@ -43,6 +43,7 @@ import { ItemType } from '../objects/inspections/items/item-type';
 import { SmsDialogComponent } from '../components/sms-dialog/sms-dialog.component';
 import * as dayjs from 'dayjs';
 import { Dayjs } from 'dayjs';
+import { VersionService } from './version.service';
 
 @Injectable({
 	providedIn: 'root'
@@ -90,7 +91,12 @@ export class InspectionService {
 	inspectionsTriggerSubject: Subject<void>;
 	inspectionsTrigger$: Observable<void>;
 
-	constructor(private http: HttpClient, private dialog: MatDialog, private snackBarService: SnackBarService) {
+	constructor(
+		private versionService: VersionService,
+		private http: HttpClient,
+		private dialog: MatDialog,
+		private snackBarService: SnackBarService
+	) {
 		this.filters = [new TodayOrdersFilter()];
 
 		this.selectedOrderInspectionSubject = new Subject<OrderInspection>();
@@ -596,7 +602,15 @@ export class InspectionService {
 	}
 
 	loadMainInfo(filters: OrdersFilter[] = this.filters): Observable<any> {
-		return this.findOrders(filters).pipe(
+		return this.versionService.findNewVersion().pipe(
+			tap(() => {
+				LocalStorageService.clear();
+				window.location.reload();
+			}),
+			defaultIfEmpty(),
+			mergeMap(() => {
+				return this.findOrders(filters);
+			}),
 			mergeMap(orders => {
 				InspectionService.orders = orders;
 				InspectionService.openedOrders = orders.filter(o => Constants.CLOSED_ORDER_STATES.find(s => s === o.state) === undefined);

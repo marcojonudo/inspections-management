@@ -66,4 +66,8 @@ export class Url {
 		return `${environment.serverUrl}/sms?to=${to}&employeeCode=${employeeCode}`;
 	}
 
+	static info(): string {
+		return `${environment.serverUrl}/info`;
+	}
+
 }

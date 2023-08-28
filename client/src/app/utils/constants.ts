@@ -33,7 +33,8 @@ export class Constants {
 		ITEM_VEHICLE_ARTICLE_CODES: 'itemVehicleArticleCodes',
 		CENTRE: 'centre',
 		RELATIONS: 'relations',
-		ITEMS: 'items'
+		ITEMS: 'items',
+		VERSION: 'version'
 	};
 
 	static readonly MESSAGE_CODE: any = {
