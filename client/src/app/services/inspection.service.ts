@@ -805,7 +805,7 @@ export class InspectionService {
 	}
 
 	sendSms(savedInspection: SavedInspection, to: number, employeeCode: string = EmployeeService.employee.code): Observable<any> {
-		this.snackBarService.open(Constants.MESSAGE_CODE.SENDING_SMS, Constants.SNACK_BAR.TYPE.WARNING, 10000);
+		this.snackBarService.open(Constants.MESSAGE_CODE.SENDING_SMS, Constants.SNACK_BAR.TYPE.WARNING, 20000);
 		savedInspection.addData(employeeCode, Constants.REASON.SENT, Constants.SEND_METHOD.SMS);
 		return this.http.post(Url.sms(to, employeeCode), savedInspection).pipe(
 			tap(
