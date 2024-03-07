@@ -124,8 +124,8 @@ assemble:jar:
 build:docker:
     stage: docker
     image: registry.gitlab.com/marco_fv/ci-scripts:docker
-    services:
-        - docker:dind
+    tags:
+        - momo-shell
     dependencies:
         - assemble:jar
         - get-version:hash
