@@ -11,7 +11,7 @@ stages:
     - chmod -R +x $SCRIPTS_DIR
 
 .gradle_template: &gradle_template
-    image: gradle:6.1
+    image: gradle:6.6.1
     tags:
         - intranet
     variables:
@@ -89,7 +89,7 @@ get-version:semantic:merge_request:
 
 build:frontend:
     stage: build
-    image: gradle:6.1
+    image: gradle:6.6.1
     tags:
         - intranet
     script:
